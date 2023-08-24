@@ -1,251 +1,104 @@
 import calUtils, { MonthItem, DayItem } from './calendarUtils';
 import * as React from 'react';
 import Box, { BoxProps } from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { PrecisionManufacturing } from '@mui/icons-material';
+import { blue } from '@mui/material/colors';
 
-const sessions = [
-    {
-        date: "2023-07-27",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
-    },
-    {
-        date: "2023-08-03",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
-    },
-    {
-        date: "2023-08-10",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
-    },
-    {
-        date: "2023-08-17",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
-    },
-    {
-        date: "2023-08-24",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
-    },
-    {
-        date: "2023-08-31",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
-    },
-    {
-        date: "2023-09-07",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
-    },
-    {
-        date: "2023-09-14",
-        subjectCode: "S03",
-        subjectTitle: "Expose website security vulnerabilities",
-        blockCode: "1",
-        crns: [
-            {
-                "crn": "18318",
-                "unitCode": "VU23214",
-                "unitTitle": "Expose website security vulnerabilities"
-            }
-        ],
-        teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
-        },
-        room: "B1.2.05",
-        timeSlots: [
-            "0900-0930",
-            "0930-1000",
-            "1000-1030",
-            "1030-1100",
-            "1100-1130",
-            "1130-1200"
-        ]
+
+const DayItemComponent = ({ dayItem, children }: { dayItem?: DayItem, children?: React.ReactNode }) => {
+    const boxSx = {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        bgcolor: (dayItem && dayItem.sessions) ? 'primary.main' : 'transparent',
+        color: (dayItem && dayItem.sessions) ? 'white' : 'black',
+        p: "3px"
     }
-];
-
-// create days for 2023/07, 2023/08, 2023/09
-const days202307: DayItem[] = calUtils.initMonthDays(2023, 6);
-const days202308: DayItem[] = calUtils.initMonthDays(2023, 7);
-const days202309: DayItem[] = calUtils.initMonthDays(2023, 8);
-
-// act
-// fill days with sessions
-calUtils.fillDaysWithSubject(days202307.concat(days202308).concat(days202309), sessions);
-
-
-
-type SingleMonthComponetProps = MonthItem;
-
-const DayItemComponent = (props: any) => {
     return (
-        <Box>
-            {props.children}
+        <Box
+            sx={boxSx}
+        >
+            <Typography
+                sx={{
+                    fontSize: '0.75rem !important',
+
+                }}
+                component="div"
+            >
+                {children}
+            </Typography>
+
+
         </Box>
     );
 }
-const SingleMonthComponet = () => {
+
+const SingleMonthHeaderComponet = () => {
     return (
         <>
-            <h1>Month component {days202307.length}</h1>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 25px)' }}>
-                {days202307.map((dayItem: DayItem, index: number) => {
-                    return (
-                        <DayItemComponent key={index}>
-                            {Number.isNaN(dayItem.day) ? "" : dayItem.day}
-                        </DayItemComponent>
-                    );
-                })}
+            <DayItemComponent>M</DayItemComponent>
+            <DayItemComponent>T</DayItemComponent>
+            <DayItemComponent>W</DayItemComponent>
+            <DayItemComponent>T</DayItemComponent>
+            <DayItemComponent>F</DayItemComponent>
+            <DayItemComponent>S</DayItemComponent>
+            <DayItemComponent>S</DayItemComponent>
+        </>
+
+    )
+}
+
+const SingleMonthComponet = ({ year, monthIndex, days }: any) => {
+    console.log(blue[200])
+    return (
+        <>
+            <Box sx={{
+                width: '250px',
+                p: '10px 20px',
+            }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        pb: '10px'
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        {new Date(year, monthIndex).toLocaleString('default', { year: "numeric", month: 'long' })}
+                    </Typography>
+                </Box>
+
+
+                <Box sx={{
+                    display: 'grid',
+                    gridGap: '5px',
+                    gridTemplateColumns: 'repeat(7, 25px)',
+                }}>
+                    <SingleMonthHeaderComponet />
+                </Box>
+
+                <Box sx={{
+                    display: 'grid',
+                    gridGap: '5px',
+                    gridTemplateColumns: 'repeat(7, 25px)',
+                }}>
+
+                    {days.map((dayItem: DayItem, index: number) => {
+                        return (
+                            <DayItemComponent key={index} dayItem={dayItem}>
+                                {Number.isNaN(dayItem.day) ? "" : dayItem.day}
+                            </DayItemComponent>
+                        );
+                    })}
+                </Box>
             </Box>
+
         </>
 
     );
@@ -255,16 +108,7 @@ type MultiMonthComponetProps = MonthItem[];
 const MultiMonthComponet = () => {
     return (
         <>
-            <h1>Month component {days202307.length}</h1>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 25px)' }}>
-                {days202307.map((dayItem: DayItem, index: number) => {
-                    return (
-                        <DayItemComponent key={index}>
-                            {Number.isNaN(dayItem.day) ? "" : dayItem.day}
-                        </DayItemComponent>
-                    );
-                })}
-            </Box>
+
         </>
 
     );
