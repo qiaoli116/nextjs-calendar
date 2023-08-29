@@ -1,4 +1,5 @@
 
+
 export type CRN = {
     crn: string,
     unitCode: string,
@@ -18,7 +19,7 @@ export type Session = {
     crns: CRN[],
     teacher: { id: string, name: string },
     room: string,
-    timeSlots: string[],
+    timeslots: string[],
 }
 
 export type DayItem = {

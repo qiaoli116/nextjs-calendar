@@ -10,6 +10,7 @@
     "post-update": "echo \"codesandbox preview only, need an update\" && yarn upgrade --latest",
     "test": "jest",
     "test:ci": "jest --ci",
+    "test:t": "jest -t",
     "test:v": "jest --verbose"
   },
   "dependencies": {

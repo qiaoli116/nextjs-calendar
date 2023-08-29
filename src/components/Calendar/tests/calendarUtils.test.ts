@@ -1,22 +1,22 @@
 import calUtils, { DayItem, Session } from '../calendarUtils';
 
-describe('Calendar.getDayOfWeekForFirstDayOfMonth', () => {
-    it('Calendar.getDayOfWeekForFirstDayOfMonth.TC001 - 2023/08/01 Tue', () => {
+describe('calendarUtils.getDayOfWeekForFirstDayOfMonth', () => {
+    it('calendarUtils.getDayOfWeekForFirstDayOfMonth.TC001 - 2023/08/01 Tue', () => {
         // 2023/08/01 is Tuesday (result is 1)
         // 08 (August) is 7th month (0 - 11)
         expect(calUtils.getDayOfWeekForFirstDayOfMonth(2023, 7)).toEqual(1);
     });
-    it('Calendar.getDayOfWeekForFirstDayOfMonth.TC002 - 2023/09/01 Fri', () => {
+    it('calendarUtils.getDayOfWeekForFirstDayOfMonth.TC002 - 2023/09/01 Fri', () => {
         // 2023/09/01 is Friday (result is 4)
         // 09 (September) is 8th month (0 - 11)
         expect(calUtils.getDayOfWeekForFirstDayOfMonth(2023, 8)).toEqual(4);
     });
-    it('Calendar.getDayOfWeekForFirstDayOfMonth.TC003 - 2023/10/01 Sun', () => {
+    it('calendarUtils.getDayOfWeekForFirstDayOfMonth.TC003 - 2023/10/01 Sun', () => {
         // 2023/10/01 is Sunday (result is 6)
         // 10 (October) is 9th month (0 - 11)
         expect(calUtils.getDayOfWeekForFirstDayOfMonth(2023, 9)).toEqual(6);
     });
-    it('Calendar.getDayOfWeekForFirstDayOfMonth.TC004 - 2023/11/01 Wed', () => {
+    it('calendarUtils.getDayOfWeekForFirstDayOfMonth.TC004 - 2023/11/01 Wed', () => {
         // 2023/11/01 is Wednesday (result is 2)
         // 11 (November) is 10th month (0 - 11)
         expect(calUtils.getDayOfWeekForFirstDayOfMonth(2023, 10)).toEqual(2);
@@ -24,31 +24,31 @@ describe('Calendar.getDayOfWeekForFirstDayOfMonth', () => {
 
 });
 
-describe('Calendar.getNumberOfDaysInMonth', () => {
-    it('Calendar.getNumberOfDaysInMonth.TC001 - 2023/01 31 days', () => {
+describe('calendarUtils.getNumberOfDaysInMonth', () => {
+    it('calendarUtils.getNumberOfDaysInMonth.TC001 - 2023/01 31 days', () => {
         // 2023/08 has 31 days
         // 01 (January) is 0th month (0 - 11)
         expect(calUtils.getNumberOfDaysInMonth(2023, 0)).toEqual(31);
     });
-    it('Calendar.getNumberOfDaysInMonth.TC002 - 2023/02 28 days', () => {
+    it('calendarUtils.getNumberOfDaysInMonth.TC002 - 2023/02 28 days', () => {
         // 2023/02 has 28 days
         // 02 (February) is 1st month (0 - 11)
         expect(calUtils.getNumberOfDaysInMonth(2023, 1)).toEqual(28);
     });
-    it('Calendar.getNumberOfDaysInMonth.TC003 - 2023/08 31 days', () => {
+    it('calendarUtils.getNumberOfDaysInMonth.TC003 - 2023/08 31 days', () => {
         // 2023/08 has 31 days
         // 08 (August) is 7th month (0 - 11)
         expect(calUtils.getNumberOfDaysInMonth(2023, 7)).toEqual(31);
     });
-    it('Calendar.getNumberOfDaysInMonth.TC004 - 2024/02 29 days', () => {
+    it('calendarUtils.getNumberOfDaysInMonth.TC004 - 2024/02 29 days', () => {
         // 2024/02 has 29 days
         // 02 (February) is 1st month (0 - 11)
         expect(calUtils.getNumberOfDaysInMonth(2024, 1)).toEqual(29);
     });
 });
 
-describe('Calendar.initMonthDays', () => {
-    it('Calendar.initMonthDays.TC001 - 2023/08', () => {
+describe('calendarUtils.initMonthDays', () => {
+    it('calendarUtils.initMonthDays.TC001 - 2023/08', () => {
         // 2023/08 has 31 days and 1st is Tuesday (1)
         // 08 (August) is 7th month (0 - 11)
         let days: DayItem[] = calUtils.initMonthDays(2023, 7);
@@ -57,7 +57,7 @@ describe('Calendar.initMonthDays', () => {
         expect(days[1].day).toEqual(1);
         expect(days[31 + 1 - 1].day).toEqual(31);
     });
-    it('Calendar.initMonthDays.TC002 - 2023/09', () => {
+    it('calendarUtils.initMonthDays.TC002 - 2023/09', () => {
         // 2023/09 has 30 days and 1st is Friday (4)
         // 09 (Sepetember) is 8th month (0 - 11)
         let days: DayItem[] = calUtils.initMonthDays(2023, 8);
@@ -69,7 +69,7 @@ describe('Calendar.initMonthDays', () => {
         expect(days[4].day).toEqual(1);
         expect(days[30 + 4 - 1].day).toEqual(30);
     });
-    it('Calendar.initMonthDays.TC003 - 2023/10', () => {
+    it('calendarUtils.initMonthDays.TC003 - 2023/10', () => {
         // 2023/10 has 31 days and 1st  is Sunday (result is 6)
         // 10 (October) is 9th month (0 - 11)
         let days: DayItem[] = calUtils.initMonthDays(2023, 9);
@@ -83,7 +83,7 @@ describe('Calendar.initMonthDays', () => {
         expect(days[6].day).toEqual(1);
         expect(days[31 + 6 - 1].day).toEqual(31);
     });
-    it('Calendar.initMonthDays.TC004 - 2023/11', () => {
+    it('calendarUtils.initMonthDays.TC004 - 2023/11', () => {
         // 2023/11 has 30 days and 1st is Wednesday (result is 2)
         // 11 (November) is 10th month (0 - 11)
         let days: DayItem[] = calUtils.initMonthDays(2023, 10);
@@ -93,7 +93,7 @@ describe('Calendar.initMonthDays', () => {
         expect(days[2].day).toEqual(1);
         expect(days[30 + 2 - 1].day).toEqual(30);
     });
-    it('Calendar.initMonthDays.TC005 - 2024/01', () => {
+    it('calendarUtils.initMonthDays.TC005 - 2024/01', () => {
         // 2024/01 has 31 days and 1st is Monday (result is 0)
         // 01 (Janurary) is 0th month (0 - 11)
         let days: DayItem[] = calUtils.initMonthDays(2024, 0);
@@ -103,8 +103,8 @@ describe('Calendar.initMonthDays', () => {
     });
 });
 
-describe('Calendar.fillDaysWithSubject', () => {
-    it('Calendar.fillDaysWithSubject.TC001 - 2023/08 with sample sessions', () => {
+describe('calendarUtils.fillDaysWithSubject', () => {
+    it('calendarUtils.fillDaysWithSubject.TC001 - 2023/08 with sample sessions', () => {
 
         // arrange
         let sessions: Session[] = [
@@ -125,7 +125,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",
@@ -151,7 +151,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",
@@ -177,7 +177,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",
@@ -203,7 +203,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",
@@ -229,7 +229,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",
@@ -255,7 +255,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",
@@ -281,7 +281,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",
@@ -307,7 +307,7 @@ describe('Calendar.fillDaysWithSubject', () => {
                     "name": "Qiao Li"
                 },
                 room: "B1.2.05",
-                timeSlots: [
+                timeslots: [
                     "0900-0930",
                     "0930-1000",
                     "1000-1030",

@@ -30,7 +30,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",
@@ -56,7 +56,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",
@@ -82,7 +82,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",
@@ -108,7 +108,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",
@@ -134,7 +134,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",
@@ -160,7 +160,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",
@@ -186,7 +186,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",
@@ -212,7 +212,7 @@ const sessions = [
             "name": "Qiao Li"
         },
         room: "B1.2.05",
-        timeSlots: [
+        timeslots: [
             "0900-0930",
             "0930-1000",
             "1000-1030",

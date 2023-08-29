@@ -4,53 +4,142 @@ import Box, { BoxProps } from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { PrecisionManufacturing } from '@mui/icons-material';
 import { blue } from '@mui/material/colors';
+import Button from '@mui/material/Button';
+import Popover from '@mui/material/Popover';
+import { timeslotOfDay } from './timeslotUtils';
 
+const SessionTimeSlotComponent = ({ timeslots }: { timeslots: string[] }) => {
+    return (
+        <>
+            {timeslotOfDay.map((timeslot: string, index: number) => {
+                return (
+                    <Box key={index}>
 
-const DayItemComponent = ({ dayItem, children }: { dayItem?: DayItem, children?: React.ReactNode }) => {
-    const boxSx = {
+                        <Typography
+                            sx={{
+                                color: (timeslots.indexOf(timeslot) >= 0) ? blue[500] : "inherit"
+                            }}
+                        >
+                            {timeslot}
+                        </Typography>
+                    </Box>
+                )
+            })}
+        </>
+    )
+}
+
+const DayItemComponent = ({ dayItem, isHeader, children }: { dayItem?: DayItem, isHeader?: boolean, children?: React.ReactNode }) => {
+    console.log(dayItem, isHeader, children)
+    let boxSx: any = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        bgcolor: (dayItem && dayItem.sessions) ? 'primary.main' : 'transparent',
-        color: (dayItem && dayItem.sessions) ? 'white' : 'black',
-        p: "3px"
+
+        p: "3px",
+        borderRadius: "4px",
+
+    };
+    const hasSession = dayItem && dayItem.sessions;
+    if (isHeader || !hasSession) {
+        boxSx['cursor'] = 'default';
+        return (
+            <Box
+                sx={boxSx}
+            >
+                <Typography
+                    sx={{
+                        fontSize: '0.75rem !important',
+                    }}
+                    component="div"
+                >
+                    {children}
+                </Typography>
+
+            </Box>
+        )
+    }
+
+    // not header && has session
+    boxSx['cursor'] = 'pointer';
+    boxSx['&:hover'] = {
+        bgcolor: blue[100]
+    };
+    boxSx['bgcolor'] = 'primary.main';
+    boxSx['color'] = 'white';
+
+    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+    const open = Boolean(anchorEl);
+    const id = open ? dayItem.date : undefined;
+    let allTimeslots: string[] = [];
+    // check if dayItem.sessions is array
+    if (Array.isArray(dayItem.sessions)) {
+        dayItem.sessions.forEach((session) => {
+            allTimeslots = allTimeslots.concat(session.timeslots);
+        });
     }
     return (
-        <Box
-            sx={boxSx}
-        >
-            <Typography
-                sx={{
-                    fontSize: '0.75rem !important',
-
-                }}
-                component="div"
+        < >
+            <Box
+                onClick={handleClick}
+                sx={boxSx}
             >
-                {children}
-            </Typography>
+                <Typography
+                    sx={{
+                        fontSize: '0.75rem !important',
+                    }}
+                    component="div"
+                >
+                    {children}
+                </Typography>
 
 
-        </Box>
+            </Box>
+            <Popover
+                id={id}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Typography sx={{ p: 2 }}>
+                    <SessionTimeSlotComponent
+                        timeslots={allTimeslots}
+                    />
+                </Typography>
+            </Popover>
+        </>
+
     );
 }
 
 const SingleMonthHeaderComponet = () => {
     return (
         <>
-            <DayItemComponent>M</DayItemComponent>
-            <DayItemComponent>T</DayItemComponent>
-            <DayItemComponent>W</DayItemComponent>
-            <DayItemComponent>T</DayItemComponent>
-            <DayItemComponent>F</DayItemComponent>
-            <DayItemComponent>S</DayItemComponent>
-            <DayItemComponent>S</DayItemComponent>
+            <DayItemComponent isHeader>M</DayItemComponent>
+            <DayItemComponent isHeader>T</DayItemComponent>
+            <DayItemComponent isHeader>W</DayItemComponent>
+            <DayItemComponent isHeader>T</DayItemComponent>
+            <DayItemComponent isHeader>F</DayItemComponent>
+            <DayItemComponent isHeader>S</DayItemComponent>
+            <DayItemComponent isHeader>S</DayItemComponent>
         </>
 
     )
 }
 
 const SingleMonthComponet = ({ year, monthIndex, days }: any) => {
-    console.log(blue[200])
+
     return (
         <>
             <Box sx={{
@@ -74,11 +163,12 @@ const SingleMonthComponet = ({ year, monthIndex, days }: any) => {
                     </Typography>
                 </Box>
 
-
                 <Box sx={{
                     display: 'grid',
                     gridGap: '5px',
                     gridTemplateColumns: 'repeat(7, 25px)',
+                    backgroundColor: blue[100],
+                    mb: "3px"
                 }}>
                     <SingleMonthHeaderComponet />
                 </Box>
