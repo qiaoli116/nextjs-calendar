@@ -1,4 +1,4 @@
-import calUtils, { MonthItem, DayItem } from './calendarUtils';
+import calUtils, { MonthItem, DayItem, Session } from './calendarUtils';
 import * as React from 'react';
 import Box, { BoxProps } from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -7,35 +7,19 @@ import { blue } from '@mui/material/colors';
 import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
 import { timeslotOfDay } from './timeslotUtils';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Chip from '@mui/material/Chip';
 
-const SessionTimeSlotComponent = ({ timeslots }: { timeslots: string[] }) => {
-    return (
-        <>
-            {timeslotOfDay.map((timeslot: string, index: number) => {
-                return (
-                    <Box key={index}>
-
-                        <Typography
-                            sx={{
-                                color: (timeslots.indexOf(timeslot) >= 0) ? blue[500] : "inherit"
-                            }}
-                        >
-                            {timeslot}
-                        </Typography>
-                    </Box>
-                )
-            })}
-        </>
-    )
-}
 
 const DayItemComponent = ({ dayItem, isHeader, children }: { dayItem?: DayItem, isHeader?: boolean, children?: React.ReactNode }) => {
-    console.log(dayItem, isHeader, children)
+    // console.log(dayItem, isHeader, children)
     let boxSx: any = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-
         p: "3px",
         borderRadius: "4px",
 
@@ -43,54 +27,19 @@ const DayItemComponent = ({ dayItem, isHeader, children }: { dayItem?: DayItem, 
     const hasSession = dayItem && dayItem.sessions;
     if (isHeader || !hasSession) {
         boxSx['cursor'] = 'default';
-        return (
-            <Box
-                sx={boxSx}
-            >
-                <Typography
-                    sx={{
-                        fontSize: '0.75rem !important',
-                    }}
-                    component="div"
-                >
-                    {children}
-                </Typography>
-
-            </Box>
-        )
+    }
+    else {
+        boxSx['cursor'] = 'pointer';
+        boxSx['&:hover'] = {
+            bgcolor: blue[100]
+        };
+        boxSx['bgcolor'] = 'primary.main';
+        boxSx['color'] = 'white';
     }
 
-    // not header && has session
-    boxSx['cursor'] = 'pointer';
-    boxSx['&:hover'] = {
-        bgcolor: blue[100]
-    };
-    boxSx['bgcolor'] = 'primary.main';
-    boxSx['color'] = 'white';
-
-    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-    const open = Boolean(anchorEl);
-    const id = open ? dayItem.date : undefined;
-    let allTimeslots: string[] = [];
-    // check if dayItem.sessions is array
-    if (Array.isArray(dayItem.sessions)) {
-        dayItem.sessions.forEach((session) => {
-            allTimeslots = allTimeslots.concat(session.timeslots);
-        });
-    }
     return (
         < >
-            <Box
-                onClick={handleClick}
-                sx={boxSx}
-            >
+            <Box sx={boxSx}>
                 <Typography
                     sx={{
                         fontSize: '0.75rem !important',
@@ -99,40 +48,23 @@ const DayItemComponent = ({ dayItem, isHeader, children }: { dayItem?: DayItem, 
                 >
                     {children}
                 </Typography>
-
-
             </Box>
-            <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-            >
-                <Typography sx={{ p: 2 }}>
-                    <SessionTimeSlotComponent
-                        timeslots={allTimeslots}
-                    />
-                </Typography>
-            </Popover>
         </>
 
     );
 }
 
 const SingleMonthHeaderComponet = () => {
+    const weekDayLables = ["M", "T", "W", "T", "F", "S", "S"]
     return (
         <>
-            <DayItemComponent isHeader>M</DayItemComponent>
-            <DayItemComponent isHeader>T</DayItemComponent>
-            <DayItemComponent isHeader>W</DayItemComponent>
-            <DayItemComponent isHeader>T</DayItemComponent>
-            <DayItemComponent isHeader>F</DayItemComponent>
-            <DayItemComponent isHeader>S</DayItemComponent>
-            <DayItemComponent isHeader>S</DayItemComponent>
+            {weekDayLables.map((label, index) => {
+                return (
+                    <DayItemComponent isHeader key={index}>
+                        {label}
+                    </DayItemComponent>
+                );
+            })}
         </>
 
     )
@@ -204,6 +136,110 @@ const MultiMonthComponet = () => {
     );
 }
 
+const SingleSessionComponet = ({ session }: { session?: Session }) => {
+    return (
+        <>
+            <Box>
+                <Typography></Typography>
+            </Box>
+        </>
+
+    );
+}
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
+
+const SingleDayComponet = ({ dateString, sessions }: { dateString?: string, sessions?: Session[] }) => {
+
+    // build the set of teacher and room to create filters
+    let teacherIdList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.teacher ? session.teacher.id : ""));
+    let roomList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.room ? session.room : ""));
+    let teacherMapping: any = {};
+    if (sessions !== undefined) {
+        sessions.forEach((session) => {
+            if (session.teacher !== null) {
+                teacherMapping[session.teacher.id] = session.teacher.name;
+            }
+        });
+    }
+    console.log(teacherIdList);
+    const [personName, setPersonName] = React.useState<string[]>([]);
+
+    const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+        const {
+            target: { value },
+        } = event;
+        setPersonName(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
+    return (
+        <>
+            <Box width={{ xs: "100px", sm: "300px", md: "500px" }} bgcolor={blue[200]}>
+                content
+            </Box>
+            {teacherIdList && (
+                <FormControl sx={{ m: 1, width: 300, mt: 3 }}>
+                    <Select
+                        labelId="demo-multiple-chip-label"
+                        id="demo-multiple-chip"
+                        multiple
+                        value={personName}
+                        onChange={handleChange}
+                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                        renderValue={(selected) => (
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {selected.map((value) => (
+                                    <Chip key={value} label={value} />
+                                ))}
+                            </Box>
+                        )}
+                        MenuProps={MenuProps}
+                    >
+                        <MenuItem disabled value="">
+                            <em>Placeholder</em>
+                        </MenuItem>
+                        {teacherIdList.map((teacherId) => (
+                            <MenuItem
+                                key={teacherId}
+                                value={teacherMapping[teacherId]}
+                            >
+                                {teacherId + " - " + teacherMapping[teacherId]}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            )}
+
+
+            <Box sx={{
+                width: {
+                    xs: 100,
+                    sm: 300,
+                    md: 500,
+                },
+                bgcolor: blue[200],
+            }}>
+                asfasdf
+            </Box>
+        </>
+
+
+    );
+}
+
 export {
-    SingleMonthComponet
+    SingleMonthComponet,
+    SingleDayComponet
 };

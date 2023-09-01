@@ -103,8 +103,8 @@ describe('calendarUtils.initMonthDays', () => {
     });
 });
 
-describe('calendarUtils.fillDaysWithSubject', () => {
-    it('calendarUtils.fillDaysWithSubject.TC001 - 2023/08 with sample sessions', () => {
+describe('calendarUtils.fillDaysWithSessions', () => {
+    it('calendarUtils.fillDaysWithSessions.TC001 - 2023/08 with sample sessions', () => {
 
         // arrange
         let sessions: Session[] = [
@@ -325,7 +325,7 @@ describe('calendarUtils.fillDaysWithSubject', () => {
 
         // act
         // fill days with sessions
-        calUtils.fillDaysWithSubject(days202307.concat(days202308).concat(days202309), sessions);
+        calUtils.fillDaysWithSessions(days202307.concat(days202308).concat(days202309), sessions);
 
         // asserts
         expect(days202307.length).toEqual(31 + 5);
@@ -353,4 +353,243 @@ describe('calendarUtils.fillDaysWithSubject', () => {
     });
 
 
+
+});
+
+describe('calendarUtils.buildSetFromSessions', () => {
+    it("calendarUtils.fillDaysWithSessions.TC001 - build teacher id set", () => {
+        const sessions = [
+            {
+                date: "2023-07-27",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18318",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: {
+                    id: "1001111111",
+                    name: "Qiao Li 1"
+                },
+                room: "B1.2.05",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18318",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: {
+                    id: "1001111112",
+                    name: "Qiao Li 2"
+                },
+                room: "B1.2.05",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18318",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: {
+                    id: "1001111112",
+                    name: "Qiao Li 2"
+                },
+                room: "B1.2.05",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18318",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: {
+                    id: "1001111113",
+                    name: "Qiao Li 3"
+                },
+                room: "B1.2.05",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18318",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: {
+                    id: "",
+                    name: ""
+                },
+                room: "B1.2.05",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18318",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: {
+                    id: "",
+                    name: ""
+                },
+                room: "B1.2.05",
+                timeslots: [
+                    "0900-0930",
+                ]
+            }
+
+        ];
+        const set = calUtils.buildSetFromSessions(sessions, (session) => session.teacher ? session.teacher.id : "");
+        expect(set.size).toEqual(4);
+        expect(set.has("1001111111")).toEqual(true);
+        expect(set.has("1001111112")).toEqual(true);
+        expect(set.has("1001111113")).toEqual(true);
+        expect(set.has("")).toEqual(true);
+
+        const array = Array.from(set);
+        expect(array.length).toEqual(4);
+        // check if array contains all elements
+        expect(array).toContain("1001111111");
+        expect(array).toContain("1001111112");
+        expect(array).toContain("1001111113");
+        expect(array).toContain("");
+
+
+    });
+    it("calendarUtils.fillDaysWithSessions.TC002 - build room set", () => {
+        const sessions = [
+            {
+                date: "2023-07-27",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18318",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: null,
+                room: "B1.2.05",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18319",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: null,
+                room: "B1.2.06",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18319",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: null,
+                room: "",
+                timeslots: [
+                    "0900-0930",
+                ]
+            },
+            {
+                date: "2023-08-03",
+                subjectCode: "S03",
+                subjectTitle: "Expose website security vulnerabilities",
+                blockCode: "1",
+                crns: [
+                    {
+                        crn: "18319",
+                        unitCode: "VU23214",
+                        unitTitle: "Expose website security vulnerabilities"
+                    }
+                ],
+                teacher: null,
+                room: null,
+                timeslots: [
+                    "0900-0930",
+                ]
+            }
+        ];
+        const set = calUtils.buildSetFromSessions(sessions, (session) => session.room ? session.room : "");
+        expect(set.size).toEqual(3);
+        expect(set.has("B1.2.05")).toEqual(true);
+        expect(set.has("B1.2.06")).toEqual(true);
+        expect(set.has("")).toEqual(true);
+
+        const array = Array.from(set);
+        expect(array.length).toEqual(3);
+        // check if array contains all elements
+        expect(array).toContain("B1.2.05");
+        expect(array).toContain("B1.2.06");
+        expect(array).toContain("");
+    });
 });

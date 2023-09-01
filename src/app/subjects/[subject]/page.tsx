@@ -8,7 +8,7 @@ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { SingleMonthComponet } from '../../../components/Calendar/calendar';
+import { SingleMonthComponet, SingleDayComponet } from '../../../components/Calendar/calendar';
 
 import calUtils, { MonthItem, DayItem } from '../../../components/Calendar/calendarUtils';
 
@@ -26,8 +26,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "1001111111",
+            "name": "Qiao Li 1"
         },
         room: "B1.2.05",
         timeslots: [
@@ -52,8 +52,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "1002222222",
+            "name": "Qiao Li 2"
         },
         room: "B1.2.05",
         timeslots: [
@@ -78,8 +78,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "1001111111",
+            "name": "Qiao Li 1"
         },
         room: "B1.2.05",
         timeslots: [
@@ -104,8 +104,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "1003333333",
+            "name": "Qiao Li 3"
         },
         room: "B1.2.05",
         timeslots: [
@@ -130,8 +130,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "1001111111",
+            "name": "Qiao Li 1"
         },
         room: "B1.2.05",
         timeslots: [
@@ -156,8 +156,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "1002222222",
+            "name": "Qiao Li 2"
         },
         room: "B1.2.05",
         timeslots: [
@@ -182,8 +182,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "1004444444",
+            "name": "Qiao Li 4"
         },
         room: "B1.2.05",
         timeslots: [
@@ -208,8 +208,8 @@ const sessions = [
             }
         ],
         teacher: {
-            "id": "1001234567",
-            "name": "Qiao Li"
+            "id": "",
+            "name": ""
         },
         room: "B1.2.05",
         timeslots: [
@@ -230,14 +230,15 @@ const days202309: DayItem[] = calUtils.initMonthDays(2023, 8);
 
 // act
 // fill days with sessions
-calUtils.fillDaysWithSubject(days202307.concat(days202308).concat(days202309), sessions);
+calUtils.fillDaysWithSessions(days202307.concat(days202308).concat(days202309), sessions);
 
 export default function SubjectSinglePage({ params }: { params: { subject: string } }) {
     const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-17'));
 
     return (
         <>
-            <p>something</p>
+            <Box><Typography variant='lable' sx={{ pl: "5px" }}>CRN</Typography><Typography variant='value'>12345</Typography></Box>
+            <SingleDayComponet sessions={sessions} />
             <SingleMonthComponet year={2023} monthIndex={6} days={days202307} />
             <SingleMonthComponet year={2023} monthIndex={7} days={days202308} />
             <SingleMonthComponet year={2023} monthIndex={8} days={days202309} />

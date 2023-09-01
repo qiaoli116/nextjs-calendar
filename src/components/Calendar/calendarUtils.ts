@@ -17,8 +17,8 @@ export type Session = {
     subjectTitle: string,
     blockCode: string,
     crns: CRN[],
-    teacher: { id: string, name: string },
-    room: string,
+    teacher: { id: string, name: string } | null,
+    room: string | null,
     timeslots: string[],
 }
 
@@ -32,6 +32,16 @@ export type MonthItem = {
     year: number,
     monthIndex: number, // 0 - 11
     days: DayItem[]
+}
+
+type getSessionObjectValueCallBack = (session: Session) => string;
+const buildSetFromSessions = (sessions: Session[], getSessionObjectValue: getSessionObjectValueCallBack): Set<string> => {
+    const set = new Set<string>();
+    sessions.forEach(session => {
+        const value: string = getSessionObjectValue(session);
+        set.add(value);
+    });
+    return set;
 }
 
 // calculate week day of first day of month
@@ -81,7 +91,7 @@ const initMonthDays = (year: number, monthIndex: number): DayItem[] => {
     return days;
 }
 
-const fillDaysWithSubject = (days: DayItem[], sessions: Session[]): void => {
+const fillDaysWithSessions = (days: DayItem[], sessions: Session[]): void => {
     for (let i = 0; i < days.length; i++) {
         const dayItem = days[i];
         const date = dayItem.date;
@@ -98,7 +108,8 @@ const calendarUtilities = {
     getDayOfWeekForFirstDayOfMonth,
     getNumberOfDaysInMonth,
     initMonthDays,
-    fillDaysWithSubject
+    fillDaysWithSessions,
+    buildSetFromSessions
 }
 
 export default calendarUtilities;
