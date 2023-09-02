@@ -12,6 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
+import InputLabel from '@mui/material/InputLabel';
 
 
 const DayItemComponent = ({ dayItem, isHeader, children }: { dayItem?: DayItem, isHeader?: boolean, children?: React.ReactNode }) => {
@@ -158,11 +159,73 @@ const MenuProps = {
     },
 };
 
+// sometimes we want to display different text in the menu item and the chip, instead of using value of the multi select
+// for example, teacher id is used as value, but we want to display teacher name in the menu item and chip
+// thus we need to pass in a callback to get the text for menu item and chip
+// and if we don't pass in the callback, we will just use the value as the text
+type getMenuItemTextCallback = (item: string) => string;
+type getChipTextCallback = (item: string) => string;
+const MultiSelectComponet = ({ items, getMenuItemText, getChipText, selectValue, setSelectValue, label }: {
+    items: string[],
+    getMenuItemText?: getMenuItemTextCallback,
+    getChipText?: getChipTextCallback
+    selectValue: string[],
+    setSelectValue: React.Dispatch<React.SetStateAction<string[]>>,
+    label: string
+}) => {
+    const handleChange = (event: SelectChangeEvent<typeof selectValue>) => {
+        const {
+            target: { value },
+        } = event;
+        console.log("value:", value);
+        setSelectValue(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+    return (
+        <FormControl sx={{ m: 1, width: 300, mt: 3 }}>
+            <InputLabel id={label + "-multiple-chip-label"}>{label}</InputLabel>
+            <Select
+                labelId={label + "-multiple-chip-label"}
+                id={label + "-multiple-chip"}
+                multiple
+                value={selectValue}
+                onChange={handleChange}
+                input={<OutlinedInput id="select-multiple-chip" label={label} />}
+                renderValue={(selected: string[]) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value: any) => (
+                            <Chip key={value} label={getChipText ? getChipText(value) : value} />
+                        ))}
+                    </Box>
+                )}
+                MenuProps={MenuProps}
+            >
+                {items.map((item) => (
+                    <MenuItem
+                        key={item}
+                        value={item}
+                        sx={{
+                            fontSize: "0.75rem"
+                        }}
+                    >
+                        {getMenuItemText ? getMenuItemText(item) : item}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl >
+    );
+}
+
 const SingleDayComponet = ({ dateString, sessions }: { dateString?: string, sessions?: Session[] }) => {
 
-    // build the set of teacher and room to create filters
+    // build the list of teacher and room to create filters
     let teacherIdList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.teacher ? session.teacher.id : ""));
     let roomList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.room ? session.room : ""));
+    let dateList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.date));
+
+    // build the mapping from teacher id to teacher name
     let teacherMapping: any = {};
     if (sessions !== undefined) {
         sessions.forEach((session) => {
@@ -171,56 +234,34 @@ const SingleDayComponet = ({ dateString, sessions }: { dateString?: string, sess
             }
         });
     }
-    console.log(teacherIdList);
-    const [personName, setPersonName] = React.useState<string[]>([]);
 
-    const handleChange = (event: SelectChangeEvent<typeof personName>) => {
-        const {
-            target: { value },
-        } = event;
-        setPersonName(
-            // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
-    };
+    // used for filtering states
+    const [teachers, setTeachers] = React.useState<string[]>(teacherIdList === null ? [] : teacherIdList);
+    const [rooms, setRooms] = React.useState<string[]>(roomList === null ? [] : roomList);
+
 
     return (
         <>
+            {teacherIdList && (<MultiSelectComponet
+                items={teacherIdList}
+                getMenuItemText={(teacherId) => teacherId + " - " + teacherMapping[teacherId]}
+                getChipText={(teacherId) => teacherMapping[teacherId]}
+                selectValue={teachers}
+                setSelectValue={setTeachers}
+                label="Teacher"
+            />)}
+            {roomList && (<MultiSelectComponet
+                items={roomList}
+                selectValue={rooms}
+                setSelectValue={setRooms}
+                label="Room"
+            />)}
+            <Box>
+                <Typography></Typography>
+            </Box>
             <Box width={{ xs: "100px", sm: "300px", md: "500px" }} bgcolor={blue[200]}>
                 content
             </Box>
-            {teacherIdList && (
-                <FormControl sx={{ m: 1, width: 300, mt: 3 }}>
-                    <Select
-                        labelId="demo-multiple-chip-label"
-                        id="demo-multiple-chip"
-                        multiple
-                        value={personName}
-                        onChange={handleChange}
-                        input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                        renderValue={(selected) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {selected.map((value) => (
-                                    <Chip key={value} label={value} />
-                                ))}
-                            </Box>
-                        )}
-                        MenuProps={MenuProps}
-                    >
-                        <MenuItem disabled value="">
-                            <em>Placeholder</em>
-                        </MenuItem>
-                        {teacherIdList.map((teacherId) => (
-                            <MenuItem
-                                key={teacherId}
-                                value={teacherMapping[teacherId]}
-                            >
-                                {teacherId + " - " + teacherMapping[teacherId]}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            )}
 
 
             <Box sx={{

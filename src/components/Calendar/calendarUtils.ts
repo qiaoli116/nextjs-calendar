@@ -34,8 +34,8 @@ export type MonthItem = {
     days: DayItem[]
 }
 
-type getSessionObjectValueCallBack = (session: Session) => string;
-const buildSetFromSessions = (sessions: Session[], getSessionObjectValue: getSessionObjectValueCallBack): Set<string> => {
+type getSessionObjectValueCallback = (session: Session) => string;
+const buildSetFromSessions = (sessions: Session[], getSessionObjectValue: getSessionObjectValueCallback): Set<string> => {
     const set = new Set<string>();
     sessions.forEach(session => {
         const value: string = getSessionObjectValue(session);
