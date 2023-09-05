@@ -148,16 +148,63 @@ const SingleSessionComponet = ({ session }: { session?: Session }) => {
     );
 }
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-};
+
+
+const MultiSelectNativeComponet = ({ items, selectValue, setSelectValue, label }: {
+    items: { value: string, text: string }[],
+    selectValue: string[],
+    setSelectValue: React.Dispatch<React.SetStateAction<string[]>>,
+    label: string
+}) => {
+    const handleChangeMultiple = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const { options } = event.target;
+        const value: string[] = [];
+        for (let i = 0, l = options.length; i < l; i += 1) {
+            if (options[i].selected) {
+                value.push(options[i].value);
+            }
+        }
+        setSelectValue(value);
+    };
+
+    return (
+        <div>
+            <FormControl sx={{ m: 1 }}>
+                <InputLabel shrink htmlFor={label + "_select-multiple-native"}>
+                    {label}
+                </InputLabel>
+                <Select
+                    sx={{
+                        "& select": {
+                            overflow: "hidden",
+                            pt: "14px",
+                            pb: "14px",
+                            pl: "14px",
+                            pr: "16px !important",
+                        }
+                    }}
+                    multiple
+                    native
+                    value={selectValue}
+                    // @ts-ignore Typings are not considering `native`
+                    onChange={handleChangeMultiple}
+                    label="Native"
+                    inputProps={{
+                        id: label + "_select-multiple-native",
+                        size: items.length,
+                    }}
+                >
+                    {items.map((item) => (
+                        <option key={item.value} value={item.value}>
+                            {item.text}
+                        </option>
+                    ))}
+                </Select>
+            </FormControl>
+        </div>
+    );
+}
+
 
 // sometimes we want to display different text in the menu item and the chip, instead of using value of the multi select
 // for example, teacher id is used as value, but we want to display teacher name in the menu item and chip
@@ -165,7 +212,7 @@ const MenuProps = {
 // and if we don't pass in the callback, we will just use the value as the text
 type getMenuItemTextCallback = (item: string) => string;
 type getChipTextCallback = (item: string) => string;
-const MultiSelectComponet = ({ items, getMenuItemText, getChipText, selectValue, setSelectValue, label }: {
+const MultiSelectChipComponet = ({ items, getMenuItemText, getChipText, selectValue, setSelectValue, label }: {
     items: string[],
     getMenuItemText?: getMenuItemTextCallback,
     getChipText?: getChipTextCallback
@@ -173,6 +220,16 @@ const MultiSelectComponet = ({ items, getMenuItemText, getChipText, selectValue,
     setSelectValue: React.Dispatch<React.SetStateAction<string[]>>,
     label: string
 }) => {
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+                width: 250,
+            },
+        },
+    };
     const handleChange = (event: SelectChangeEvent<typeof selectValue>) => {
         const {
             target: { value },
@@ -218,12 +275,67 @@ const MultiSelectComponet = ({ items, getMenuItemText, getChipText, selectValue,
     );
 }
 
+const FilterComponet = ({ sessions }: { sessions: Session[] }) => {
+    let teacherIdList: string[] = Array.from(calUtils.buildSetFromSessions(sessions, (session) => {
+        console.log(session.teacher);
+        return session.teacher ? session.teacher.id : "1000000000";
+    }));
+    let roomList: string[] = Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.room ? session.room : "B0.0.0"));
+    let subjectList: string[] = Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.subjectCode));
+    console.log("teacherIdList", teacherIdList);
+    // build the mapping from teacher id to teacher name
+    let teacherMapping: any = {};
+    if (sessions !== undefined) {
+        sessions.forEach((session) => {
+            if (session.teacher !== null) {
+                teacherMapping[session.teacher.id] = session.teacher.name;
+            }
+        });
+    }
+
+    // build the mapping from subject code to subject title
+    let subjectMapping: any = {};
+    if (sessions !== undefined) {
+        sessions.forEach((session) => {
+            if (session.subjectCode !== null) {
+                subjectMapping[session.subjectCode] = session.subjectTitle;
+            }
+        });
+    }
+
+    // used for filtering states
+    const [teachers, setTeachers] = React.useState<string[]>(teacherIdList);
+    const [rooms, setRooms] = React.useState<string[]>(roomList);
+    const [subjects, setSubjects] = React.useState<string[]>(subjectList);
+    return (
+        <>
+            <MultiSelectNativeComponet
+                items={teacherIdList.map((teacherId) => { return { value: teacherId, text: teacherMapping[teacherId] } })}
+                selectValue={teachers}
+                setSelectValue={setTeachers}
+                label="Teachers"
+            />
+            <MultiSelectNativeComponet
+                items={roomList.map((room) => { return { value: room, text: room } })}
+                selectValue={rooms}
+                setSelectValue={setRooms}
+                label="Rooms"
+            />
+            <MultiSelectNativeComponet
+                items={subjectList.map((subjectCode) => { return { value: subjectCode, text: subjectMapping[subjectCode] } })}
+                selectValue={subjects}
+                setSelectValue={setSubjects}
+                label="Subjects"
+            />
+        </>
+    )
+}
+
 const SingleDayComponet = ({ dateString, sessions }: { dateString?: string, sessions?: Session[] }) => {
 
     // build the list of teacher and room to create filters
     let teacherIdList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.teacher ? session.teacher.id : ""));
     let roomList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.room ? session.room : ""));
-    let dateList: string[] | null = sessions === undefined ? null : Array.from(calUtils.buildSetFromSessions(sessions, (session) => session.date));
 
     // build the mapping from teacher id to teacher name
     let teacherMapping: any = {};
@@ -238,11 +350,11 @@ const SingleDayComponet = ({ dateString, sessions }: { dateString?: string, sess
     // used for filtering states
     const [teachers, setTeachers] = React.useState<string[]>(teacherIdList === null ? [] : teacherIdList);
     const [rooms, setRooms] = React.useState<string[]>(roomList === null ? [] : roomList);
-
+    const [rooms2, setRooms2] = React.useState<string[]>(roomList === null ? [] : roomList);
 
     return (
         <>
-            {teacherIdList && (<MultiSelectComponet
+            {teacherIdList && (<MultiSelectChipComponet
                 items={teacherIdList}
                 getMenuItemText={(teacherId) => teacherId + " - " + teacherMapping[teacherId]}
                 getChipText={(teacherId) => teacherMapping[teacherId]}
@@ -250,10 +362,17 @@ const SingleDayComponet = ({ dateString, sessions }: { dateString?: string, sess
                 setSelectValue={setTeachers}
                 label="Teacher"
             />)}
-            {roomList && (<MultiSelectComponet
+            {roomList && (<MultiSelectChipComponet
                 items={roomList}
                 selectValue={rooms}
                 setSelectValue={setRooms}
+                label="Room"
+            />)}
+
+            {teacherIdList && (<MultiSelectNativeComponet
+                items={teacherIdList.map((teacherId) => { return { value: teacherId, text: teacherMapping[teacherId] } })}
+                selectValue={rooms2}
+                setSelectValue={setRooms2}
                 label="Room"
             />)}
             <Box>
@@ -282,5 +401,6 @@ const SingleDayComponet = ({ dateString, sessions }: { dateString?: string, sess
 
 export {
     SingleMonthComponet,
-    SingleDayComponet
+    SingleDayComponet,
+    FilterComponet
 };
