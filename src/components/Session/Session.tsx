@@ -103,6 +103,8 @@ const SessionCreateComponent = () => {
                 <Box sx={{ py: "5px" }}>
                     <TeacherSelect
                         value={session.spare1}
+                        name="spare1"
+                        onChange={handleInputChange}
                     />
                 </Box>
                 <Box sx={{ py: "5px" }}>

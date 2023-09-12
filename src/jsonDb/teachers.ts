@@ -19,7 +19,16 @@ orgId   userName    email   name.first  name.last
 100644722	fzeidan	fzeidan@student.holmesglen.edu.au	Zeidan	Fatmeh
 
 */
-const teachers = [
+export interface ITeacher {
+    orgId: string;
+    userName: string;
+    email: string;
+    name: {
+        first: string;
+        last: string;
+    };
+}
+const teachers: ITeacher[] = [
     {
         orgId: "100605089",
         userName: "jalfaro1",
