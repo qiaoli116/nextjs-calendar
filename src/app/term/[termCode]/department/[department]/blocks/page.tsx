@@ -1,6 +1,7 @@
 "use client"
 
 import { FilterComponet } from "../../../../../../components/Calendar/calendar";
+import { SessionCreateComponent } from "../../../../../../components/Session/Session";
 const sessions = [
     {
         date: "2023-07-27",
@@ -222,6 +223,7 @@ export default function BlocksPage({ params }: { params: { termCode: string, dep
             <FilterComponet
                 sessions={sessions}
             />
+            <SessionCreateComponent />
         </>
     )
 }

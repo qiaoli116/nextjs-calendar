@@ -23,7 +23,8 @@
     "dayjs": "^1.11.9",
     "next": "13.x",
     "react": "18.x",
-    "react-dom": "18.x"
+    "react-dom": "18.x",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.0.1",
@@ -32,6 +33,7 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@types/uuid": "^9.0.3",
     "eslint": "latest",
     "eslint-config-next": "latest",
     "jest": "^29.6.2",
