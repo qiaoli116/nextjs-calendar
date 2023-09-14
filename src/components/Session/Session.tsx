@@ -7,6 +7,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import Button from '@mui/material/Button';
 import TeacherSelect from '../Controls/TeacherSelect';
 import RoomSelect from '../Controls/RoomSelect';
+import FormControl from '@mui/material/FormControl';
+import TimeSlotsSelect from '../Controls/TimeSlotsSelect';
 
 type SessionCreateForm = {
     reference: string;
@@ -56,6 +58,7 @@ const SessionCreateComponent = () => {
         }} >
             <h1>Session Create</h1>
             <form onSubmit={handleSubmit}>
+
                 <Box sx={{ py: "5px" }}>
                     <TextField
                         fullWidth
@@ -63,7 +66,9 @@ const SessionCreateComponent = () => {
                         value={session.reference}
                         name='reference'
                         onChange={handleInputChange}
-                        disabled
+                        InputProps={{
+                            readOnly: true,
+                        }}
                     />
                 </Box>
                 <Box sx={{ py: "5px" }}>
@@ -90,6 +95,13 @@ const SessionCreateComponent = () => {
                     <RoomSelect
                         value={session.room === null ? "" : session.room}
                         name="room"
+                        onChange={handleInputChange}
+                    />
+                </Box>
+                <Box sx={{ py: "5px" }}>
+                    <TimeSlotsSelect
+                        values={session.timeslots}
+                        name="timeslots"
                         onChange={handleInputChange}
                     />
                 </Box>

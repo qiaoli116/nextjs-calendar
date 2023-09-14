@@ -6,7 +6,7 @@ import { PrecisionManufacturing } from '@mui/icons-material';
 import { blue } from '@mui/material/colors';
 import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
-import { timeslotOfDay } from './timeslotUtils';
+import { timeslotsOfDay } from './timeslotUtils';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
