@@ -1,3 +1,4 @@
+"use client"
 import React from 'react';
 import Select from '@mui/material/Select';
 import { timeslotsOfWorkDay } from '../Calendar/timeslotUtils';
@@ -24,33 +25,37 @@ export default function TimeSlotsSelect({ values, name, onChange }:
         });
     };
     const elementId = "id-" + uuidv4();
+    const label = "Timeslots - " + (values === undefined ? "0" : values.length / 2) + "h";
+    console.log("label", label)
     return (
         <>
             <FormControl>
-                <InputLabel shrink htmlFor={elementId}>Timeslots</InputLabel>
+                <InputLabel shrink htmlFor={elementId}>{label}</InputLabel>
                 <Select
                     sx={{
                         "& select": {
                             overflow: "hidden",
                             pt: "14px",
                             pb: "14px",
-                            pl: "14px",
-                            pr: "16px !important",
+                            pl: "18px",
+                            pr: "20px !important",
                         }
                     }}
                     multiple
                     native
                     onChange={handleChangeMultiple}
-                    label="Timeslots"
+                    label={label}
                     inputProps={{
                         size: timeslotsOfWorkDay.length,
                         id: elementId,
+
                     }}
+                    value={values === undefined ? [] : values}
                 >
                     {timeslotsOfWorkDay.map((timeslot: string) => {
                         const selected: boolean = values !== undefined && values.includes(timeslot) ? true : false
                         return (
-                            <option key={timeslot} value={timeslot} selected={selected}>
+                            <option key={timeslot} value={timeslot} >
                                 {timeslot}
                             </option>
                         );

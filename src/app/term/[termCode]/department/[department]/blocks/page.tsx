@@ -1,7 +1,7 @@
 "use client"
 
 import { FilterComponet } from "../../../../../../components/Calendar/calendar";
-import { SessionCreateComponent } from "../../../../../../components/Session/Session";
+import { SessionCreateOrUpdateComponent, SessionViewOneComponent } from "../../../../../../components/Session/Session";
 const sessions = [
     {
         date: "2023-07-27",
@@ -220,10 +220,12 @@ export default function BlocksPage({ params }: { params: { termCode: string, dep
             <h1>Blocks Page</h1>
             <p>Term Code: {params.termCode}</p>
             <p>Department: {params.department}</p>
-            <FilterComponet
-                sessions={sessions}
+            <SessionViewOneComponent
+                reference="Session#617553ca-92b2-4027-b536-9bf7ad71ec28"
             />
-            <SessionCreateComponent />
+            <SessionCreateOrUpdateComponent
+                reference="Session#617553ca-92b2-4027-b536-9bf7ad71ec28"
+            />
         </>
     )
 }

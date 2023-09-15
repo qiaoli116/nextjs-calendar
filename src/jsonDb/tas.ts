@@ -1,5 +1,5 @@
 const tas: any = [
-    {
+    { // 22603VIC
         year: "2023",
         department: "CAIT",
         qualification: {
@@ -7,7 +7,7 @@ const tas: any = [
             title: "Certificate IV in Cyber Security"
         },
         subjects: [
-            {
+            { // 22603VIC-01: VU23214
                 code: "22603VIC-01",
                 title: "Secure a PC",
                 units: [
@@ -17,7 +17,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-02: BSBWHS309
                 code: "22603VIC-02",
                 title: "WHS",
                 units: [
@@ -27,7 +27,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-03: ICTPRG435
                 code: "22603VIC-03",
                 title: "Python Programming",
                 units: [
@@ -37,7 +37,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-04: VU23217, BSBINS401
                 code: "22603VIC-04",
                 title: "",
                 units: [
@@ -51,7 +51,7 @@ const tas: any = [
                     },
                 ]
             },
-            {
+            { // 22603VIC-05: VU23213
                 code: "22603VIC-05",
                 title: "Research Information",
                 units: [
@@ -61,7 +61,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-06: VU23213
                 code: "22603VIC-06",
                 title: "Network Fundamentals for Cyber",
                 units: [
@@ -71,7 +71,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-07: ICTNWK422
                 code: "22603VIC-07",
                 title: "Install and Manage Servers",
                 units: [
@@ -81,7 +81,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-08: VU23215
                 code: "22603VIC-08",
                 title: "Introduction to PEN Testing",
                 units: [
@@ -91,7 +91,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-09: VU23218 
                 code: "22603VIC-09",
                 title: "Network Security Infrastructure",
                 units: [
@@ -101,7 +101,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-10: ICTCLD401
                 code: "22603VIC-10",
                 title: "Configure Cloud Services",
                 units: [
@@ -111,7 +111,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-11: VU23222
                 code: "22603VIC-11",
                 title: "Securing websites",
                 units: [
@@ -121,7 +121,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-12: ICTICT443
                 code: "22603VIC-12",
                 title: "Working in ICT",
                 units: [
@@ -131,7 +131,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-13: VU23219, VU23221
                 code: "22603VIC-13",
                 title: "Monitor and Manage Security",
                 units: [
@@ -145,7 +145,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-14: VU23220
                 code: "22603VIC-14",
                 title: "Industry Project",
                 units: [
@@ -155,7 +155,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // 22603VIC-15: VU23223
                 code: "22603VIC-15",
                 title: "Cyber Ethics",
                 units: [
@@ -167,7 +167,7 @@ const tas: any = [
             }
         ]
     },
-    {
+    { // ICT40120-P
         year: "2023",
         department: "CAIT",
         qualification: {
@@ -175,7 +175,7 @@ const tas: any = [
             title: "Certificate IV in Information Technology (Programming)"
         },
         subjects: [
-            {
+            { // ICT40120-P-01: ICTICT451, ICTICT443, BSBXCS404
                 code: "ICT40120-P-01",
                 title: "Working in ICT",
                 units: [
@@ -184,16 +184,16 @@ const tas: any = [
                         title: "Comply with IP, ethics and privacy policies in ICT environments"
                     },
                     {
-                        code: "ICTICT443 ",
+                        code: "ICTICT443",
                         title: "Work collaboratively in the ICT industry"
                     },
                     {
-                        code: "BSBXCS404 ",
+                        code: "BSBXCS404",
                         title: "Contribute to cyber security risk management"
                     }
                 ]
             },
-            {
+            { // ICT40120-P-02: ICTSAS432, ICTICT426, BSBCRT404
                 code: "ICT40120-P-02",
                 title: "Emerging ICT Tech",
                 units: [
@@ -206,12 +206,12 @@ const tas: any = [
                         title: "Identify and evaluate emerging technologies and practices"
                     },
                     {
-                        code: "BSBCRT404 ",
+                        code: "BSBCRT404",
                         title: "Apply advanced critical thinking to work processes"
                     }
                 ]
             },
-            {
+            { // ICT40120-P-03: ICTPRG432, ICTPRG433, ICTPRG430
                 code: "ICT40120-P-03",
                 title: "Develop Data-driven Applications",
                 units: [
@@ -229,7 +229,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT40120-P-04: ICTDBS416, ICTPRG431
                 code: "ICT40120-P-04",
                 title: "Create Database",
                 units: [
@@ -243,7 +243,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT40120-P-05: ICTWEB431, ICTWEB432, ICTWEB433, ICTWEB452
                 code: "ICT40120-P-05",
                 title: "Website Desigin Fundamentals",
                 units: [
@@ -265,7 +265,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT40120-P-06: ICTPRG437, ICTPRG440, ICTICT449
                 code: "ICT40120-P-06",
                 title: "JavaScript",
                 units: [
@@ -283,7 +283,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT40120-P-07: ICTPRG435, ICTPRG302
                 code: "ICT40120-P-07",
                 title: "Python Programming",
                 units: [
@@ -299,7 +299,7 @@ const tas: any = [
             }
         ]
     },
-    {
+    { // ICT50120-P
         year: "2023",
         department: "CAIT",
         qualification: {
@@ -307,7 +307,7 @@ const tas: any = [
             title: "Diploma of Information Technology (Advanced Programming) & (Back End Web Development)"
         },
         "subjects": [
-            {
+            { // ICT50220-P-01: ICTPRG444, ICTSAD502
                 "code": "ICT50220-P-01",
                 "title": "System Analysis and Design",
                 "units": [
@@ -321,7 +321,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT50220-P-02: ICTPRG446, ICTPRG545, ICTPRG547
                 code: "ICT50220-P-02",
                 title: "Develop a Dynamic Website",
                 units: [
@@ -339,7 +339,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT50220-P-03: ICTSAD501, ICTPRG554
                 code: "ICT50220-P-03",
                 title: "Database Design",
                 units: [
@@ -353,7 +353,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT50220-P-04: ICTCLD507, ICTPRG553
                 code: "ICT50220-P-04",
                 title: "",
                 units: [
@@ -367,7 +367,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT50220-P-05: BSBXCS402, ICTICT532
                 code: "ICT50220-P-05",
                 title: "Cloud Programming",
                 units: [
@@ -381,7 +381,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT50220-P-06: ICTPRG535, ICTPRG547, ICTWEB522
                 code: "ICT50220-P-06",
                 title: "Full Stack Development",
                 units: [
@@ -399,7 +399,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT50220-P-07: ICTPRG556, ICTPRG549
                 code: "ICT50220-P-07",
                 title: "Web Framework",
                 units: [
@@ -413,7 +413,7 @@ const tas: any = [
                     }
                 ]
             },
-            {
+            { // ICT50220-P-08: BSBCRT512, BSBXTW401, ICTICT517, ICTSAS527
                 code: "ICT50220-P-08",
                 title: "Group Project",
                 units: [

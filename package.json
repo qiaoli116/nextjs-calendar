@@ -21,7 +21,7 @@
     "@mui/material": "latest",
     "@mui/x-date-pickers": "^6.11.2",
     "dayjs": "^1.11.9",
-    "next": "13.x",
+    "next": "^13.4.19",
     "react": "18.x",
     "react-dom": "18.x",
     "uuid": "^9.0.0"
