@@ -39,7 +39,7 @@ const tas: any = [
             },
             { // 22603VIC-04: VU23217, BSBINS401
                 code: "22603VIC-04",
-                title: "",
+                title: "Recognise Cyber Needs",
                 units: [
                     {
                         code: "VU23217",
@@ -415,6 +415,144 @@ const tas: any = [
             },
             { // ICT50220-P-08: BSBCRT512, BSBXTW401, ICTICT517, ICTSAS527
                 code: "ICT50220-P-08",
+                title: "Group Project",
+                units: [
+                    {
+                        code: "BSBCRT512",
+                        title: "Originate and develop concepts"
+                    },
+                    {
+                        code: "BSBXTW401",
+                        title: "Lead and facilitate a team"
+                    },
+                    {
+                        code: "ICTICT517",
+                        title: "Match ICT needs with the strategic direction of the organisation"
+                    },
+                    {
+                        code: "ICTSAS527",
+                        title: "Manage client problems"
+                    }
+                ]
+            }
+        ]
+    },
+    { // ICT50120-P
+        year: "2023",
+        department: "BSD",
+        qualification: {
+            code: "BSD12345",
+            title: "Diploma of Information Technology (Advanced Programming) & (Back End Web Development)"
+        },
+        "subjects": [
+            { // ICT50220-P-01: ICTPRG444, ICTSAD502
+                "code": "BSD12345-P-01",
+                "title": "System Analysis and Design",
+                "units": [
+                    {
+                        "code": "ICTPRG444",
+                        "title": "Analyse software requirements"
+                    },
+                    {
+                        "code": "ICTSAD502",
+                        title: "Model data processes"
+                    }
+                ]
+            },
+            { // ICT50220-P-02: ICTPRG446, ICTPRG545, ICTPRG547
+                code: "BSD12345-P-02",
+                title: "Develop a Dynamic Website",
+                units: [
+                    {
+                        code: "ICTWEB514",
+                        title: "Create dynamic web pages"
+                    },
+                    {
+                        code: "ICTDBS507",
+                        title: "Integrate databases with websites"
+                    },
+                    {
+                        code: "ICTWEB525",
+                        title: "Implement quality assurance process for websites"
+                    }
+                ]
+            },
+            { // BSD12345-P-03: ICTSAD501, ICTPRG554
+                code: "BSD12345-P-03",
+                title: "Database Design",
+                units: [
+                    {
+                        code: "ICTSAD501",
+                        title: "Model data objects"
+                    },
+                    {
+                        code: "ICTPRG554",
+                        title: "Manage data persistence using noSQL data stores"
+                    }
+                ]
+            },
+            { // BSD12345-P-04: ICTCLD507, ICTPRG553
+                code: "BSD12345-P-04",
+                title: "",
+                units: [
+                    {
+                        code: "ICTCLD507",
+                        title: "Build and deploy resources on cloud platforms"
+                    },
+                    {
+                        code: "ICTPRG553",
+                        title: "Create and develop REST APIs"
+                    }
+                ]
+            },
+            { // BSD12345-P-05: BSBXCS402, ICTICT532
+                code: "BSD12345-P-05",
+                title: "Cloud Programming",
+                units: [
+                    {
+                        code: "BSBXCS402",
+                        title: "Promote workplace cyber security awareness and best practices"
+                    },
+                    {
+                        code: "ICTICT532",
+                        title: "Apply IP, ethics and privacy policies in ICT environments"
+                    }
+                ]
+            },
+            { // BSD12345-P-06: ICTPRG535, ICTPRG547, ICTWEB522
+                code: "BSD12345-P-06",
+                title: "Full Stack Development",
+                units: [
+                    {
+                        code: "ICTPRG535",
+                        title: "Build advanced user interfaces"
+                    },
+                    {
+                        code: "ICTPRG547",
+                        title: "Apply advanced programming skills in another language"
+                    },
+                    {
+                        code: "ICTWEB522",
+                        title: "Develop website information architecture"
+                    }
+                ]
+            },
+            { // BSD12345-P-07: ICTPRG556, ICTPRG549
+                code: "BSD12345-P-07",
+                title: "Web Framework",
+                units: [
+                    {
+                        code: "ICTPRG556",
+                        title: "Implement and use a model view controller framework"
+                    },
+                    {
+                        code: "ICTPRG549",
+                        title: "Apply intermediate object-oriented language skills"
+                    }
+                ]
+            },
+            { // BSD12345-P-08: BSBCRT512, BSBXTW401, ICTICT517, ICTSAS527
+                code: "BSD12345-P-08",
                 title: "Group Project",
                 units: [
                     {

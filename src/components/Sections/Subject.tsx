@@ -7,6 +7,12 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import * as _ from 'lodash';
 import TASDataService from '../../dataService/tas';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import YearSelect from '../Controls/YearSelect';
+import DepartmentSelect from '../Controls/DepartmentSelect';
+import TASQualificationSelect from '../Controls/TASQualificationSelect';
+import TASSubjectSelect from '../Controls/TASSubjectSelect';
+import DeliveryModeSelect from '../Controls/DeliveryModeSelect';
 
 const generateSubjectReference = () => {
     return "Subject#" + uuidv4();
@@ -14,7 +20,7 @@ const generateSubjectReference = () => {
 
 const generateInitialSubject = (): ISubject => {
     return {
-        reference: generateSubjectReference(),
+        reference: "",
         code: "",
         title: "",
         term: "",
@@ -46,9 +52,10 @@ interface IInitSusbjectForm {
 }
 const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
     { reference?: string, create?: boolean }) => {
+    const currentYear = new Date().getFullYear();
     const [subject, setSubject] = React.useState<ISubject>(generateInitialSubject());
     const [initSubjectForm, setInitSubjectForm] = React.useState<IInitSusbjectForm>({
-        year: "",
+        year: currentYear.toString(),
         department: "",
         qualificationCode: "",
         subjectCode: "",
@@ -85,7 +92,8 @@ const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
         const tasSubjectExtended = await TASDataService.getOneSubjectExtended(initSubjectForm.year, initSubjectForm.qualificationCode, initSubjectForm.subjectCode);
         console.log("handleSubmitInitSusbject", tasSubjectExtended);
         if (tasSubjectExtended) {
-            const s = { ...subject };
+            const s = generateInitialSubject();
+            s.reference = generateSubjectReference();
             s.code = tasSubjectExtended.code;
             s.title = tasSubjectExtended.title;
             s.department = tasSubjectExtended.department;
@@ -106,23 +114,31 @@ const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
         <>
             <form onSubmit={handleSubmitInitSusbject}>
                 <Box sx={boxSx}>
-                    <TextField
-                        label="year"
+                    <YearSelect
+                        sx={{ minWidth: "200px", pr: "10px" }}
+                        value={initSubjectForm.year}
                         name='year'
                         onChange={handleInputChangeInitSusbject}
                     />
-                    <TextField
-                        label="department"
+                    <DepartmentSelect
+                        sx={{ minWidth: "200px", pr: "10px" }}
+                        value={initSubjectForm.department}
                         name='department'
                         onChange={handleInputChangeInitSusbject}
                     />
-                    <TextField
-                        label="qualification"
+                    <TASQualificationSelect
+                        sx={{ minWidth: "200px", pr: "10px" }}
+                        year={initSubjectForm.year}
+                        department={initSubjectForm.department}
+                        value={initSubjectForm.qualificationCode}
                         name='qualificationCode'
                         onChange={handleInputChangeInitSusbject}
                     />
-                    <TextField
-                        label="subject"
+                    <TASSubjectSelect
+                        sx={{ minWidth: "200px" }}
+                        year={initSubjectForm.year}
+                        qualification={initSubjectForm.qualificationCode}
+                        value={initSubjectForm.subjectCode}
                         name='subjectCode'
                         onChange={handleInputChangeInitSusbject}
                     />
@@ -135,137 +151,135 @@ const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
             </form>
             <form onSubmit={handleSubmit}>
                 <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Subject ID"
-                        name='reference'
-                        onChange={handleInputChange}
-                    />
+                    <Button type='submit'>
+                        Save
+                    </Button>
+                    <Button onClick={resetForm}>
+                        Reset
+                    </Button>
                 </Box>
                 <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Code"
-                        name='code'
-                        value={subject.code}
-                        onChange={handleInputChange}
-                    />
+                    <FormControl sx={{ minWidth: "440px", pr: "10px" }}>
+                        <TextField
+                            fullWidth
+                            label="Subject ID (Read only)"
+                            name='reference'
+                            value={subject.reference}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ minWidth: "410px", pr: "10px" }}>
+                        <TextField
+                            fullWidth
+                            label="Subject Code - Title (Read only)"
+                            value={subject.code === "" ? "" : subject.code + " - " + subject.title}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                    </FormControl>
+
                 </Box>
                 <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Title"
-                        name='title'
-                        value={subject.title}
-                        onChange={handleInputChange}
-                    />
+                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                        <TextField
+                            fullWidth
+                            label="Term"
+                            name='term'
+                            value={subject.term}
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                        <TextField
+                            fullWidth
+                            label="Department (Read only)"
+                            value={subject.department}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ minWidth: "400px" }}>
+                        <TextField
+                            fullWidth
+                            label="Qualification Code - Title (Read only)"
+                            value={subject.qualification.code === "" ? "" : subject.qualification.code + " - " + subject.qualification.title}
+                        />
+                    </FormControl>
                 </Box>
+
                 <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Term"
-                        name='term'
-                        value={subject.term}
-                        onChange={handleInputChange}
-                    />
+                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+
+                        <TextField
+                            fullWidth
+                            label="Block"
+                            name='block'
+                            value={subject.block}
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                        <DeliveryModeSelect
+                            name='deliveryMode'
+                            value={subject.deliveryMode}
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                        <TextField
+                            fullWidth
+                            type='date'
+                            label="Start Date"
+                            name='dateRange.startDate'
+                            onChange={handleInputChange}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+
+                    </FormControl>
+                    <FormControl sx={{ minWidth: "200px" }}>
+                        <TextField
+                            fullWidth
+                            type='date'
+                            label="End Date"
+                            name='dateRange.endDate'
+                            onChange={handleInputChange}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </FormControl>
+
                 </Box>
-                <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Department"
-                        name='department'
-                        value={subject.department}
-                        onChange={handleInputChange}
-                    />
-                </Box>
-                <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Block"
-                        name='block'
-                        value={subject.block}
-                        onChange={handleInputChange}
-                    />
-                </Box>
-                <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Qualification Code"
-                        name='qualification.code'
-                        value={subject.qualification.code}
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Qualification Title"
-                        name='qualification.title'
-                        value={subject.qualification.title}
-                        onChange={handleInputChange}
-                    />
-                </Box>
-                <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Delivery Mode"
-                        name='deliveryMode'
-                        defaultValue={subject.deliveryMode}
-                        onChange={handleInputChange}
-                    />
-                </Box>
-                <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Start Date"
-                        name='dateRange.startDate'
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        fullWidth
-                        label="End Date"
-                        name='dateRange.endDate'
-                        onChange={handleInputChange}
-                    />
-                </Box>
-                <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Unit Code 1"
-                        name='units[0].code'
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Unit Title 1"
-                        name='units[0].title'
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Unit CRN 1"
-                        name='units[0].crn'
-                        onChange={handleInputChange}
-                    />
-                </Box>
-                <Box sx={boxSx}>
-                    <TextField
-                        fullWidth
-                        label="Unit Code 2"
-                        name='units[1].code'
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Unit Title 2"
-                        name='units[1].title'
-                        onChange={handleInputChange}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Unit CRN 2"
-                        name='units[1].crn'
-                        onChange={handleInputChange}
-                    />
-                </Box>
+
+                {subject.units.map((u, index) => {
+                    return (
+                        <Box sx={boxSx}>
+                            <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                                <TextField
+                                    fullWidth
+                                    label={`Unit ${(index + 1)} CRN`}
+                                    name={`units[${index}].crn`}
+                                    onChange={handleInputChange}
+                                />
+                            </FormControl>
+                            <FormControl sx={{ minWidth: "620px" }}>
+                                <TextField
+                                    fullWidth
+                                    label="Code - Title (Read only)"
+                                    value={u.code === "" ? "" : subject.units[index].code + " - " + subject.units[index].title}
+                                />
+                            </FormControl>
+                        </Box>
+                    )
+                })}
+
+
             </form>
         </>
     )
