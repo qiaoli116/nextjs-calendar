@@ -34,8 +34,10 @@ export default function TimeSlotsSelect({ values, name, onChange }:
                 <Select
                     sx={{
                         "& select": {
-                            overflow: "hidden",
-                            pt: "14px",
+                            overflow: "auto",
+                            mt: "14px",
+                            mb: "5px",
+                            pt: "0px",
                             pb: "14px",
                             pl: "18px",
                             pr: "20px !important",
@@ -46,7 +48,7 @@ export default function TimeSlotsSelect({ values, name, onChange }:
                     onChange={handleChangeMultiple}
                     label={label}
                     inputProps={{
-                        size: timeslotsOfWorkDay.length,
+                        size: 12,
                         id: elementId,
 
                     }}

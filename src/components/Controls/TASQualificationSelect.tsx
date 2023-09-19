@@ -23,8 +23,11 @@ export default function TASQualificationSelect({ year, department, value, name, 
     const label = "Qualification";
 
     React.useEffect(() => {
+        console.log("TASQualificationSelect useEffect: ", year, department, value);
         (async () => {
+            console.log("TASQualificationSelect useEffect: loading... ", year, department);
             const q = await TASDataService.getAllQualificationsByYearAndDepartment(year, department);
+            console.log("TASQualificationSelect useEffect: q = ", q);
             q === undefined ? setQualifications([]) : setQualifications(q);
 
             setLoading(false);

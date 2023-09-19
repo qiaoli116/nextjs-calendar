@@ -99,6 +99,10 @@ const SessionViewOneComponent = ({ reference }: { reference: string }) => {
     )
 }
 
+const SessionBunchCreateComponent = () => {
+
+}
+
 /**
  * Create of update a session. Specify "create" for create, if not specified, it is update.
  * If create is true, reference will be ignored. If create is false, reference should be specified.
@@ -163,63 +167,73 @@ const SessionCreateOrUpdateComponent = ({ reference, create = false }:
                         <h1>Session {create ? "create" : "update"}</h1>
                     </Grid>
                     <Grid xs={6}>
-                        <Box sx={boxSx}>
-                            <Button type='submit'>
-                                Save
-                            </Button>
-                            <Button onClick={resetForm}>
-                                Reset
-                            </Button>
+                        <div>
+                            <Grid container spacing={2}>
+                                <Grid xs={8}>
+                                    <Box sx={boxSx}>
+                                        <TextField
+                                            fullWidth
+                                            label="Session ID (Read only)"
+                                            value={session.reference}
+                                            name='reference'
+                                            onChange={handleInputChange}
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <TextField
+                                            type='date'
+                                            fullWidth
+                                            label="Date"
+                                            value={session.date}
+                                            name='date'
+                                            onChange={handleInputChange}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <TeacherSelect
+                                            value={session.teacher === null ? "" : session.teacher}
+                                            name="teacher"
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <RoomSelect
+                                            value={session.room === null ? "" : session.room}
+                                            name="room"
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <Button type='submit'>
+                                            Save
+                                        </Button>
+                                        <Button onClick={resetForm}>
+                                            Reset
+                                        </Button>
+                                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                    </Box>
+                                </Grid>
+                                <Grid xs={4}>
+                                    <Box sx={boxSx}>
+                                        <TimeSlotsSelect
+                                            values={session.timeslots}
+                                            name="timeslots"
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
+                                </Grid>
 
-                            {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                            </Grid>
+                        </div>
 
-                        </Box>
-                        <Box sx={boxSx}>
-                            <TextField
-                                fullWidth
-                                label="Session ID (Read only)"
-                                value={session.reference}
-                                name='reference'
-                                onChange={handleInputChange}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                        </Box>
-                        <Box sx={boxSx}>
-                            <TextField
-                                type='date'
-                                fullWidth
-                                label="Date"
-                                value={session.date}
-                                name='date'
-                                onChange={handleInputChange}
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                            />
-                        </Box>
-                        <Box sx={boxSx}>
-                            <TeacherSelect
-                                value={session.teacher === null ? "" : session.teacher}
-                                name="teacher"
-                                onChange={handleInputChange}
-                            />
-                        </Box>
-                        <Box sx={boxSx}>
-                            <RoomSelect
-                                value={session.room === null ? "" : session.room}
-                                name="room"
-                                onChange={handleInputChange}
-                            />
-                        </Box>
-                        <Box sx={boxSx}>
-                            <TimeSlotsSelect
-                                values={session.timeslots}
-                                name="timeslots"
-                                onChange={handleInputChange}
-                            />
-                        </Box>
+
+
 
                     </Grid>
                     <Grid xs={6}>

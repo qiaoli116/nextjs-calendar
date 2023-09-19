@@ -5,7 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { v4 as uuidv4 } from 'uuid';
 
-const years = [2026, 2025, 2024, 2023, 2022, 2021];
+const years: string[] = ["2026", "2025", "2024", "2023", "2022", "2021"];
 
 export default function YearSelect({ value, name, onChange, sx }:
     { value?: string, name?: string, onChange?: (e: any) => void, sx?: any }) {
@@ -31,7 +31,7 @@ export default function YearSelect({ value, name, onChange, sx }:
                 onChange={handleChange}
             >
                 <MenuItem value=""><em>===None===</em></MenuItem>
-                {years.map((year: number) => {
+                {years.map((year: string) => {
                     return (
                         <MenuItem key={year} value={year} >
                             {year}
