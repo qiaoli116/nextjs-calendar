@@ -47,7 +47,7 @@ export default function TASQualificationSelect({ year, department, value, name, 
                 <MenuItem value=""><em>===None===</em></MenuItem>
                 {!loading && qualifications.map((q) => {
                     return (
-                        <MenuItem key={q.code} value={q.code} >
+                        <MenuItem key={q.code.toLowerCase()} value={q.code.toLowerCase()} >
                             {q.code} - {q.title}
                         </MenuItem>
                     );

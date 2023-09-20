@@ -1,4 +1,4 @@
-
+"use client"
 import React, { useEffect } from 'react';
 import { ISubject } from '../../dataService/subjects';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,31 +14,10 @@ import TASQualificationSelect from '../Controls/TASQualificationSelect';
 import TASSubjectSelect from '../Controls/TASSubjectSelect';
 import DeliveryModeSelect from '../Controls/DeliveryModeSelect';
 import { init } from 'next/dist/compiled/@vercel/og/satori';
+import { type } from 'os';
 
 const generateSubjectReference = () => {
     return "Subject#" + uuidv4();
-}
-
-const generateInitialSubject = (): ISubject => {
-    return {
-        reference: "",
-        code: "",
-        title: "",
-        term: "",
-        department: "",
-        block: "",
-        qualification: {
-            code: "",
-            title: "",
-        },
-        deliveryMode: "",
-        dateRange: {
-            startDate: "",
-            endDate: "",
-        },
-        units: [],
-        sessions: [],
-    }
 }
 
 const boxSx = {
@@ -49,21 +28,44 @@ interface IInitSusbjectForm {
     department: string,
     qualificationCode: string,
     subjectCode: string,
-
+    numberOfSessions: number,
 }
-const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
-    { reference?: string, create?: boolean }) => {
+const SubjectCreateOrUpdateComponent = ({ reference, create = false, department, term }:
+    { reference?: string, create?: boolean, department?: string, term?: string }) => {
+    console.log("SubjectCreateOrUpdateComponent - ", "reference", reference, "create", create, "department", department, "term", term)
+    const generateInitialSubject = (): ISubject => {
+        return {
+            reference: "",
+            code: "",
+            title: "",
+            term: term === undefined ? "" : term,
+            department: "",
+            block: "",
+            qualification: {
+                code: "",
+                title: "",
+            },
+            deliveryMode: "",
+            dateRange: {
+                startDate: "",
+                endDate: "",
+            },
+            units: [],
+            sessions: [],
+        }
+    }
     const currentYear = new Date().getFullYear();
     const [subject, setSubject] = React.useState<ISubject>(generateInitialSubject());
     const [initSubjectForm, setInitSubjectForm] = React.useState<IInitSusbjectForm>({
         year: currentYear.toString(),
-        department: "",
+        department: department === undefined ? "" : department,
         qualificationCode: "",
         subjectCode: "",
+        numberOfSessions: 0,
     });
     const handleInputChangeInitSusbject = (e: any) => {
         const { name, value } = e.target;
-        console.log("handleInputChangeInitSusbject - ", "name", name, "value", value);
+        console.log("handleInputChangeInitSusbject - ", "name", name, "value", value, typeof (value));
         const obj = { ...initSubjectForm };
         _.set(obj, name, value);
         setInitSubjectForm(obj);
@@ -107,6 +109,12 @@ const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
                     crn: ""
                 }
             });
+            for (let i = 0; i < initSubjectForm.numberOfSessions; i++) {
+                s.sessions[i] = {
+                    date: "",
+                    sessionReference: "",
+                }
+            }
             setSubject(s);
         }
     }
@@ -118,43 +126,46 @@ const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
 
     return (
         <>
-            <form onSubmit={handleSubmitInitSusbject}>
-                <Box sx={boxSx}>
-                    <YearSelect
-                        sx={{ minWidth: "100px", pr: "10px" }}
-                        value={initSubjectForm.year}
-                        name='year'
-                        onChange={handleInputChangeInitSusbject}
-                    />
-                    <DepartmentSelect
-                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
-                        value={initSubjectForm.department}
-                        name='department'
-                        onChange={handleInputChangeInitSusbject}
-                    />
-                    <TASQualificationSelect
-                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
-                        year={initSubjectForm.year}
-                        department={initSubjectForm.department}
-                        value={initSubjectForm.qualificationCode}
-                        name='qualificationCode'
-                        onChange={handleInputChangeInitSusbject}
-                    />
-                    <TASSubjectSelect
-                        sx={{ minWidth: "200px", maxWidth: "400px" }}
-                        year={initSubjectForm.year}
-                        qualification={initSubjectForm.qualificationCode}
-                        value={initSubjectForm.subjectCode}
-                        name='subjectCode'
-                        onChange={handleInputChangeInitSusbject}
-                    />
-                </Box>
-                <Box sx={boxSx}>
-                    <Button type='submit'>
-                        Create Subject
-                    </Button>
-                </Box>
-            </form>
+            {create && (
+                <form onSubmit={handleSubmitInitSusbject}>
+                    <Box sx={boxSx}>
+                        <YearSelect
+                            sx={{ minWidth: "100px", pr: "10px" }}
+                            value={initSubjectForm.year}
+                            name='year'
+                            onChange={handleInputChangeInitSusbject}
+                        />
+                        <DepartmentSelect
+                            sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                            value={initSubjectForm.department}
+                            name='department'
+                            onChange={handleInputChangeInitSusbject}
+                        />
+                        <TASQualificationSelect
+                            sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                            year={initSubjectForm.year}
+                            department={initSubjectForm.department}
+                            value={initSubjectForm.qualificationCode}
+                            name='qualificationCode'
+                            onChange={handleInputChangeInitSusbject}
+                        />
+                        <TASSubjectSelect
+                            sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                            year={initSubjectForm.year}
+                            qualification={initSubjectForm.qualificationCode}
+                            value={initSubjectForm.subjectCode}
+                            name='subjectCode'
+                            onChange={handleInputChangeInitSusbject}
+                        />
+                    </Box>
+                    <Box sx={boxSx}>
+                        <Button type='submit'>
+                            Create Subject
+                        </Button>
+                    </Box>
+                </form>
+            )}
+
             <form onSubmit={handleSubmit}>
 
                 <Box sx={boxSx}>
@@ -277,7 +288,6 @@ const SubjectCreateOrUpdateComponent = ({ reference, create = false }:
                         </Box>
                     )
                 })}
-
                 <Box sx={boxSx}>
                     <Button type='submit'>
                         Save

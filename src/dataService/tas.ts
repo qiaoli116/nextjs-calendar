@@ -31,7 +31,8 @@ export interface ITASSubjectExtended extends ITASSubject {
  */
 const getAllSubjectsByYearAndQualificationCode = async (year: string, qualificationCode: string): Promise<ITASSubject[] | undefined> => {
     await sleep(1e3); // For demo purposes.
-    const tas: ITAS = TAS.find((tas: ITAS) => tas.qualification.code === qualificationCode && tas.year === year);
+    const tas: ITAS = TAS.find((tas: ITAS) =>
+        tas.qualification.code.toLowerCase() === qualificationCode.toLowerCase() && tas.year === year);
     if (!tas) {
         return undefined;
     }
@@ -46,7 +47,8 @@ const getAllSubjectsByYearAndQualificationCode = async (year: string, qualificat
  */
 const getAllQualificationsByYearAndDepartment = async (year: string, department: string): Promise<ITASQualification[] | undefined> => {
     await sleep(1e3); // For demo purposes.
-    const tas: ITAS[] = TAS.filter((tas: ITAS) => tas.year === year && tas.department === department);
+    const tas: ITAS[] = TAS.filter((tas: ITAS) =>
+        tas.year === year && tas.department.toLowerCase() === department.toLowerCase());
     if (tas.length === 0) {
         return undefined;
     }
@@ -59,11 +61,13 @@ const getOneSubjectExtended = async (
     subjectCode: string
 ): Promise<ITASSubjectExtended | undefined> => {
     await sleep(1e3); // For demo purposes.
-    const tas: ITAS = TAS.find((tas: ITAS) => tas.qualification.code === qualificationCode && tas.year === year);
+    const tas: ITAS = TAS.find((tas: ITAS) =>
+        tas.qualification.code.toLowerCase() === qualificationCode.toLowerCase() && tas.year === year);
     if (!tas) {
         return undefined;
     }
-    const subject: ITASSubject | undefined = tas.subjects.find((subject: ITASSubject) => subject.code === subjectCode);
+    const subject: ITASSubject | undefined = tas.subjects.find((subject: ITASSubject) =>
+        subject.code.toLowerCase() === subjectCode.toLowerCase());
     if (!subject) {
         return undefined;
     }

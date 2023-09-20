@@ -25,13 +25,6 @@ const subjects = [
             }
         ],
         sessions: [
-            "session#200de2fc-8800-4bdd-8d4e-2332e41efeee",
-            "session#200de2fc-8800-4bdd-8d4e-2332e41efeee",
-            "session#200de2fc-8800-4bdd-8d4e-2332e41efeee",
-            "session#200de2fc-8800-4bdd-8d4e-2332e41efeee",
-            "session#200de2fc-8800-4bdd-8d4e-2332e41efeee",
-            "session#200de2fc-8800-4bdd-8d4e-2332e41efeee",
-
         ]
     }
 ];

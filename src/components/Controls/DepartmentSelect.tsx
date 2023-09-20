@@ -42,7 +42,7 @@ export default function DepartmentSelect({ value, name, onChange, sx }:
                     <MenuItem value=""><em>===None===</em></MenuItem>
                     {departments.map((department) => {
                         return (
-                            <MenuItem key={department.code} value={department.code} >
+                            <MenuItem key={department.code.toLowerCase()} value={department.code.toLowerCase()} >
                                 {department.code} - {department.name}
                             </MenuItem>
                         );

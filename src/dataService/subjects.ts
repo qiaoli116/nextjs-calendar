@@ -24,7 +24,10 @@ export interface ISubject {
         code: string;
         title: string;
     }[];
-    sessions: string[];
+    sessions: {
+        date: string;
+        sessionReference: string;
+    }[];
 }
 
 const getAllSessions = async (): Promise<ISubject[]> => {

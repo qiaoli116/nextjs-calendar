@@ -45,7 +45,7 @@ export default function TASSubjectSelect({ year, qualification, value, name, onC
                 <MenuItem value=""><em>===None===</em></MenuItem>
                 {!loading && subjects.map((s) => {
                     return (
-                        <MenuItem key={s.code} value={s.code} >
+                        <MenuItem key={s.code.toLowerCase()} value={s.code.toLowerCase()} >
                             {s.code} - {s.title}
                         </MenuItem>
                     );
