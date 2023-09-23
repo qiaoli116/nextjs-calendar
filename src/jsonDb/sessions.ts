@@ -1,7 +1,7 @@
 // session id is an uuid
 const sessions = [
     {
-        "reference": "Session#a9456e08-d901-4be0-b636-dc29c9fb2ea7",
+        "reference": "Session.a9456e08-d901-4be0-b636-dc29c9fb2ea7",
         "date": "2023-09-18",
         "teacher": "100613352",
         "room": "B1.2.5",

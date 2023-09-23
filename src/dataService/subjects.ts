@@ -30,17 +30,21 @@ export interface ISubject {
     }[];
 }
 
-const getAllSessions = async (): Promise<ISubject[]> => {
-    await sleep(1e3); // For demo purposes.
-    return Subjects;
+const getAllSubjects = async (): Promise<ISubject[]> => {
+    await sleep(1e3);
+    const subjects: ISubject[] = Subjects;
+    const subjectsJSON = JSON.stringify(subjects);
+    return JSON.parse(subjectsJSON);
 }
 
-const getOneSessionByReference = async (reference: string): Promise<ISubject | undefined> => {
-    await sleep(1e3); // For demo purposes.
-    return Subjects.find((subject) => subject.reference === reference);
+const getOneSubjectByReference = async (reference: string): Promise<ISubject | undefined> => {
+    await sleep(1e3);
+    const subject: ISubject | undefined = Subjects.find((subject: ISubject) => subject.reference.toLowerCase() === reference.toLowerCase());
+    const subjectJSON = JSON.stringify(subject);
+    return JSON.parse(subjectJSON);
 }
 
 export default {
-    getAllSessions,
-    getOneSessionByReference
+    getAllSubjects,
+    getOneSubjectByReference
 }
