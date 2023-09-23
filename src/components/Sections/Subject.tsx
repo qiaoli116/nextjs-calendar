@@ -412,10 +412,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
 
     return (
         <>
-
-
             <form onSubmit={handleSubmit}>
-
                 <Box sx={boxSx}>
                     <FormControl sx={{ minWidth: "440px", pr: "10px" }}>
                         <TextField
@@ -438,7 +435,6 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                             }}
                         />
                     </FormControl>
-
                 </Box>
                 <Box sx={boxSx}>
                     <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
@@ -514,9 +510,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                             }}
                         />
                     </FormControl>
-
                 </Box>
-
                 {subject.units.map((u, index) => {
                     return (
                         <Box sx={boxSx}>
@@ -539,6 +533,11 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                         </Box>
                     )
                 })}
+                <Box sx={boxSx}>
+                    <Button type='submit'>
+                        Add Session
+                    </Button>
+                </Box>
                 <Box sx={boxSx}>
                     <Button type='submit'>
                         Save

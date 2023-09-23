@@ -34,14 +34,20 @@ const getAllSubjects = async (): Promise<ISubject[]> => {
     await sleep(1e3);
     const subjects: ISubject[] = Subjects;
     const subjectsJSON = JSON.stringify(subjects);
-    return JSON.parse(subjectsJSON);
+    const _subjects: ISubject[] = JSON.parse(subjectsJSON);
+    return _subjects;
 }
 
 const getOneSubjectByReference = async (reference: string): Promise<ISubject | undefined> => {
     await sleep(1e3);
     const subject: ISubject | undefined = Subjects.find((subject: ISubject) => subject.reference.toLowerCase() === reference.toLowerCase());
+    if (subject === undefined) {
+        return undefined;
+    }
+
     const subjectJSON = JSON.stringify(subject);
-    return JSON.parse(subjectJSON);
+    const _subject: ISubject = JSON.parse(subjectJSON);
+    return _subject;
 }
 
 export default {
