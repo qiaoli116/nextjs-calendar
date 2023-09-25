@@ -1,11 +1,11 @@
-
+type Name {
+    first: String
+    last: String
+}
 type Teacher {
     _id: ID!
     orgId: String
     userName: String
     email: String
-    name: {
-        first: String
-        last: String
-    }
+    name: Name
 }
