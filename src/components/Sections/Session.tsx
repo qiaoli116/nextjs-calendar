@@ -10,9 +10,12 @@ import TimeSlotsSelect from '../Controls/TimeSlotsSelect';
 import Grid from '@mui/material/Unstable_Grid2';
 import SessionsDataService, { ISession } from "../../dataService/sessions"
 import CircularProgress from '@mui/material/CircularProgress';
+import _ from "lodash";
+import FormControl from '@mui/material/FormControl';
+import { useFetchOneById } from "../Hooks/crud";
 
 const generateSessionReference = () => {
-    return "Session#" + uuidv4();
+    return "Session." + uuidv4();
 }
 
 const generateInitialSession = (): ISession => {
@@ -99,9 +102,142 @@ const SessionViewOneComponent = ({ reference }: { reference: string }) => {
     )
 }
 
-const SessionBunchCreateComponent = () => {
+const SessionCreateComponent = ({ date, teacher, room, subject, createResultCallback }: {
+    date?: string,
+    teacher?: string,
+    room?: string,
+    subject?: string,
+    createResultCallback?: (session: ISession | undefined) => void,
+}) => {
+    console.log("SessionCreateComponent", date, teacher, room, subject, createResultCallback)
+    const sessionInit = {
+        ...sessionInitNew,
+        date: date === undefined ? "" : date,
+        teacher: teacher === undefined ? null : teacher,
+        room: room === undefined ? null : room,
+        subjects: subject === undefined ? [] : [subject],
+    }
+    const [session, setSession] = React.useState<ISession>(sessionInit);
+    const [loading, setLoading] = React.useState<boolean>(true);
 
+    // this is a general purpose handler for all input fields
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const s = { ...session };
+        _.set(s, name, value);
+        setSession(s);
+        console.log("handleInputChange - ", "session", session);
+    };
+
+    const resetForm = () => {
+        console.log("resetForm called");
+        setSession(generateInitialSession());
+    };
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit", session);
+        console.log("handleSubmit", JSON.stringify(session, null, 2));
+        const _session = await SessionsDataService.createSession(session);
+        if (createResultCallback !== undefined) {
+            console.log("handleSubmit", "createResultCallback", _session);
+            createResultCallback(_session);
+        }
+    };
+
+    return (
+        <Box sx={{
+            width: '100%',
+        }} >
+            <form onSubmit={handleSubmit}>
+                <Grid container spacing={2}>
+                    <Grid xs={12}>
+                        <h1>Session create</h1>
+                    </Grid>
+                    <Grid xs={6}>
+                        <div>
+                            <Grid container spacing={2}>
+                                <Grid xs={8}>
+                                    <Box sx={boxSx}>
+                                        <TextField
+                                            fullWidth
+                                            label="Session ID (Read only)"
+                                            value={session.reference}
+                                            name='reference'
+                                            onChange={handleInputChange}
+                                            InputProps={{
+                                                readOnly: true,
+                                            }}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <TextField
+                                            type='date'
+                                            fullWidth
+                                            label="Date"
+                                            value={session.date}
+                                            name='date'
+                                            onChange={handleInputChange}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <TeacherSelect
+                                            value={session.teacher === null ? "" : session.teacher}
+                                            name="teacher"
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <RoomSelect
+                                            value={session.room === null ? "" : session.room}
+                                            name="room"
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
+                                    <Box sx={boxSx}>
+                                        <Button type='submit'>
+                                            Save
+                                        </Button>
+                                        <Button onClick={resetForm}>
+                                            Reset
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                                <Grid xs={4}>
+                                    <Box sx={boxSx}>
+                                        <TimeSlotsSelect
+                                            values={session.timeslots}
+                                            name="timeslots"
+                                            onChange={handleInputChange}
+                                        />
+                                    </Box>
+                                </Grid>
+
+                            </Grid>
+                        </div>
+
+
+
+
+                    </Grid>
+                    <Grid xs={6}>
+                        <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                            <code>
+                                <pre>
+                                    {JSON.stringify(session, null, 2) + ","}
+                                </pre>
+                            </code>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </form>
+        </Box >
+    )
 }
+
 
 /**
  * Create of update a session. Specify "create" for create, if not specified, it is update.
@@ -111,7 +247,7 @@ const SessionBunchCreateComponent = () => {
  * @param create - true for create, false for update. default is false
  *  
  */
-const SessionCreateOrUpdateComponent = ({ reference, create = false }:
+const SessionUpdateComponent = ({ reference, create = false }:
     { reference?: string, create?: boolean }) => {
     console.log("SessionCreateOrUpdateComponent", reference, create)
     const [session, setSession] = React.useState<ISession>(sessionInitEmpty);
@@ -252,5 +388,6 @@ const SessionCreateOrUpdateComponent = ({ reference, create = false }:
 }
 export {
     SessionViewOneComponent,
-    SessionCreateOrUpdateComponent
+    SessionCreateComponent,
+    SessionUpdateComponent,
 };

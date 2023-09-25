@@ -10,6 +10,13 @@ export interface ISession {
     subjects: string[];
 }
 
+const createSession = async (session: ISession): Promise<ISession | undefined> => {
+    await sleep(1e3); // For demo purposes.
+    if (!session.reference) return undefined;
+    Sessions.push(session);
+    return session;
+}
+
 const getAllSessions = async (): Promise<ISession[]> => {
     await sleep(1e3); // For demo purposes.
     return Sessions;
@@ -17,10 +24,11 @@ const getAllSessions = async (): Promise<ISession[]> => {
 
 const getOneSessionByReference = async (reference: string): Promise<ISession | undefined> => {
     await sleep(1e3); // For demo purposes.
-    return Sessions.find((session) => session.reference === reference);
+    return Sessions.find((session: ISession) => session.reference === reference);
 }
 
 export default {
+    createSession,
     getAllSessions,
     getOneSessionByReference
 }

@@ -34,7 +34,9 @@ const subjects: any = [
                 "crn": "12347"
             }
         ],
-        "sessions": []
+        "sessions": [
+            "Session.a9456e08-d901-4be0-b636-dc29c9fb2ea7"
+        ]
     },
 ];
 

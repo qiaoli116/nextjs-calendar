@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect } from 'react';
-import { ISubject } from '../../dataService/subjects';
+import { ISubject, ISubjectFull } from '../../dataService/subjects';
 import { v4 as uuidv4 } from 'uuid';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -15,6 +15,11 @@ import TASSubjectSelect from '../Controls/TASSubjectSelect';
 import DeliveryModeSelect from '../Controls/DeliveryModeSelect';
 import SubjectsDataService from '../../dataService/subjects';
 import { CircularProgress } from '@mui/material';
+import { useFetchOneById } from '../Hooks/crud';
+import Modal from '@mui/material/Modal';
+import { SessionCreateComponent } from './Session';
+import { ISession } from '../../dataService/sessions';
+
 
 const generateSubjectReference = () => {
     return "Subject." + uuidv4();
@@ -30,33 +35,8 @@ interface IInitSusbjectForm {
     subjectCode: string,
     numberOfSessions: number,
 }
-function useFetchOneById<T>(id: string, fetchMethod: (id: string) => Promise<T>) {
-    const [item, setItem] = React.useState<T | null>(null);
-    const [loading, setLoading] = React.useState<boolean>(true);
-    const [error, setError] = React.useState<boolean>(false);
-    const fetchData = async () => {
-        console.log("useFetchOneById useEffect", item, loading, error);
-        const _item: T = await fetchMethod(id);
-        if (_item !== undefined) {
-            console.log("useFetchOneById useEffect object fetched", _item);
-            setItem({ ..._item });
-        } else {
-            setError(true);
-        }
-        setLoading(false);
-    };
 
-    const refresh = () => {
-        setItem(null);
-        setLoading(true);
-        setError(false);
-    }
 
-    React.useEffect(() => {
-        fetchData();
-    }, [loading, error]);
-    return { item, setItem, loading, error, refresh };
-}
 const SubjectCreateComponent = ({ department, term }:
     { department?: string, term?: string }) => {
     console.log("SubjectCreateComponent - ", "department", department, "term", term)
@@ -137,10 +117,7 @@ const SubjectCreateComponent = ({ department, term }:
                 }
             });
             for (let i = 0; i < initSubjectForm.numberOfSessions; i++) {
-                s.sessions[i] = {
-                    date: "",
-                    sessionReference: "",
-                }
+                s.sessions[i] = "";
             }
             setSubject(s);
         }
@@ -372,8 +349,13 @@ const SubjectViewOneComponent = ({ reference }: { reference: string }) => {
 }
 
 const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
-    const { item: subject, setItem: setSubject, loading, error, refresh } = useFetchOneById<ISubject | undefined>(reference, SubjectsDataService.getOneSubjectByReference);
+    const { item: subjectFull, setItem: setSubjectFull, loading, error, refresh } = useFetchOneById<ISubjectFull | undefined>(reference, SubjectsDataService.getOneSubjectFullByReference);
     console.log("SubjectUpdateComponent - reference", reference)
+
+    const [openModalCreateSession, setOpenModalCreateSession] = React.useState(false);
+    const handleOpenModalCreateSession = () => setOpenModalCreateSession(true);
+    const handleCloseModalCreateSession = () => setOpenModalCreateSession(false);
+
     const currentYear = new Date().getFullYear();
     if (loading) {
         return (
@@ -383,12 +365,12 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
         )
     }
 
-    if (error || subject === null || subject === undefined) {
+    if (error || subjectFull === null || subjectFull === undefined) {
         return (
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
                     <pre>
-                        {`Error: Subject ${reference} not found`}
+                        {`Error: subjectFull ${reference} not found`}
                     </pre>
                 </code>
             </Box>
@@ -399,17 +381,26 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
         console.log("handleInputChange - ", "name", name, "value", value);
-        const s = { ...subject };
+        const s = { ...subjectFull };
         _.set(s, name, value);
-        setSubject(s);
-        console.log("handleInputChange - ", "subject", subject);
+        setSubjectFull(s);
+        console.log("handleInputChange - ", "subjectFull", subjectFull);
     };
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        console.log("handleSubmit", subject);
-        console.log("handleSubmit", JSON.stringify(subject, null, 2));
+        console.log("handleSubmit", subjectFull);
+        console.log("handleSubmit", JSON.stringify(subjectFull, null, 2));
     };
 
+    const sessionCreateCallback = (session: ISession | undefined) => {
+        console.log("sessionCreateCallback - ", "session", session);
+        if (session !== undefined) {
+            const s = { ...subjectFull };
+            s.sessions.push(session);
+            setSubjectFull(s);
+        }
+        handleCloseModalCreateSession();
+    }
     return (
         <>
             <form onSubmit={handleSubmit}>
@@ -419,7 +410,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                             fullWidth
                             label="Subject ID (Read only)"
                             name='reference'
-                            value={subject.reference}
+                            value={subjectFull.reference}
                             InputProps={{
                                 readOnly: true,
                             }}
@@ -429,7 +420,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                         <TextField
                             fullWidth
                             label="Subject Code - Title (Read only)"
-                            value={subject.code === "" ? "" : subject.code + " - " + subject.title}
+                            value={subjectFull.code === "" ? "" : subjectFull.code + " - " + subjectFull.title}
                             InputProps={{
                                 readOnly: true,
                             }}
@@ -442,7 +433,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                             fullWidth
                             label="Term"
                             name='term'
-                            value={subject.term}
+                            value={subjectFull.term}
                             onChange={handleInputChange}
                         />
                     </FormControl>
@@ -450,7 +441,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                         <TextField
                             fullWidth
                             label="Department (Read only)"
-                            value={subject.department}
+                            value={subjectFull.department}
                             InputProps={{
                                 readOnly: true,
                             }}
@@ -460,7 +451,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                         <TextField
                             fullWidth
                             label="Qualification Code - Title (Read only)"
-                            value={subject.qualification.code === "" ? "" : subject.qualification.code + " - " + subject.qualification.title}
+                            value={subjectFull.qualification.code === "" ? "" : subjectFull.qualification.code + " - " + subjectFull.qualification.title}
                         />
                     </FormControl>
                 </Box>
@@ -472,14 +463,14 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                             fullWidth
                             label="Block"
                             name='block'
-                            value={subject.block}
+                            value={subjectFull.block}
                             onChange={handleInputChange}
                         />
                     </FormControl>
                     <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
                         <DeliveryModeSelect
                             name='deliveryMode'
-                            value={subject.deliveryMode}
+                            value={subjectFull.deliveryMode}
                             onChange={handleInputChange}
                         />
                     </FormControl>
@@ -489,7 +480,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                             type='date'
                             label="Start Date"
                             name='dateRange.startDate'
-                            value={subject.dateRange.startDate}
+                            value={subjectFull.dateRange.startDate}
                             onChange={handleInputChange}
                             InputLabelProps={{
                                 shrink: true,
@@ -503,7 +494,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                             type='date'
                             label="End Date"
                             name='dateRange.endDate'
-                            value={subject.dateRange.endDate}
+                            value={subjectFull.dateRange.endDate}
                             onChange={handleInputChange}
                             InputLabelProps={{
                                 shrink: true,
@@ -511,7 +502,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                         />
                     </FormControl>
                 </Box>
-                {subject.units.map((u, index) => {
+                {subjectFull.units.map((u, index) => {
                     return (
                         <Box sx={boxSx}>
                             <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
@@ -519,7 +510,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                                     fullWidth
                                     label={`Unit ${(index + 1)} CRN`}
                                     name={`units[${index}].crn`}
-                                    value={subject.units[index].crn}
+                                    value={u.crn}
                                     onChange={handleInputChange}
                                 />
                             </FormControl>
@@ -527,15 +518,54 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                                 <TextField
                                     fullWidth
                                     label="Code - Title (Read only)"
-                                    value={u.code === "" ? "" : subject.units[index].code + " - " + subject.units[index].title}
+                                    value={u.code === "" ? "" : u.code + " - " + u.title}
+                                />
+                            </FormControl>
+                        </Box>
+                    )
+                })}
+                {subjectFull.sessions.map((s, index) => {
+                    return (
+                        <Box sx={boxSx}>
+                            <FormControl sx={{ minWidth: "400px", pr: "10px" }}>
+                                <TextField
+                                    fullWidth
+                                    label={`Session ${(index + 1)}`}
+                                    value={s.reference}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </FormControl>
+                            <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                                <TextField
+                                    fullWidth
+                                    label={`Date`}
+                                    value={s.date}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </FormControl>
+                            <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                                <TextField
+                                    fullWidth
+                                    label={`Teacher`}
+                                    value={s.teacher}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
                                 />
                             </FormControl>
                         </Box>
                     )
                 })}
                 <Box sx={boxSx}>
-                    <Button type='submit'>
-                        Add Session
+                    <Button onClick={handleOpenModalCreateSession}>
+                        + New Session
+                    </Button>
+                    <Button >
+                        + Existing Session
                     </Button>
                 </Box>
                 <Box sx={boxSx}>
@@ -545,16 +575,40 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
                     <Button onClick={refresh}>
                         Reload
                     </Button>
-
                 </Box>
             </form>
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
                     <pre>
-                        {JSON.stringify(subject, null, 2) + ","}
+                        {JSON.stringify(subjectFull, null, 2) + ","}
                     </pre>
                 </code>
             </Box>
+            <div>
+                <Modal
+                    open={openModalCreateSession}
+                    onClose={handleCloseModalCreateSession}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={{
+                        position: 'absolute' as 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 1300,
+                        bgcolor: 'background.paper',
+                        border: '1px solid #aaa',
+                        boxShadow: 24,
+                        p: 4,
+                    }}>
+                        <SessionCreateComponent
+                            subject={subjectFull.reference}
+                            createResultCallback={sessionCreateCallback}
+                        />
+                    </Box>
+                </Modal>
+            </div>
         </>
     )
 }
