@@ -4,5 +4,87 @@ type Query {
   book(id: ID): Book
   authors: [Author]
   author(id: ID): Author
-  teachers: [Teacher]
+  Teachers: [Teacher]
+  Teacher(orgId: String): Teacher
+  Rooms: [Room]
+  Room(roomNumber: String): Room
 }
+
+type Room{
+    roomNumber: String!
+    type: String!
+}
+type Name {
+    first: String
+    last: String
+}
+
+type TASQualification {
+    code: String!
+    title: String!
+}
+
+type Teacher {
+    orgId: String
+    userName: String
+    email: String
+    name: Name
+}
+
+
+type DateRange{
+    startDate: String!
+    endDate: String!
+}
+
+
+interface Unit {
+    code: String!
+    title: String!
+}
+type TASUnit implements Unit{
+    code: String!
+    title: String!
+}
+type SubjectUnit implements Unit{
+    code: String!
+    title: String!
+    crn: String!
+}
+
+type TASSubject {
+    code: String!
+    title: String!
+    units: [TASUnit]!
+}
+type TAS {
+    year: String!
+    department: String!
+    qualification: TASQualification
+    subjects: [TASSubject]
+}
+
+type Subject {
+    reference: String!
+    code: String!
+    title: String!
+    term: String!
+    department: String!
+    block: String!
+    qualification: TASQualification
+    deliveryMode: String!
+    dateRange: DateRange!
+    units: [SubjectUnit]!
+    sessions: [Session]!
+}
+
+type Session {
+    reference: String!
+    date: String!
+    teacher: Teacher
+    room: Room
+    timeslots: [String]!
+    subjects: [Subject]!
+}
+
+

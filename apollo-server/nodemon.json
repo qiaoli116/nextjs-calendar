@@ -1,0 +1,7 @@
+{
+    "ext": "ts, graphql",
+    "watch": [
+        "src",
+        "scheme"
+    ]
+}
