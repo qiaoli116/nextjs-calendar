@@ -4,10 +4,13 @@ type Query {
   book(id: ID): Book
   authors: [Author]
   author(id: ID): Author
-  Teachers: [Teacher]
-  Teacher(orgId: String): Teacher
-  Rooms: [Room]
-  Room(roomNumber: String): Room
+  teachers: [Teacher]
+  teacher(orgId: String): Teacher
+  rooms: [Room]
+  room(roomNumber: String): Room
+  tases: [TAS]
+  tas(year: String, department: String, qualificationCode: String): TAS
+  tasSubject(year: String, department: String, qualificationCode: String, subjectCode: String): TAS
 }
 
 type Room{

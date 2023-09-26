@@ -43,11 +43,17 @@ async function readTeacherByOrgId(orgId: string): Promise<ITeacher | null> {
     return teacher;
 }
 const TeachersQuery = {
-    Teachers: async () => { return await readAllTeachers() },
-    Teacher: (parent, args, context, info) => {
-        const { orgId } = args;
-        return readTeacherByOrgId(orgId);
+    Query: {
+        teachers: async () => { return await readAllTeachers() },
+        teacher: (parent, args, context, info) => {
+            const { orgId } = args;
+            return readTeacherByOrgId(orgId);
+        }
+    },
+    Children: {
+
     }
+
 }
 const TeachersCRUD = {
     readAllTeachers,

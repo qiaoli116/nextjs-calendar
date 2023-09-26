@@ -2,6 +2,7 @@ import books from '../dataSource/books.js';
 import authors from '../dataSource/authors.js';
 import teachers from '../dataSource/teachers.js';
 import { TeachersQuery } from './teachers.js';
+import {TASQuery} from './tas.js';
 
 
 
@@ -18,8 +19,11 @@ const resolvers = {
             return authors.find(author => author.id === id);
         },
 
-        ...TeachersQuery,
+        ...TeachersQuery.Query,
+        ...TASQuery.Query
     },
+    ...TeachersQuery.Children,
+    ...TASQuery.Children,
     Book: {
         author: (parent, args, context, info) => {
             console.log("Book author", parent);
