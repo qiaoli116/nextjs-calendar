@@ -1,9 +1,5 @@
 
 type Query {
-  books: [Book]
-  book(id: ID): Book
-  authors: [Author]
-  author(id: ID): Author
   teachers: [Teacher]
   teacher(orgId: String): Teacher
   rooms: [Room]
@@ -11,6 +7,10 @@ type Query {
   tases: [TAS]
   tas(year: String, department: String, qualificationCode: String): TAS
   tasSubject(year: String, department: String, qualificationCode: String, subjectCode: String): TAS
+  sessions: [Session]
+  session(reference: String): Session
+  subjects: [Subject]
+  subject(reference: String): Subject
 }
 
 type Room{

@@ -1,24 +1,8 @@
-import dbClient from '../db.js'
+import { dbClient, dbCollections, readAllDocuments } from '../db.js'
 import { ITAS, ITASSubject } from './types.js'
+const collectionName = dbCollections.tas;
 async function readAllTAS(): Promise<ITAS[] | null> {
-    let tas = null;
-    try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
-
-        const db = dbClient.db('appdb'); // Replace with your database name
-        const collection = db.collection('tas'); // Replace with your collection name
-
-        const docs = await collection.find({}).toArray();
-        console.log('Found documents:', docs);
-        tas = docs;
-    } catch (err) {
-        console.error('Error reading data:', err);
-    } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
-    }
-    return tas;
+    return await readAllDocuments<ITAS>(collectionName);
 }
 async function readTAS(year: string, department: string, qualificationCode: string): Promise<ITAS | null> {
     let tas = null;

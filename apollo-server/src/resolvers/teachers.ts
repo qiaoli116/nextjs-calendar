@@ -1,25 +1,11 @@
-import dbClient from '../db.js'
+import { dbClient, dbCollections, readAllDocuments } from '../db.js'
 import { ITeacher } from './types.js'
+const collectionName = dbCollections.teachers;
+
 async function readAllTeachers(): Promise<ITeacher[] | null> {
-    let teachers = null;
-    try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
-
-        const db = dbClient.db('appdb'); // Replace with your database name
-        const collection = db.collection('teachers'); // Replace with your collection name
-
-        const docs = await collection.find({}).toArray();
-        console.log('Found documents:', docs);
-        teachers = docs;
-    } catch (err) {
-        console.error('Error reading data:', err);
-    } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
-    }
-    return teachers;
+    return await readAllDocuments<ITeacher>(collectionName);
 }
+
 async function readTeacherByOrgId(orgId: string): Promise<ITeacher | null> {
     let teacher = null;
     try {
