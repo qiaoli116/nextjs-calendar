@@ -1,6 +1,6 @@
 import { dbClient, dbCollections, readAllDocuments } from '../db.js'
 import { ITeacher } from './types.js'
-const collectionName = dbCollections.teachers;
+const collectionName = dbCollections.teachers.name;
 
 async function readAllTeachers(): Promise<ITeacher[] | null> {
     return await readAllDocuments<ITeacher>(collectionName);

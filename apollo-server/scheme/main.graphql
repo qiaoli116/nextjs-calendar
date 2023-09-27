@@ -14,7 +14,7 @@ type Query {
 }
 
 type Room{
-    roomNumber: String!
+    roomNum: String!
     type: String!
 }
 type Name {

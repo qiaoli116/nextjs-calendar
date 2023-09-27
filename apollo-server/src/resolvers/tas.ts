@@ -1,6 +1,6 @@
 import { dbClient, dbCollections, readAllDocuments } from '../db.js'
 import { ITAS, ITASSubject } from './types.js'
-const collectionName = dbCollections.tas;
+const collectionName = dbCollections.tas.name;
 async function readAllTAS(): Promise<ITAS[] | null> {
     return await readAllDocuments<ITAS>(collectionName);
 }

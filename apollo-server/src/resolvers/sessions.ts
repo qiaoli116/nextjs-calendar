@@ -2,7 +2,7 @@ import { dbClient, dbCollections, readAllDocuments } from '../db.js'
 import { ISession } from './types.js'
 import { TeachersCRUD } from './teachers.js';
 import { SubjectsCRUD } from './subjects.js';
-const collectionName = dbCollections.sessions;
+const collectionName = dbCollections.sessions.name;
 async function readAllSessions(query: any = {}): Promise<ISession[] | null> {
     return await readAllDocuments<ISession>(collectionName, query);
 }

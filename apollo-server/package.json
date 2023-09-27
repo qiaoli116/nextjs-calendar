@@ -7,7 +7,10 @@
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
-    "dev": "nodemon --exec 'npm run start'"
+    "dev": "nodemon --exec 'npm run start'",
+    "db:init": "npm run compile && node ./dist/dataSource/dbInit.js",
+    "db:start": "sudo docker start mongo",
+    "db:shell": "sudo docker exec -it mongo mongosh"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +25,7 @@
   "devDependencies": {
     "@types/node": "^20.6.5",
     "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }
 }
