@@ -15,6 +15,10 @@ const getAllTeachers = async (): Promise<ITeacher[]> => {
     await sleep(1e3); // For demo purposes.
     return Teachers;
 }
+const getAllTeachersGraphql = async (): Promise<ITeacher[]> => {
+    await sleep(1e3); // For demo purposes.
+    return Teachers;
+}
 
 const getOneTeacherByOrgId = async (orgId: string): Promise<ITeacher | undefined> => {
     return Teachers.find((teacher) => teacher.orgId === orgId);
