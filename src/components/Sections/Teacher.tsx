@@ -3,6 +3,7 @@ import { gql, useQuery } from 'urql';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useQueryTeachers } from '../Hooks/teachers';
 const teachersQuery = gql`
     query Teachers {
         teachers {
@@ -32,10 +33,9 @@ const columns: GridColDef[] = [
 ];
 
 export default function TeacherViewAllComponent() {
-    const [result, reexecuteQuery] = useQuery({
-        query: teachersQuery,
-    });
-    const { data, fetching: loading, error } = result;
+    console.log("TeacherViewAllComponent");
+    const { loading, error, dataError, teachers, reexecuteQueryTeachers } = useQueryTeachers();
+
     if (loading) {
         return (
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
@@ -48,20 +48,25 @@ export default function TeacherViewAllComponent() {
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
                     <pre>
-                        {`Error: Subject ${reference} not found`}
+                        <div>Error: {error.message}</div>;
                     </pre>
                 </code>
             </Box>
         )
     }
-    console.log("data fetched ...", data);
-    if (data === undefined || data === null || data.teachers === undefined || data.teachers === null) {
-        return <p>no data</p>
+    if (dataError) {
+        return (
+            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                <code>
+                    <pre>
+                        <div>Error: Data is missing or invalid</div>;
+                    </pre>
+                </code>
+            </Box>
+        )
     }
-    if (!Array.isArray(data.teachers)) {
-        return <p>data is not an array</p>
-    }
-    const rows = data.teachers.map((teacher: any) => {
+
+    const rows = teachers.map((teacher: any) => {
         return {
             id: teacher.orgId,
             firstName: teacher.name.first,

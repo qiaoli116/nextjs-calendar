@@ -1,5 +1,6 @@
 'use client'
 import * as React from 'react';
+import { TeacherViewAllComponent } from '../../../../components/Sections/Teacher';
 
 
 
@@ -8,7 +9,7 @@ export default function SubjectSinglePage({ params }: { params: { termCode: stri
     console.log("params", params);
     return (
         <>
-            <div>hello teacher page</div>
+            <TeacherViewAllComponent />
         </>
 
     );
