@@ -13,6 +13,17 @@ type Query {
   subject(reference: String): Subject
 }
 
+type Mutation {
+  addTeacher(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
+#   addRoom(roomNumber: String, type: String): Room
+#   addTAS(year: String, department: String, qualificationCode: String): TAS
+#   addTASSubject(year: String, department: String, qualificationCode: String, subjectCode: String, subjectTitle: String): TAS
+#   addSubject(reference: String, code: String, title: String, term: String, department: String, block: String, qualificationCode: String, deliveryMode: String, startDate: String, endDate: String): Subject
+#   addSession(reference: String, date: String, teacherOrgId: String, roomNumber: String, timeslots: [String]): Session
+#   addSubjectUnit(reference: String, code: String, title: String, crn: String): Subject
+#   addTASUnit(year: String, department: String, qualificationCode: String, subjectCode: String, code: String, title: String): TAS
+}
+
 type Room{
     roomNum: String!
     type: String!

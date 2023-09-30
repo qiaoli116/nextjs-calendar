@@ -13,6 +13,9 @@ const resolvers = {
         ...SubjectsQuery.Query,
         ...RoomsQuery.Query,
     },
+    Mutation: {
+        ...TeachersQuery.Mutation
+    },
     ...TeachersQuery.Children,
     ...TASQuery.Children,
     ...SessionsQuery.Children,

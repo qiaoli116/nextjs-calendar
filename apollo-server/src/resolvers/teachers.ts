@@ -28,12 +28,52 @@ async function readTeacherByOrgId(orgId: string): Promise<ITeacher | null> {
     }
     return teacher;
 }
+
+async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
+    let teacherCreated = null;
+    console.log("createTeacher", teacher);
+    try {
+        await dbClient.connect();
+        console.log('Connected to MongoDB');
+
+        const db = dbClient.db('appdb');
+        const collection = db.collection('teachers');
+
+        const result = await collection.insertOne(teacher);
+        console.log('Inserted result:', result);
+        if (result.acknowledged) {
+            teacherCreated = await readTeacherByOrgId(result.insertedId.toString());
+        }
+    } catch (err) {
+        console.error('Error reading data:', err);
+    } finally {
+        await dbClient.close();
+        console.log('Closed MongoDB connection');
+    }
+    return teacherCreated;
+}
+
 const TeachersQuery = {
     Query: {
         teachers: async () => { return await readAllTeachers() },
         teacher: (parent, args, context, info) => {
             const { orgId } = args;
             return readTeacherByOrgId(orgId);
+        }
+    },
+    Mutation: {
+        addTeacher: (parent, args, context, info) => {
+            console.log("addTeacher", args);
+            const teacher: ITeacher = {
+                orgId: args.orgId,
+                userName: args.userName,
+                email: args.email,
+                name: {
+                    first: args.firstName,
+                    last: args.lastName
+                }
+            };
+            return createTeacher(teacher);
         }
     },
     Children: {
