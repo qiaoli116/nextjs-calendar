@@ -1,4 +1,5 @@
-import { gql, useQuery } from 'urql';
+import { gql, useQuery, useMutation } from 'urql';
+import { ITeacher } from "../../types"
 
 export function useQueryTeachers() {
   const TEACHERS_QUERY = gql`
@@ -14,7 +15,7 @@ export function useQueryTeachers() {
     }
   `;
 
-  const [result, reexecuteQuery] = useQuery({ query: TEACHERS_QUERY });
+  const [result, executeQuery] = useQuery<{ teachers: ITeacher[] } | undefined | null>({ query: TEACHERS_QUERY });
   const { data, fetching: loading, error } = result;
   const dataError =
     data === undefined ||
@@ -28,28 +29,10 @@ export function useQueryTeachers() {
     error,
     dataError,
     teachers: dataError ? [] : data.teachers,
-    reexecuteQueryTeachers: reexecuteQuery,
+    reexecuteQueryTeachers: executeQuery,
   };
 }
 
-
-interface Teacher {
-  email: string;
-  name: {
-    first: string;
-    last: string;
-  };
-  orgId: string;
-  userName: string;
-}
-
-interface QueryData {
-  teacher: Teacher;
-}
-
-interface QueryVariables {
-  orgId: string;
-}
 
 export function useQueryOneTeacher(orgId: string) {
   const TEACHER_QUERY = gql`
@@ -66,7 +49,7 @@ export function useQueryOneTeacher(orgId: string) {
     }
   `;
 
-  const [result, reexecuteQuery] = useQuery({
+  const [result, executeQuery] = useQuery<{ teacher: ITeacher } | undefined | null>({
     query: TEACHER_QUERY,
     variables: { orgId },
   });
@@ -82,6 +65,47 @@ export function useQueryOneTeacher(orgId: string) {
     error,
     dataError,
     teacher: dataError ? [] : data.teacher,
-    reexecuteQueryTeacher: reexecuteQuery,
+    reexecuteQueryTeacher: executeQuery,
+  };
+}
+
+export interface ICreateTeacherMutationVariables {
+  orgId: string;
+  userName: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+type CreateTeacherMutationData = { teacher: ITeacher } | undefined | null;
+export function useCreateTeacher() {
+  const ADD_TEACHER_MUTATION = gql`
+    mutation Mutation($orgId: String, $userName: String, $email: String, $firstName: String, $lastName: String) {
+      addTeacher(orgId: $orgId, userName: $userName, email: $email, firstName: $firstName, lastName: $lastName) {
+        email
+        name {
+          first
+          last
+        }
+        orgId
+        userName
+      }
+    }
+  `;
+
+  const [result, executeQuery] = useMutation<CreateTeacherMutationData, ICreateTeacherMutationVariables>(ADD_TEACHER_MUTATION);
+
+  const { data, fetching: loading, error } = result;
+  const dataError =
+    data === undefined ||
+    data === null ||
+    data.teacher === undefined ||
+    data.teacher === null;
+
+  return {
+    loading,
+    error,
+    dataError,
+    teacher: dataError ? [] : data.teacher,
+    reexecuteQueryTeacher: executeQuery,
   };
 }

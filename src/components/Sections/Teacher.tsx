@@ -195,7 +195,7 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
 }
 
 
-function TeacherCreateComponent() {
+function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess: () => void }) {
     console.log("TeacherCreateComponent");
     const emptyTeacher: ITeacher = {
         orgId: "",
