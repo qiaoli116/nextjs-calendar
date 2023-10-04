@@ -14,7 +14,7 @@ type Query {
 }
 
 type Mutation {
-  addTeacher(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
+  teacherCreate(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
 #   addRoom(roomNumber: String, type: String): Room
 #   addTAS(year: String, department: String, qualificationCode: String): TAS
 #   addTASSubject(year: String, department: String, qualificationCode: String, subjectCode: String, subjectTitle: String): TAS

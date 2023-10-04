@@ -1,4 +1,4 @@
-import { gql, useQuery, useMutation } from 'urql';
+import { gql, useQuery, useMutation, CombinedError, UseMutationExecute } from 'urql';
 import { ITeacher } from "../../types"
 
 export function useQueryTeachers() {
@@ -64,10 +64,12 @@ export function useQueryOneTeacher(orgId: string) {
     loading,
     error,
     dataError,
-    teacher: dataError ? [] : data.teacher,
+    teacher: dataError ? null : data.teacher,
     reexecuteQueryTeacher: executeQuery,
   };
 }
+
+
 
 export interface ICreateTeacherMutationVariables {
   orgId: string;
@@ -77,10 +79,11 @@ export interface ICreateTeacherMutationVariables {
   lastName: string;
 }
 type CreateTeacherMutationData = { teacher: ITeacher } | undefined | null;
-export function useCreateTeacher() {
-  const ADD_TEACHER_MUTATION = gql`
+// executeMutation({ orgId, userName, email, firstName, lastName })
+export function useCreateTeacher(): [boolean, CombinedError | undefined, boolean, ITeacher | null, UseMutationExecute<CreateTeacherMutationData, ICreateTeacherMutationVariables>] {
+  const TEACHER_CREATE_MUTATION = gql`
     mutation Mutation($orgId: String, $userName: String, $email: String, $firstName: String, $lastName: String) {
-      addTeacher(orgId: $orgId, userName: $userName, email: $email, firstName: $firstName, lastName: $lastName) {
+      teacherCreate(orgId: $orgId, userName: $userName, email: $email, firstName: $firstName, lastName: $lastName) {
         email
         name {
           first
@@ -92,7 +95,7 @@ export function useCreateTeacher() {
     }
   `;
 
-  const [result, executeQuery] = useMutation<CreateTeacherMutationData, ICreateTeacherMutationVariables>(ADD_TEACHER_MUTATION);
+  const [result, executeMutation] = useMutation<CreateTeacherMutationData, ICreateTeacherMutationVariables>(TEACHER_CREATE_MUTATION);
 
   const { data, fetching: loading, error } = result;
   const dataError =
@@ -101,11 +104,12 @@ export function useCreateTeacher() {
     data.teacher === undefined ||
     data.teacher === null;
 
-  return {
+  const teacher = dataError ? null : data.teacher;
+  return [
     loading,
     error,
     dataError,
-    teacher: dataError ? [] : data.teacher,
-    reexecuteQueryTeacher: executeQuery,
-  };
+    teacher,
+    executeMutation,
+  ];
 }

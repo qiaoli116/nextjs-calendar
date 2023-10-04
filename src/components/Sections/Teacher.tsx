@@ -2,7 +2,7 @@
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useQueryTeachers, useQueryOneTeacher } from '../Hooks/teachers';
+import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher } from '../Hooks/teachers';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import Link from 'next/link';
 import TextField from '@mui/material/TextField';
@@ -128,7 +128,7 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
             </Box>
         )
     }
-    if (dataError) {
+    if (dataError || teacher === null) {
         return (
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
@@ -195,7 +195,7 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
 }
 
 
-function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess: () => void }) {
+function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: () => void }) {
     console.log("TeacherCreateComponent");
     const emptyTeacher: ITeacher = {
         orgId: "",
@@ -207,6 +207,7 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess: () => vo
         userName: "",
     }
     const [teacher, setTeacher] = React.useState<ITeacher>(emptyTeacher);
+    const [loading, error, dataError, newTeacher, executeCreateTeacher] = useCreateTeacher();
     // this is a general purpose handler for all input fields
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
@@ -216,14 +217,25 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess: () => vo
         setTeacher(s);
         console.log("handleInputChange - ", "teacher", teacher);
     };
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
         console.log("handleSubmit - ", "teacher", teacher);
+        const _teacher = {
+            orgId: teacher.orgId,
+            userName: teacher.userName,
+            email: teacher.email,
+            firstName: teacher.name.first,
+            lastName: teacher.name.last
+        };
+        const x = await executeCreateTeacher(_teacher);
+        console.log("handleSubmit - ", "x", x);
+        console.log("handleSubmit - ", "loading", loading, "dataError", dataError, "newTeacher", newTeacher);
     };
     const resetForm = () => {
         setTeacher(emptyTeacher);
     };
 
+    console.log("TeacherCreateComponent - ", "loading", loading, "dataError", dataError, "newTeacher", newTeacher);
     return (
         <>
             <h1>View teacher</h1>

@@ -1,4 +1,4 @@
-import { dbClient, dbCollections, readAllDocuments } from '../db.js'
+import { dbClient, dbCollections, readAllDocuments, readOneDocumentById } from '../db.js'
 import { ITeacher } from './types.js'
 const collectionName = dbCollections.teachers.name;
 
@@ -42,7 +42,8 @@ async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
         const result = await collection.insertOne(teacher);
         console.log('Inserted result:', result);
         if (result.acknowledged) {
-            teacherCreated = await readTeacherByOrgId(result.insertedId.toString());
+            teacherCreated = await readOneDocumentById<ITeacher>("teachers", result.insertedId.toString() as string);
+            console.log('Inserted teacher:', teacherCreated);
         }
     } catch (err) {
         console.error('Error reading data:', err);
@@ -62,7 +63,7 @@ const TeachersQuery = {
         }
     },
     Mutation: {
-        addTeacher: (parent, args, context, info) => {
+        teacherCreate: (parent, args, context, info) => {
             console.log("addTeacher", args);
             const teacher: ITeacher = {
                 orgId: args.orgId,
