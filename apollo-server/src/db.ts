@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 const url = 'mongodb://localhost:27017';
 const dbName = 'appdb';
 const dbClient = new MongoClient(url);
+const collationCaseInsensitive = { locale: 'en', strength: 2 }
 const dbCollections = {
     teachers: {
         name: 'teachers',
@@ -52,12 +53,12 @@ const readOneDocumentByIndex = async <T>(collectionName: string, indexQuery: obj
     let document = null;
     try {
         await dbClient.connect();
-        console.log('Connected to MongoDB');
+        console.log('Connected to MongoDB, ', collectionName, indexQuery);
 
         const db = dbClient.db('appdb'); // Replace with your database name
         const collection = db.collection(collectionName); // Replace with your collection name
 
-        const docs = await collection.find(indexQuery).toArray();
+        const docs = await collection.find(indexQuery).collation(collationCaseInsensitive).toArray();
         console.log('Found documents:', docs);
         if (docs.length > 0) {
             document = docs[0];
@@ -77,8 +78,8 @@ const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | n
         await dbClient.connect();
         console.log('Connected to MongoDB');
 
-        const db = dbClient.db('appdb'); // Replace with your database name
-        const collection = db.collection(collectionName); // Replace with your collection name
+        const db = dbClient.db('appdb');
+        const collection = db.collection(collectionName);
         const indexQuery = { _id: new ObjectId(id) };
         const docs = await collection.find(indexQuery).toArray();
         console.log('Found documents:', docs);
@@ -94,5 +95,30 @@ const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | n
     return document;
 }
 
+const deleteOneDocumentByIndex = async <T>(collectionName: string, indexQuery: object): Promise<T | null> => {
+    let document = null;
+    try {
+        await dbClient.connect();
+        console.log('Connected to MongoDB');
 
-export { dbName, dbClient, dbCollections, readAllDocuments, readOneDocumentByIndex, readOneDocumentById };
+        const db = dbClient.db('appdb'); // Replace with your database name
+        const collection = db.collection(collectionName); // Replace with your collection name
+
+        const docs = await collection.find(indexQuery).toArray();
+        console.log('Found documents:', docs);
+        if (docs.length > 0) {
+            document = docs[0];
+        }
+    } catch (err) {
+        console.error('Error reading data:', err);
+    } finally {
+        await dbClient.close();
+        console.log('Closed MongoDB connection');
+    }
+    return document;
+}
+
+
+
+
+export { dbName, dbClient, dbCollections, readAllDocuments, readOneDocumentByIndex, readOneDocumentById, collationCaseInsensitive };
