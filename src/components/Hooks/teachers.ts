@@ -78,9 +78,9 @@ export interface ICreateTeacherMutationVariables {
   firstName: string;
   lastName: string;
 }
-type CreateTeacherMutationData = { teacher: ITeacher } | undefined | null;
+type CreateTeacherMutationData = { teacherCreate: ITeacher } | undefined | null;
 // executeMutation({ orgId, userName, email, firstName, lastName })
-export function useCreateTeacher(): [boolean, CombinedError | undefined, boolean, ITeacher | null, UseMutationExecute<CreateTeacherMutationData, ICreateTeacherMutationVariables>] {
+export function useCreateTeacher(): [UseMutationExecute<CreateTeacherMutationData, ICreateTeacherMutationVariables>] {
   const TEACHER_CREATE_MUTATION = gql`
     mutation Mutation($orgId: String, $userName: String, $email: String, $firstName: String, $lastName: String) {
       teacherCreate(orgId: $orgId, userName: $userName, email: $email, firstName: $firstName, lastName: $lastName) {
@@ -97,19 +97,15 @@ export function useCreateTeacher(): [boolean, CombinedError | undefined, boolean
 
   const [result, executeMutation] = useMutation<CreateTeacherMutationData, ICreateTeacherMutationVariables>(TEACHER_CREATE_MUTATION);
 
-  const { data, fetching: loading, error } = result;
-  const dataError =
-    data === undefined ||
-    data === null ||
-    data.teacher === undefined ||
-    data.teacher === null;
+  // const { data, fetching: loading, error } = result;
+  // const dataError =
+  //   data === undefined ||
+  //   data === null ||
+  //   data.teacher === undefined ||
+  //   data.teacher === null;
 
-  const teacher = dataError ? null : data.teacher;
+  // const teacher = dataError ? null : data.teacher;
   return [
-    loading,
-    error,
-    dataError,
-    teacher,
-    executeMutation,
+    executeMutation
   ];
 }

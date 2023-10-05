@@ -47,6 +47,7 @@ async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
         }
     } catch (err) {
         console.error('Error reading data:', err);
+        throw err;
     } finally {
         await dbClient.close();
         console.log('Closed MongoDB connection');

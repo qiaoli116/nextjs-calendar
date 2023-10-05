@@ -12,10 +12,16 @@ const db = dbClient.db(dbName);
 
 async function initCollection(collectionName: string, index: {}, documents: any[]) {
     const collection = db.collection(collectionName);
-    await collection.drop();
-    await db.createCollection(collectionName);
-    await collection.createIndex(index, { collation: { locale: 'en', strength: 2 } });
-    await collection.insertMany(documents);
+    try {
+        await collection.drop();
+        await db.createCollection(collectionName);
+        await collection.createIndex(index, { unique: true, collation: { locale: 'en', strength: 2 } });
+        await collection.insertMany(documents);
+    }
+    catch(e){
+        console.log(e);
+    }
+    
 }
 
 await initCollection(dbCollections.teachers.name, dbCollections.teachers.index, teachers);

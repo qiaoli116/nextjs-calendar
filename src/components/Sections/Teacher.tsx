@@ -11,6 +11,7 @@ import _ from 'lodash';
 import { ITeacher } from '../../types';
 import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
+import { sleep } from '../../dataService/utils';
 
 
 function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath: string }) {
@@ -88,17 +89,17 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
     console.log("row", rows);
     return (
         <>
-            <h1>View all teachers</h1>
+
             <div style={{ width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
                     initialState={{
                         pagination: {
-                            paginationModel: { page: 0, pageSize: 10 },
+                            paginationModel: { page: 0, pageSize: 50 },
                         },
                     }}
-                    pageSizeOptions={[5, 10]}
+                    pageSizeOptions={[50, 100]}
                     disableRowSelectionOnClick
                 />
             </div>
@@ -194,8 +195,8 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
     )
 }
 
-
-function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: () => void }) {
+type MutationStatus = "idle" | "loading" | "success" | "error";
+function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teacher: ITeacher) => void }) {
     console.log("TeacherCreateComponent");
     const emptyTeacher: ITeacher = {
         orgId: "",
@@ -207,7 +208,8 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: () => v
         userName: "",
     }
     const [teacher, setTeacher] = React.useState<ITeacher>(emptyTeacher);
-    const [loading, error, dataError, newTeacher, executeCreateTeacher] = useCreateTeacher();
+    const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
+    const [executeCreateTeacher] = useCreateTeacher();
     // this is a general purpose handler for all input fields
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
@@ -220,6 +222,7 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: () => v
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         console.log("handleSubmit - ", "teacher", teacher);
+        setMutationStatus("loading");
         const _teacher = {
             orgId: teacher.orgId,
             userName: teacher.userName,
@@ -227,18 +230,32 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: () => v
             firstName: teacher.name.first,
             lastName: teacher.name.last
         };
-        const x = await executeCreateTeacher(_teacher);
-        console.log("handleSubmit - ", "x", x);
-        console.log("handleSubmit - ", "loading", loading, "dataError", dataError, "newTeacher", newTeacher);
+        sleep(2000)
+        const result = await executeCreateTeacher(_teacher);
+        console.log("handleSubmit - ", "result", result)
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.teacherCreate == null || result.data.teacherCreate == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onCreateSuccess) {
+                    onCreateSuccess(result.data.teacherCreate);
+                }
+            }
+
+        }
     };
-    const resetForm = () => {
-        setTeacher(emptyTeacher);
+    const resetForm = async () => {
+
+        //setTeacher(emptyTeacher);
     };
 
-    console.log("TeacherCreateComponent - ", "loading", loading, "dataError", dataError, "newTeacher", newTeacher);
+
+
     return (
         <>
-            <h1>View teacher</h1>
             <form onSubmit={handleSubmit}>
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
@@ -302,14 +319,15 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: () => v
                 </Box>
                 <Box sx={{ py: "8px" }}>
                     <Button type='submit'>
-                        Save
+                        {mutationStatus === "loading" ? <>Creating <CircularProgress color="inherit" size={20} /></> : "Create"}
                     </Button>
                     <Button onClick={resetForm}>
                         Reset
                     </Button>
                 </Box>
             </form>
-
+            {mutationStatus === "error" && <div>Mutation Error</div>}
+            {mutationStatus === "success" && <div>Mutation Succeed</div>}
 
         </>
     )
