@@ -1,3 +1,4 @@
+import { BlobOptions } from 'buffer';
 import { MongoClient } from 'mongodb';
 import { ObjectId } from 'mongodb';
 
@@ -81,7 +82,7 @@ const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | n
         const db = dbClient.db('appdb');
         const collection = db.collection(collectionName);
         const indexQuery = { _id: new ObjectId(id) };
-        const docs = await collection.find(indexQuery).toArray();
+        const docs = await collection.find(indexQuery).collation(collationCaseInsensitive).toArray();
         console.log('Found documents:', docs);
         if (docs.length > 0) {
             document = docs[0];
@@ -95,8 +96,57 @@ const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | n
     return document;
 }
 
-const deleteOneDocumentByIndex = async <T>(collectionName: string, indexQuery: object): Promise<T | null> => {
-    let document = null;
+
+const insertOneDocument = async <T>(collectionName: string, document: T): Promise<T | null> => {
+    let documentCreated = null;
+    try {
+        await dbClient.connect();
+        console.log('Connected to MongoDB');
+
+        const db = dbClient.db('appdb');
+        const collection = db.collection(collectionName);
+
+        const result = await collection.insertOne(document);
+        console.log('Inserted result:', result);
+        if (result.insertedId) {
+            documentCreated = await readOneDocumentById<T>(collectionName, result.insertedId.toString() as string);
+            console.log('Inserted document:', documentCreated);
+        }
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        await dbClient.close();
+        console.log('Closed MongoDB connection');
+    }
+    return documentCreated;
+}
+
+const udpateOneDocument = async <T>(collectionName: string, indexQuery: object, updates: object): Promise<T | null> => {
+    let documentUpdated = null;
+    try {
+        await dbClient.connect();
+        console.log('Connected to MongoDB');
+
+        const db = dbClient.db('appdb');
+        const collection = db.collection(collectionName);
+
+        const result = await collection.updateOne(indexQuery, { $set: updates });
+        console.log('Update result:', result);
+        if (result.upsertedId) {
+            documentUpdated = await readOneDocumentById<T>(collectionName, result.upsertedId.toString() as string);
+            console.log('Update document:', documentUpdated);
+        }
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        await dbClient.close();
+        console.log('Closed MongoDB connection');
+    }
+    return documentUpdated;
+}
+
+const deleteOneDocumentByIndex = async (collectionName: string, indexQuery: object): Promise<boolean> => {
+    let result: boolean = false;
     try {
         await dbClient.connect();
         console.log('Connected to MongoDB');
@@ -104,10 +154,10 @@ const deleteOneDocumentByIndex = async <T>(collectionName: string, indexQuery: o
         const db = dbClient.db('appdb'); // Replace with your database name
         const collection = db.collection(collectionName); // Replace with your collection name
 
-        const docs = await collection.find(indexQuery).toArray();
-        console.log('Found documents:', docs);
-        if (docs.length > 0) {
-            document = docs[0];
+        const deleteOneResult = await collection.deleteOne(indexQuery, { collation: collationCaseInsensitive });
+        console.log('Delete documents:', deleteOneResult);
+        if (deleteOneResult.deletedCount == 1) {
+            result = true;
         }
     } catch (err) {
         console.error('Error reading data:', err);
@@ -115,10 +165,21 @@ const deleteOneDocumentByIndex = async <T>(collectionName: string, indexQuery: o
         await dbClient.close();
         console.log('Closed MongoDB connection');
     }
-    return document;
+    return result;
 }
 
 
 
 
-export { dbName, dbClient, dbCollections, readAllDocuments, readOneDocumentByIndex, readOneDocumentById, collationCaseInsensitive };
+export {
+    dbName,
+    dbClient,
+    dbCollections,
+    readAllDocuments,
+    readOneDocumentByIndex,
+    readOneDocumentById,
+    insertOneDocument,
+    deleteOneDocumentByIndex,
+    collationCaseInsensitive,
+    udpateOneDocument
+};

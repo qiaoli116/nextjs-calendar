@@ -123,7 +123,7 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
                     <pre>
-                        <div>Error: {error.message}</div>;
+                        <div>Error: {error.message}</div>
                     </pre>
                 </code>
             </Box>
@@ -332,5 +332,7 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
         </>
     )
 }
+
+
 
 export { TeacherViewAllComponent, TeacherViewOneComponent, TeacherCreateComponent }

@@ -1,4 +1,4 @@
-import { dbClient, dbCollections, readAllDocuments, readOneDocumentById, readOneDocumentByIndex } from '../db.js'
+import { dbClient, dbCollections, readAllDocuments, readOneDocumentById, readOneDocumentByIndex, deleteOneDocumentByIndex, insertOneDocument } from '../db.js'
 import { ITeacher } from './types.js'
 const collectionName = dbCollections.teachers.name;
 
@@ -11,30 +11,12 @@ async function readTeacherByOrgId(orgId: string): Promise<ITeacher | null> {
 }
 
 async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
-    let teacherCreated = null;
-    console.log("createTeacher", teacher);
-    try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
-
-        const db = dbClient.db('appdb');
-        const collection = db.collection('teachers');
-
-        const result = await collection.insertOne(teacher);
-        console.log('Inserted result:', result);
-        if (result.acknowledged) {
-            teacherCreated = await readOneDocumentById<ITeacher>("teachers", result.insertedId.toString() as string);
-            console.log('Inserted teacher:', teacherCreated);
-        }
-    } catch (err) {
-        console.error('Error reading data:', err);
-    } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
-    }
-    return teacherCreated;
+    return insertOneDocument<ITeacher>(collectionName, teacher);
 }
 
+async function deleteTeacherByOrgId(orgId: string): Promise<boolean> {
+    return await deleteOneDocumentByIndex(collectionName, { orgId: orgId });
+}
 const TeachersQuery = {
     Query: {
         teachers: async () => { return await readAllTeachers() },
@@ -56,6 +38,11 @@ const TeachersQuery = {
                 }
             };
             return createTeacher(teacher);
+        },
+        teacherDelete: (parent, args, context, info) => {
+            console.log("deleteTeacher", args);
+            const { orgId } = args;
+            return deleteTeacherByOrgId(orgId);
         }
     },
     Children: {

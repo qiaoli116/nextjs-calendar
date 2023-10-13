@@ -33,7 +33,7 @@ const server = new ApolloServer({
 });
 await server.start();
 app.use(
-    '/graphql',
+    '/api/graphql',
     cors<cors.CorsRequest>(
         {
             origin: '*',
@@ -46,7 +46,7 @@ app.use(
 );
 
 await new Promise<void>((resolve) => httpServer.listen({ port: 4001 }, resolve));
-console.log(`🚀 Server ready at http://localhost:4001/graphql`);
+console.log(`🚀 Server ready at http://localhost:4001/api/graphql`);
 // Passing an ApolloServer instance to the `startStandaloneServer` function:
 //  1. creates an Express app
 //  2. installs your ApolloServer instance as middleware
