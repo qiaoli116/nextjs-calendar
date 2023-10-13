@@ -69,8 +69,6 @@ export function useQueryOneTeacher(orgId: string) {
   };
 }
 
-
-
 export interface ICreateTeacherMutationVariables {
   orgId: string;
   userName: string;
@@ -97,14 +95,37 @@ export function useCreateTeacher(): [UseMutationExecute<CreateTeacherMutationDat
 
   const [result, executeMutation] = useMutation<CreateTeacherMutationData, ICreateTeacherMutationVariables>(TEACHER_CREATE_MUTATION);
 
-  // const { data, fetching: loading, error } = result;
-  // const dataError =
-  //   data === undefined ||
-  //   data === null ||
-  //   data.teacher === undefined ||
-  //   data.teacher === null;
+  return [
+    executeMutation
+  ];
+}
 
-  // const teacher = dataError ? null : data.teacher;
+export interface IUpdateTeacherMutationVariables {
+  orgId: string;
+  userName: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+type UpdateTeacherMutationData = { teacherUpdate: ITeacher } | undefined | null;
+// executeMutation({ orgId, userName, email, firstName, lastName })
+export function useUpdateTeacher(): [UseMutationExecute<UpdateTeacherMutationData, IUpdateTeacherMutationVariables>] {
+  const TEACHER_UPDATE_MUTATION = gql`
+    mutation Mutation($orgId: String, $userName: String, $email: String, $firstName: String, $lastName: String) {
+      teacherUpdate(orgId: $orgId, userName: $userName, email: $email, firstName: $firstName, lastName: $lastName) {
+        email
+        name {
+          first
+          last
+        }
+        orgId
+        userName
+      }
+    }
+  `;
+
+  const [result, executeMutation] = useMutation<UpdateTeacherMutationData, IUpdateTeacherMutationVariables>(TEACHER_UPDATE_MUTATION);
+
   return [
     executeMutation
   ];

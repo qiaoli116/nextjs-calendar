@@ -1,21 +1,23 @@
 
 type Query {
-  teachers: [Teacher]
-  teacher(orgId: String): Teacher
-  rooms: [Room]
-  room(roomNumber: String): Room
-  tases: [TAS]
-  tas(year: String, department: String, qualificationCode: String): TAS
-  tasSubject(year: String, department: String, qualificationCode: String, subjectCode: String): TAS
-  sessions: [Session]
-  session(reference: String): Session
-  subjects: [Subject]
-  subject(reference: String): Subject
+    teachers: [Teacher]
+    teacher(orgId: String): Teacher
+    rooms: [Room]
+    room(roomNumber: String): Room
+    tases: [TAS]
+    tas(year: String, department: String, qualificationCode: String): TAS
+    tasSubject(year: String, department: String, qualificationCode: String, subjectCode: String): TAS
+    sessions: [Session]
+    session(reference: String): Session
+    subjects: [Subject]
+    subject(reference: String): Subject
 }
 
 type Mutation {
-  teacherCreate(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
-  teacherDelete(orgId: String): Boolean
+    teacherCreate(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
+    teacherUpdate(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
+    teacherDelete(orgId: String): Boolean
+
 #   addRoom(roomNumber: String, type: String): Room
 #   addTAS(year: String, department: String, qualificationCode: String): TAS
 #   addTASSubject(year: String, department: String, qualificationCode: String, subjectCode: String, subjectTitle: String): TAS

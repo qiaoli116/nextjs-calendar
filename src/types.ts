@@ -7,3 +7,5 @@ export interface ITeacher {
         last: string;
     };
 }
+
+export type MutationStatus = "idle" | "loading" | "success" | "error";

@@ -1,4 +1,13 @@
-import { dbClient, dbCollections, readAllDocuments, readOneDocumentById, readOneDocumentByIndex, deleteOneDocumentByIndex, insertOneDocument } from '../db.js'
+import {
+    dbClient,
+    dbCollections,
+    readAllDocuments,
+    readOneDocumentById,
+    readOneDocumentByIndex,
+    deleteOneDocumentByIndex,
+    insertOneDocument,
+    udpateOneDocument
+} from '../db.js'
 import { ITeacher } from './types.js'
 const collectionName = dbCollections.teachers.name;
 
@@ -12,6 +21,10 @@ async function readTeacherByOrgId(orgId: string): Promise<ITeacher | null> {
 
 async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
     return insertOneDocument<ITeacher>(collectionName, teacher);
+}
+
+async function updateTeacher(orgId: string, updates: {}): Promise<ITeacher | null> {
+    return await udpateOneDocument<ITeacher>(collectionName, { orgId: orgId }, updates);
 }
 
 async function deleteTeacherByOrgId(orgId: string): Promise<boolean> {
@@ -39,6 +52,19 @@ const TeachersQuery = {
             };
             return createTeacher(teacher);
         },
+        teacherUpdate: (parent, args, context, info) => {
+            console.log("updateTeacher", args);
+            const { orgId } = args;
+            const updates: any = {
+                userName: args.userName,
+                email: args.email,
+                name: {
+                    first: args.firstName,
+                    last: args.lastName
+                }
+            };
+            return updateTeacher(orgId, updates);
+        },
         teacherDelete: (parent, args, context, info) => {
             console.log("deleteTeacher", args);
             const { orgId } = args;
@@ -48,10 +74,13 @@ const TeachersQuery = {
     Children: {
 
     }
-
 }
+
 const TeachersCRUD = {
     readAllTeachers,
-    readTeacherByOrgId
+    readTeacherByOrgId,
+    createTeacher,
+    updateTeacher,
+    deleteTeacherByOrgId
 }
 export { TeachersQuery, TeachersCRUD };

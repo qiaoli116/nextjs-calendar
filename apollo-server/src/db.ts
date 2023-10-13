@@ -96,7 +96,6 @@ const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | n
     return document;
 }
 
-
 const insertOneDocument = async <T>(collectionName: string, document: T): Promise<T | null> => {
     let documentCreated = null;
     try {
@@ -109,7 +108,12 @@ const insertOneDocument = async <T>(collectionName: string, document: T): Promis
         const result = await collection.insertOne(document);
         console.log('Inserted result:', result);
         if (result.insertedId) {
-            documentCreated = await readOneDocumentById<T>(collectionName, result.insertedId.toString() as string);
+            const indexQuery = { _id: new ObjectId(result.insertedId) };
+            const docs = await collection.find(indexQuery).collation(collationCaseInsensitive).toArray();
+            console.log('Found documents:', docs);
+            if (docs.length > 0) {
+                documentCreated = docs[0];
+            }
             console.log('Inserted document:', documentCreated);
         }
     } catch (err) {
@@ -132,8 +136,12 @@ const udpateOneDocument = async <T>(collectionName: string, indexQuery: object, 
 
         const result = await collection.updateOne(indexQuery, { $set: updates });
         console.log('Update result:', result);
-        if (result.upsertedId) {
-            documentUpdated = await readOneDocumentById<T>(collectionName, result.upsertedId.toString() as string);
+        if (result.modifiedCount == 1) {
+            const docs = await collection.find(indexQuery).collation(collationCaseInsensitive).toArray();
+            console.log('Found documents:', docs);
+            if (docs.length > 0) {
+                documentUpdated = docs[0];
+            }
             console.log('Update document:', documentUpdated);
         }
     } catch (err) {
@@ -179,7 +187,8 @@ export {
     readOneDocumentByIndex,
     readOneDocumentById,
     insertOneDocument,
+    udpateOneDocument,
     deleteOneDocumentByIndex,
     collationCaseInsensitive,
-    udpateOneDocument
+
 };

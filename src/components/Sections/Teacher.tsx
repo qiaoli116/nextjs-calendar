@@ -2,7 +2,7 @@
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher } from '../Hooks/teachers';
+import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher, useUpdateTeacher } from '../Hooks/teachers';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import Link from 'next/link';
 import TextField from '@mui/material/TextField';
@@ -12,6 +12,7 @@ import { ITeacher } from '../../types';
 import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
 import { sleep } from '../../dataService/utils';
+import { MutationStatus } from '../../types';
 
 
 function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath: string }) {
@@ -195,7 +196,6 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
     )
 }
 
-type MutationStatus = "idle" | "loading" | "success" | "error";
 function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teacher: ITeacher) => void }) {
     console.log("TeacherCreateComponent");
     const emptyTeacher: ITeacher = {
@@ -251,9 +251,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
 
         //setTeacher(emptyTeacher);
     };
-
-
-
     return (
         <>
             <form onSubmit={handleSubmit}>
@@ -333,6 +330,172 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
     )
 }
 
+function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onUpdateSuccess?: (teacher: ITeacher) => void }) {
+    console.log("TeacherViewOneComponent");
+    const { loading, error, dataError, teacher: teacherCurrent, reexecuteQueryTeacher } = useQueryOneTeacher(orgId);
+
+    if (loading) {
+        return (
+            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+            </Box>
+        )
+    };
+    if (error) {
+        return (
+            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                <code>
+                    <pre>
+                        <div>Error: {error.message}</div>
+                    </pre>
+                </code>
+            </Box>
+        )
+    }
+    if (dataError || teacherCurrent === null) {
+        return (
+            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                <code>
+                    <pre>
+                        <div>Error: Data is missing or invalid</div>;
+                    </pre>
+                </code>
+            </Box>
+        )
+    }
+
+    const initTeacher: ITeacher = {
+        orgId: teacherCurrent.orgId,
+        name: {
+            first: teacherCurrent.name.first,
+            last: teacherCurrent.name.last
+        },
+        email: teacherCurrent.email,
+        userName: teacherCurrent.userName,
+    }
+    const [teacher, setTeacher] = React.useState<ITeacher>(initTeacher);
+    const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
+    const [executeUpdateTeacher] = useUpdateTeacher();
+    // this is a general purpose handler for all input fields
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const s = { ...teacher };
+        _.set(s, name, value);
+        setTeacher(s);
+        console.log("handleInputChange - ", "teacher", teacher);
+    };
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit - ", "teacher", teacher);
+        setMutationStatus("loading");
+        const _teacher = {
+            orgId: teacher.orgId,
+            userName: teacher.userName,
+            email: teacher.email,
+            firstName: teacher.name.first,
+            lastName: teacher.name.last
+        };
+        sleep(2000)
+        const result = await executeUpdateTeacher(_teacher);
+        console.log("handleSubmit - ", "result", result)
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.teacherUpdate == null || result.data.teacherUpdate == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onUpdateSuccess) {
+                    onUpdateSuccess(result.data.teacherUpdate);
+                }
+            }
+
+        }
+    };
+    const resetForm = async () => {
+
+        //setTeacher(emptyTeacher);
+    };
+    return (
+        <>
+            <h1>View teacher</h1>
+            <form onSubmit={handleSubmit}>
+                <Box sx={{ pb: "20px", width: "400px" }}>
+                    <TextField
+                        id="outlined-read-only-input"
+                        fullWidth
+                        label="Org ID"
+                        name="orgId"
+                        value={teacher.orgId}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </Box>
+                <Box sx={{ pb: "20px", width: "400px" }}>
+                    <TextField
+                        id="outlined-read-only-input"
+                        fullWidth
+                        label="First Name"
+                        name="name.first"
+                        value={teacher.name.first}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </Box>
+                <Box sx={{ pb: "20px", width: "400px" }}>
+                    <TextField
+                        id="outlined-read-only-input"
+                        fullWidth
+                        label="Last Name"
+                        name="name.last"
+                        value={teacher.name.last}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </Box>
+                <Box sx={{ pb: "20px", width: "400px" }}>
+                    <TextField
+                        id="outlined-read-only-input"
+                        fullWidth
+                        label="Email"
+                        name="email"
+                        value={teacher.email}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </Box>
+                <Box sx={{ py: "8px" }}>
+                    <FormControl sx={{ minWidth: "400px" }}>
+                        <TextField
+                            id="outlined-read-only-input"
+                            fullWidth
+                            label="User Name"
+                            name='userName'
+                            value={teacher.userName}
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                </Box>
+                <Box sx={{ py: "8px" }}>
+                    <Button type='submit'>
+                        {mutationStatus === "loading" ? <>Creating <CircularProgress color="inherit" size={20} /></> : "Create"}
+                    </Button>
+                    <Button onClick={resetForm}>
+                        Reset
+                    </Button>
+                </Box>
+            </form>
+            {mutationStatus === "error" && <div>Mutation Error</div>}
+            {mutationStatus === "success" && <div>Mutation Succeed</div>}
+
+        </>
+    )
+}
 
 
-export { TeacherViewAllComponent, TeacherViewOneComponent, TeacherCreateComponent }
+export { TeacherViewAllComponent, TeacherViewOneComponent, TeacherCreateComponent, TeacherUpdateComponent }
