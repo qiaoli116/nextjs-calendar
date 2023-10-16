@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 
 
-export default function SubjectSinglePage({ params }: { params: { orgId: string } }) {
+export default function TeachersViewOnePage({ params }: { params: { orgId: string } }) {
     console.log("params", params);
     return (
         <>

@@ -35,6 +35,7 @@ export function useQueryTeachers() {
 
 
 export function useQueryOneTeacher(orgId: string) {
+  console.log("useQueryOneTeacher ", orgId)
   const TEACHER_QUERY = gql`
     query Teachers($orgId: String) {
       teacher(orgId: $orgId) {

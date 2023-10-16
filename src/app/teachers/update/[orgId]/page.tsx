@@ -6,7 +6,7 @@ import { ITeacher } from '../../../../types';
 
 
 
-export default function SubjectSinglePage({ params }: { params: { orgId: string } }) {
+export default function TeachersUpdatePage({ params }: { params: { orgId: string } }) {
     console.log("params", params);
     const onTeacherUpdateSuccess = (teacher: ITeacher) => {
         console.log("onTeacherCreateSuccess - ", "teacher", teacher);

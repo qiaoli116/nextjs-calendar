@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { TeacherViewAllComponent } from '../../components/Sections/Teacher';
 
-export default function TeacherViewAll() {
+export default function TeachersViewAll() {
     return (
         <>
             <h1>View all teachers</h1>

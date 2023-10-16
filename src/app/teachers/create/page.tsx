@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 
 
 
-export default function SubjectSinglePage({ params }: { params: { orgId: string } }) {
+export default function TeachersCreatePage({ params }: { params: { orgId: string } }) {
     const router = useRouter();
     const onTeacherCreateSuccess = (teacher: ITeacher) => {
         console.log("onTeacherCreateSuccess - ", "teacher", teacher);

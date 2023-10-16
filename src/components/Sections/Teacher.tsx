@@ -135,7 +135,7 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
                     <pre>
-                        <div>Error: Data is missing or invalid</div>;
+                        <div>Error: Data is missing or invalid</div>
                     </pre>
                 </code>
             </Box>
@@ -334,46 +334,17 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
     console.log("TeacherViewOneComponent");
     const { loading, error, dataError, teacher: teacherCurrent, reexecuteQueryTeacher } = useQueryOneTeacher(orgId);
 
-    if (loading) {
-        return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
-            </Box>
-        )
-    };
-    if (error) {
-        return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: {error.message}</div>
-                    </pre>
-                </code>
-            </Box>
-        )
-    }
-    if (dataError || teacherCurrent === null) {
-        return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: Data is missing or invalid</div>;
-                    </pre>
-                </code>
-            </Box>
-        )
-    }
 
-    const initTeacher: ITeacher = {
-        orgId: teacherCurrent.orgId,
+    const emptyTeacher: ITeacher = {
+        orgId: "",
         name: {
-            first: teacherCurrent.name.first,
-            last: teacherCurrent.name.last
+            first: "",
+            last: ""
         },
-        email: teacherCurrent.email,
-        userName: teacherCurrent.userName,
+        email: "",
+        userName: "",
     }
-    const [teacher, setTeacher] = React.useState<ITeacher>(initTeacher);
+    const [teacher, setTeacher] = React.useState<ITeacher>(emptyTeacher);
     const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
     const [executeUpdateTeacher] = useUpdateTeacher();
     // this is a general purpose handler for all input fields
@@ -417,13 +388,48 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
 
         //setTeacher(emptyTeacher);
     };
+
+    React.useEffect(() => {
+        if (teacherCurrent) {
+            setTeacher(teacherCurrent);
+        }
+    }, [teacherCurrent]);
+    if (loading) {
+        return (
+            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+            </Box>
+        )
+    };
+    if (error) {
+        return (
+            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                <code>
+                    <pre>
+                        <div>Error: {error.message}</div>
+                    </pre>
+                </code>
+            </Box>
+        )
+    }
+    if (dataError || teacherCurrent === null) {
+        return (
+            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                <code>
+                    <pre>
+                        <div>Error: Data is missing or invalid</div>;
+                    </pre>
+                </code>
+            </Box>
+        )
+    }
+
     return (
         <>
-            <h1>View teacher</h1>
+            <h1>Update teacher</h1>
             <form onSubmit={handleSubmit}>
                 <Box sx={{ pb: "20px", width: "400px" }}>
                     <TextField
-                        id="outlined-read-only-input"
                         fullWidth
                         label="Org ID"
                         name="orgId"
@@ -435,44 +441,34 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
                 </Box>
                 <Box sx={{ pb: "20px", width: "400px" }}>
                     <TextField
-                        id="outlined-read-only-input"
                         fullWidth
                         label="First Name"
                         name="name.first"
                         value={teacher.name.first}
-                        InputProps={{
-                            readOnly: true,
-                        }}
+                        onChange={handleInputChange}
                     />
                 </Box>
                 <Box sx={{ pb: "20px", width: "400px" }}>
                     <TextField
-                        id="outlined-read-only-input"
                         fullWidth
                         label="Last Name"
                         name="name.last"
                         value={teacher.name.last}
-                        InputProps={{
-                            readOnly: true,
-                        }}
+                        onChange={handleInputChange}
                     />
                 </Box>
                 <Box sx={{ pb: "20px", width: "400px" }}>
                     <TextField
-                        id="outlined-read-only-input"
                         fullWidth
                         label="Email"
                         name="email"
                         value={teacher.email}
-                        InputProps={{
-                            readOnly: true,
-                        }}
+                        onChange={handleInputChange}
                     />
                 </Box>
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
-                            id="outlined-read-only-input"
                             fullWidth
                             label="User Name"
                             name='userName'
