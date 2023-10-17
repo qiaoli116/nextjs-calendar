@@ -2,7 +2,7 @@
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher, useUpdateTeacher } from '../Hooks/teachers';
+import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher, useUpdateTeacher, useDeleteTeacher } from '../Hooks/teachers';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import Link from 'next/link';
 import TextField from '@mui/material/TextField';
@@ -13,6 +13,7 @@ import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
 import { sleep } from '../../dataService/utils';
 import { MutationStatus } from '../../types';
+import { Alert, AlertTitle } from '@mui/material';
 
 
 function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath: string }) {
@@ -331,9 +332,8 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
 }
 
 function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onUpdateSuccess?: (teacher: ITeacher) => void }) {
-    console.log("TeacherViewOneComponent");
+    console.log("TeacherUpdateComponent");
     const { loading, error, dataError, teacher: teacherCurrent, reexecuteQueryTeacher } = useQueryOneTeacher(orgId);
-
 
     const emptyTeacher: ITeacher = {
         orgId: "",
@@ -367,7 +367,6 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
             firstName: teacher.name.first,
             lastName: teacher.name.last
         };
-        sleep(2000)
         const result = await executeUpdateTeacher(_teacher);
         console.log("handleSubmit - ", "result", result)
         if (!!result.error) {
@@ -385,15 +384,17 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
         }
     };
     const resetForm = async () => {
-
-        //setTeacher(emptyTeacher);
+        reexecuteQueryTeacher({ requestPolicy: 'network-only' });
+        setMutationStatus("idle")
     };
 
     React.useEffect(() => {
+        console.log("TeacherUpdateComponent - useEffect - teacherCurrent", teacherCurrent)
         if (teacherCurrent) {
-            setTeacher(teacherCurrent);
+            setTeacher({ ...teacherCurrent });
         }
-    }, [teacherCurrent]);
+    }, [loading]);
+
     if (loading) {
         return (
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
@@ -431,7 +432,7 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
                 <Box sx={{ pb: "20px", width: "400px" }}>
                     <TextField
                         fullWidth
-                        label="Org ID"
+                        label="Org ID (Read Only)"
                         name="orgId"
                         value={teacher.orgId}
                         InputProps={{
@@ -479,19 +480,66 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
                 </Box>
                 <Box sx={{ py: "8px" }}>
                     <Button type='submit'>
-                        {mutationStatus === "loading" ? <>Creating <CircularProgress color="inherit" size={20} /></> : "Create"}
+                        {mutationStatus === "loading" ? <>Updating <CircularProgress color="inherit" size={20} /></> : "Save"}
                     </Button>
                     <Button onClick={resetForm}>
-                        Reset
+                        Reload
                     </Button>
                 </Box>
             </form>
-            {mutationStatus === "error" && <div>Mutation Error</div>}
-            {mutationStatus === "success" && <div>Mutation Succeed</div>}
+            {mutationStatus === "error" && <div>Update Error</div>}
+            {mutationStatus === "success" && <div>Update Succeed</div>}
 
         </>
     )
 }
 
+function TeacherDeleteComponent({ orgId }: { orgId: string }) {
+    console.log("TeacherUpdateComponent");
+    const { loading, error, dataError, teacher, reexecuteQueryTeacher } = useQueryOneTeacher(orgId);
+    const [executeDeleteTeacher] = useDeleteTeacher();
 
-export { TeacherViewAllComponent, TeacherViewOneComponent, TeacherCreateComponent, TeacherUpdateComponent }
+    if (loading) {
+        return (
+            <Alert severity="info">
+                <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+            </Alert>
+        )
+    };
+    if (error) {
+        return (
+            <Alert severity="error">
+                Failed to load teacher <strong>{orgId}</strong>
+                <br />
+                Error Message: {error.message}
+            </Alert>
+        )
+    }
+    if (dataError || teacher === null) {
+        return (
+            <Alert severity="info">
+                Failed to load teacher <strong>{orgId}</strong>
+            </Alert>
+        )
+    }
+    const deleteTeacher = async () => {
+        console.log("deleteTeacher - ", "teacher", orgId);
+        const result = await executeDeleteTeacher({ orgId });
+        console.log("deleteTeacher - ", "result", result)
+
+    }
+
+    return (
+        <>
+            <h1>Delete teacher</h1>
+            <p>orgId: {orgId}</p>
+            <Alert severity="warning">
+                <AlertTitle>Warning</AlertTitle>
+                Are you sure to delete <strong>{orgId} - {teacher.name.last}, {teacher.name.first} </strong>
+                <Button onClick={deleteTeacher}>Delete</Button>
+            </Alert>
+        </>
+    )
+}
+
+export { TeacherViewAllComponent, TeacherViewOneComponent, TeacherCreateComponent, TeacherUpdateComponent, TeacherDeleteComponent }

@@ -131,3 +131,23 @@ export function useUpdateTeacher(): [UseMutationExecute<UpdateTeacherMutationDat
     executeMutation
   ];
 }
+
+
+export interface IDeleteTeacherMutationVariables {
+  orgId: string;
+}
+type DeleteTeacherMutationData = { teacherDelete: boolean } | undefined | null;
+// executeMutation({ orgId })
+export function useDeleteTeacher(): [UseMutationExecute<DeleteTeacherMutationData, IDeleteTeacherMutationVariables>] {
+  const TEACHER_DELETE_MUTATION = gql`
+    mutation Mutation($orgId: String) {
+      teacherDelete(orgId: $orgId)
+    }
+  `;
+
+  const [result, executeMutation] = useMutation<DeleteTeacherMutationData, IDeleteTeacherMutationVariables>(TEACHER_DELETE_MUTATION);
+
+  return [
+    executeMutation
+  ];
+}

@@ -46,11 +46,20 @@ const theme = createTheme({
   components: {
     MuiAlert: {
       styleOverrides: {
-        root: ({ ownerState }) => ({
-          ...(ownerState.severity === 'info' && {
-            backgroundColor: '#60a5fa',
-          }),
-        }),
+        root: ({ ownerState }) => {
+          switch (ownerState.severity) {
+            case 'error':
+              return { backgroundColor: 'rgb(253, 237, 237)' };
+            case 'info':
+              return { backgroundColor: 'rgb(229, 246, 253)' };
+            case 'success':
+              return { backgroundColor: 'rgb(237, 247, 237)' };
+            case 'warning':
+              return { backgroundColor: 'rgb(255, 244, 229)' };
+            default:
+              return {};
+          }
+        },
       },
     },
   },
