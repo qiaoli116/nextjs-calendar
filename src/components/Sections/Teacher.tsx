@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher, useUpdateTeacher, useDeleteTeacher } from '../Hooks/teachers';
 import { GridRenderCellParams } from '@mui/x-data-grid';
-import Link from 'next/link';
+import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import React from 'react';
 import _ from 'lodash';
@@ -56,7 +56,7 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
             maxWidth: 130,
             renderCell: (params: GridRenderCellParams<any, string>) => (
                 <strong>
-                    <Link href={`${singleTeacherPath}/view/${params.value}`}>{params.value}</Link>
+                    <Link underline="hover" href={`${singleTeacherPath}/view/${params.value}`}>{params.value}</Link>
 
                 </strong>
             )
@@ -84,13 +84,13 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
             renderCell: (params: GridRenderCellParams<any, string>) => (
                 <>
                     <Box component="span" sx={{ mr: "10px" }} >
-                        <Link href={`${singleTeacherPath}/view/${params.row.id}`}><ArticleIcon /></Link>
+                        <Link underline="hover" href={`${singleTeacherPath}/view/${params.row.id}`}><ArticleIcon /></Link>
                     </Box>
                     <Box component="span" sx={{ mr: "10px" }} >
-                        <Link href={`${singleTeacherPath}/edit/${params.row.id}`}><EditIcon /></Link>
+                        <Link underline="hover" href={`${singleTeacherPath}/edit/${params.row.id}`}><EditIcon /></Link>
                     </Box>
                     <Box component="span" sx={{ mr: "10px" }} >
-                        <Link href={`${singleTeacherPath}/delete/${params.row.id}`}><DeleteIcon /></Link>
+                        <Link underline="hover" href={`${singleTeacherPath}/delete/${params.row.id}`}><DeleteIcon /></Link>
                     </Box>
 
 
@@ -141,7 +141,6 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
     if (loading) {
         return (
             <>
-                <h1>View teacher</h1>
                 <Alert severity="info">
                     <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
                 </Alert>
@@ -152,7 +151,6 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
     if (error) {
         return (
             <>
-                <h1>View teacher</h1>
                 <Alert severity="error">
                     Failed to load teacher <strong>{orgId}</strong>
                     <br />
@@ -164,7 +162,6 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
     if (dataError || teacher === null) {
         return (
             <>
-                <h1>View teacher</h1>
                 <Alert severity="info">
                     Failed to load teacher <strong>{orgId}</strong>
                 </Alert>
@@ -175,7 +172,6 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
 
     return (
         <>
-            <h1>View teacher</h1>
             <Box sx={{ pb: "20px", width: "400px" }}>
                 <TextField
                     id="outlined-read-only-input"
@@ -283,7 +279,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
     };
     return (
         <>
-            <h1>Create teacher</h1>
             <form onSubmit={handleSubmit}>
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
@@ -428,7 +423,6 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
     if (loading) {
         return (
             <>
-                <h1>Edit teacher</h1>
                 <Alert severity="info">
                     <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
                 </Alert>
@@ -438,7 +432,6 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
     if (error) {
         return (
             <>
-                <h1>Edit teacher</h1>
                 <Alert severity="error">
                     Failed to load teacher <strong>{orgId}</strong>
                     <br />
@@ -450,7 +443,6 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
     if (dataError || teacherCurrent === null) {
         return (
             <>
-                <h1>Edit teacher</h1>
                 <Alert severity="info">
                     Failed to load teacher <strong>{orgId}</strong>
                 </Alert>
@@ -460,7 +452,6 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
 
     return (
         <>
-            <h1>Update teacher</h1>
             <form onSubmit={handleSubmit}>
                 <Box sx={{ pb: "20px", width: "400px" }}>
                     <TextField
@@ -535,7 +526,6 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
     if (loading) {
         return (
             <>
-                <h1>Delete teacher</h1>
                 <Alert severity="info">
                     <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
                 </Alert>
@@ -545,7 +535,6 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
     if (error) {
         return (
             <>
-                <h1>Delete teacher</h1>
                 <Alert severity="error">
                     Failed to load teacher <strong>{orgId}</strong>
                     <br />
@@ -558,7 +547,6 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
     if (dataError || teacher === null) {
         return (
             <>
-                <h1>Delete teacher</h1>
                 <Alert severity="info">
                     Failed to load teacher <strong>{orgId}</strong>
                 </Alert>
@@ -574,8 +562,6 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
 
     return (
         <>
-            <h1>Delete teacher</h1>
-            <p>orgId: {orgId}</p>
             <Alert severity="warning">
                 <AlertTitle>Warning</AlertTitle>
                 Are you sure to delete <strong>{orgId} - {teacher.name.last}, {teacher.name.first} </strong>

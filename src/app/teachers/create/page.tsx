@@ -1,10 +1,11 @@
 'use client'
 import * as React from 'react';
 import { TeacherCreateComponent } from '../../../components/Sections/Teacher';
-import Link from 'next/link';
 import { ITeacher } from '../../../types';
 import { useRouter } from 'next/navigation'
-
+import Typography from '@mui/material/Typography';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
 
 
 export default function TeachersCreatePage({ params }: { params: { orgId: string } }) {
@@ -16,8 +17,14 @@ export default function TeachersCreatePage({ params }: { params: { orgId: string
     console.log("params", params);
     return (
         <>
-            <h1>View teacher</h1>
-            <Link href="/teachers">Teachers</Link>
+
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link underline="hover" href="/teachers">
+                    Teachers
+                </Link>
+                <Typography color="text.primary">Create</Typography>
+            </Breadcrumbs>
+            <h2>Create a teacher</h2>
             <TeacherCreateComponent
                 onCreateSuccess={onTeacherCreateSuccess}
             />
