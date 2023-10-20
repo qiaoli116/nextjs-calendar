@@ -1,5 +1,5 @@
 "use client"
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridValueGetterParams, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher, useUpdateTeacher, useDeleteTeacher } from '../Hooks/teachers';
@@ -14,6 +14,9 @@ import Button from '@mui/material/Button';
 import { sleep } from '../../dataService/utils';
 import { MutationStatus } from '../../types';
 import { Alert, AlertTitle } from '@mui/material';
+import ArticleIcon from '@mui/icons-material/Article';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath: string }) {
@@ -22,31 +25,25 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
 
     if (loading) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+            <Alert severity="info">
                 <CircularProgress color="inherit" size={20} /> Loading Teacher List ...
-            </Box>
+            </Alert>
         )
     };
     if (error) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: {error.message}</div>;
-                    </pre>
-                </code>
-            </Box>
+            <Alert severity="error">
+                Failed to load teacher list
+                <br />
+                Error Message: {error.message}
+            </Alert>
         )
     }
     if (dataError) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: Data is missing or invalid</div>;
-                    </pre>
-                </code>
-            </Box>
+            <Alert severity="info">
+                Failed to load teacher list
+            </Alert >
         )
     }
 
@@ -59,7 +56,7 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
             maxWidth: 130,
             renderCell: (params: GridRenderCellParams<any, string>) => (
                 <strong>
-                    <Link href={`${singleTeacherPath}/${params.value}`}>{params.value}</Link>
+                    <Link href={`${singleTeacherPath}/view/${params.value}`}>{params.value}</Link>
 
                 </strong>
             )
@@ -77,7 +74,29 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
                 `${params.row.firstName || ''} ${params.row.lastName || ''}`,
 
         },
-        { field: 'email', headerName: 'Email', flex: 1 }
+        { field: 'email', headerName: 'Email', flex: 1, maxWidth: 400 },
+        {
+            field: "actions",
+            headerName: "Actions",
+            flex: 1,
+            maxWidth: 200,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams<any, string>) => (
+                <>
+                    <Box component="span" sx={{ mr: "10px" }} >
+                        <Link href={`${singleTeacherPath}/view/${params.row.id}`}><ArticleIcon /></Link>
+                    </Box>
+                    <Box component="span" sx={{ mr: "10px" }} >
+                        <Link href={`${singleTeacherPath}/edit/${params.row.id}`}><EditIcon /></Link>
+                    </Box>
+                    <Box component="span" sx={{ mr: "10px" }} >
+                        <Link href={`${singleTeacherPath}/delete/${params.row.id}`}><DeleteIcon /></Link>
+                    </Box>
+
+
+                </>
+            )
+        }
     ];
 
     const rows = teachers.map((teacher: any) => {
@@ -103,6 +122,12 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
                     }}
                     pageSizeOptions={[50, 100]}
                     disableRowSelectionOnClick
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={{
+                        toolbar: {
+                            showQuickFilter: true,
+                        },
+                    }}
                 />
             </div>
 
@@ -115,31 +140,35 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
 
     if (loading) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
-            </Box>
+            <>
+                <h1>View teacher</h1>
+                <Alert severity="info">
+                    <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+                </Alert>
+            </>
+
         )
     };
     if (error) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: {error.message}</div>
-                    </pre>
-                </code>
-            </Box>
+            <>
+                <h1>View teacher</h1>
+                <Alert severity="error">
+                    Failed to load teacher <strong>{orgId}</strong>
+                    <br />
+                    Error Message: {error.message}
+                </Alert>
+            </>
         )
     }
     if (dataError || teacher === null) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: Data is missing or invalid</div>
-                    </pre>
-                </code>
-            </Box>
+            <>
+                <h1>View teacher</h1>
+                <Alert severity="info">
+                    Failed to load teacher <strong>{orgId}</strong>
+                </Alert>
+            </>
         )
     }
 
@@ -254,6 +283,7 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
     };
     return (
         <>
+            <h1>Create teacher</h1>
             <form onSubmit={handleSubmit}>
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
@@ -397,31 +427,34 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
 
     if (loading) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
-            </Box>
+            <>
+                <h1>Edit teacher</h1>
+                <Alert severity="info">
+                    <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+                </Alert>
+            </>
         )
     };
     if (error) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: {error.message}</div>
-                    </pre>
-                </code>
-            </Box>
+            <>
+                <h1>Edit teacher</h1>
+                <Alert severity="error">
+                    Failed to load teacher <strong>{orgId}</strong>
+                    <br />
+                    Error Message: {error.message}
+                </Alert>
+            </>
         )
     }
     if (dataError || teacherCurrent === null) {
         return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        <div>Error: Data is missing or invalid</div>;
-                    </pre>
-                </code>
-            </Box>
+            <>
+                <h1>Edit teacher</h1>
+                <Alert severity="info">
+                    Failed to load teacher <strong>{orgId}</strong>
+                </Alert>
+            </>
         )
     }
 
@@ -501,25 +534,35 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
 
     if (loading) {
         return (
-            <Alert severity="info">
-                <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
-            </Alert>
+            <>
+                <h1>Delete teacher</h1>
+                <Alert severity="info">
+                    <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+                </Alert>
+            </>
         )
     };
     if (error) {
         return (
-            <Alert severity="error">
-                Failed to load teacher <strong>{orgId}</strong>
-                <br />
-                Error Message: {error.message}
-            </Alert>
+            <>
+                <h1>Delete teacher</h1>
+                <Alert severity="error">
+                    Failed to load teacher <strong>{orgId}</strong>
+                    <br />
+                    Error Message: {error.message}
+                </Alert>
+            </>
+
         )
     }
     if (dataError || teacher === null) {
         return (
-            <Alert severity="info">
-                Failed to load teacher <strong>{orgId}</strong>
-            </Alert>
+            <>
+                <h1>Delete teacher</h1>
+                <Alert severity="info">
+                    Failed to load teacher <strong>{orgId}</strong>
+                </Alert>
+            </>
         )
     }
     const deleteTeacher = async () => {
