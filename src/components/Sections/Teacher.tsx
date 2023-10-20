@@ -93,7 +93,6 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
             renderCell: (params: GridRenderCellParams<any, string>) => (
                 <strong>
                     <Link underline="hover" href={`${singleTeacherPath}/view/${params.value}`}>{params.value}</Link>
-
                 </strong>
             )
         },
