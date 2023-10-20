@@ -14,16 +14,21 @@ export default function TeachersViewOnePage({ params }: { params: { orgId: strin
                 <Link underline="hover" href="/teachers">
                     Teachers
                 </Link>
-                <Typography color="text.primary">{params.orgId}</Typography>
+                <Typography color="text.primary">{params.orgId} (view)</Typography>
             </Breadcrumbs>
             <h2>View teacher</h2>
             <TeacherViewOneComponent
                 orgId={params.orgId}
             />
             <Box component="span" sx={{ mr: "10px" }} >
+                <Link href={`/teachers/view/${params.orgId}`}>View</Link>
+            </Box>
+            <Box component="span" sx={{ mr: "10px" }} >
                 <Link href={`/teachers/edit/${params.orgId}`}>Edit</Link>
             </Box>
-
+            <Box component="span" sx={{ mr: "10px" }} >
+                <Link href={`/teachers/delete/${params.orgId}`}>Delete</Link>
+            </Box>
 
         </>
 

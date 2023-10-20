@@ -1,5 +1,5 @@
 "use client"
-import { DataGrid, GridColDef, GridValueGetterParams, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridValueGetterParams, GridToolbar, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useQueryTeachers, useQueryOneTeacher, useCreateTeacher, useUpdateTeacher, useDeleteTeacher } from '../Hooks/teachers';
@@ -17,8 +17,44 @@ import { Alert, AlertTitle } from '@mui/material';
 import ArticleIcon from '@mui/icons-material/Article';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 
+function CRUDLinksComponent({ baseURL = "/", resourceId = "", createLink = true, readLink = true, updateLink = true, deleteLink = true }:
+    {
+        baseURL: string,
+        resourceId?: string,
+        createLink?: boolean,
+        readLink?: boolean,
+        updateLink?: boolean,
+        deleteLink?: boolean
+    }) {
+    return (
+        <>
+            {createLink && (
+                <Box component="span" sx={{ mr: "10px" }} >
+                    <Link underline="hover" href={`${baseURL}/create`}><AddBoxIcon sx={{ mb: "-5px" }} /></Link>
+                </Box>
+            )}
+            {readLink && (
+                <Box component="span" sx={{ mr: "10px" }} >
+                    <Link underline="hover" href={`${baseURL}/view/${resourceId}`}><ArticleIcon sx={{ mb: "-5px" }} /></Link>
+                </Box>
+            )}
+            {updateLink && (
+                <Box component="span" sx={{ mr: "10px" }} >
+                    <Link underline="hover" href={`${baseURL}/edit/${resourceId}`}><EditIcon sx={{ mb: "-5px" }} /></Link>
+                </Box>
+            )}
+            {deleteLink && (
+                <Box component="span" sx={{ mr: "10px" }} >
+                    <Link underline="hover" href={`${baseURL}/delete/${resourceId}`}><DeleteIcon sx={{ mb: "-5px" }} /></Link>
+                </Box>
+            )}
+        </>
+    )
+}
 function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath: string }) {
     console.log("TeacherViewAllComponent");
     const { loading, error, dataError, teachers, reexecuteQueryTeachers } = useQueryTeachers();
@@ -83,16 +119,11 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
             sortable: false,
             renderCell: (params: GridRenderCellParams<any, string>) => (
                 <>
-                    <Box component="span" sx={{ mr: "10px" }} >
-                        <Link underline="hover" href={`${singleTeacherPath}/view/${params.row.id}`}><ArticleIcon /></Link>
-                    </Box>
-                    <Box component="span" sx={{ mr: "10px" }} >
-                        <Link underline="hover" href={`${singleTeacherPath}/edit/${params.row.id}`}><EditIcon /></Link>
-                    </Box>
-                    <Box component="span" sx={{ mr: "10px" }} >
-                        <Link underline="hover" href={`${singleTeacherPath}/delete/${params.row.id}`}><DeleteIcon /></Link>
-                    </Box>
-
+                    <CRUDLinksComponent
+                        baseURL={singleTeacherPath}
+                        resourceId={params.row.id}
+                        createLink={true}
+                    />
 
                 </>
             )
@@ -122,7 +153,25 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
                     }}
                     pageSizeOptions={[50, 100]}
                     disableRowSelectionOnClick
-                    slots={{ toolbar: GridToolbar }}
+                    slots={{
+                        toolbar: () => (
+                            <>
+                                <GridToolbarContainer>
+                                    <CRUDLinksComponent
+                                        baseURL={singleTeacherPath}
+                                        createLink={true}
+                                        readLink={false}
+                                        updateLink={false}
+                                        deleteLink={false}
+                                    />
+                                    <GridToolbarExport />
+                                    <Box sx={{ flex: '1 1 0%' }}></Box>
+                                    <GridToolbarQuickFilter />
+
+                                </GridToolbarContainer>
+                            </>
+                        )
+                    }}
                     slotProps={{
                         toolbar: {
                             showQuickFilter: true,
@@ -564,7 +613,7 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
         <>
             <Alert severity="warning">
                 <AlertTitle>Warning</AlertTitle>
-                Are you sure to delete <strong>{orgId} - {teacher.name.last}, {teacher.name.first} </strong>
+                Are you sure to delete teacher <strong>{orgId} - {teacher.name.last}, {teacher.name.first} </strong>
                 <Button onClick={deleteTeacher}>Delete</Button>
             </Alert>
         </>
