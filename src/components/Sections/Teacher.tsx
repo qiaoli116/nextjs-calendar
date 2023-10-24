@@ -14,47 +14,9 @@ import Button from '@mui/material/Button';
 import { sleep } from '../../dataService/utils';
 import { MutationStatus } from '../../types';
 import { Alert, AlertTitle } from '@mui/material';
-import ArticleIcon from '@mui/icons-material/Article';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import AddBoxIcon from '@mui/icons-material/AddBox';
+import CRUDLinksComponent from '../Controls/CRUDLinks';
 
 
-function CRUDLinksComponent({ baseURL = "/", resourceId = "", createLink = true, readLink = true, updateLink = true, deleteLink = true }:
-    {
-        baseURL: string,
-        resourceId?: string,
-        createLink?: boolean,
-        readLink?: boolean,
-        updateLink?: boolean,
-        deleteLink?: boolean
-    }) {
-    return (
-        <>
-            {createLink && (
-                <Box component="span" sx={{ mr: "10px" }} >
-                    <Link underline="hover" href={`${baseURL}/create`}><AddBoxIcon sx={{ mb: "-5px" }} /></Link>
-                </Box>
-            )}
-            {readLink && (
-                <Box component="span" sx={{ mr: "10px" }} >
-                    <Link underline="hover" href={`${baseURL}/view/${resourceId}`}><ArticleIcon sx={{ mb: "-5px" }} /></Link>
-                </Box>
-            )}
-            {updateLink && (
-                <Box component="span" sx={{ mr: "10px" }} >
-                    <Link underline="hover" href={`${baseURL}/edit/${resourceId}`}><EditIcon sx={{ mb: "-5px" }} /></Link>
-                </Box>
-            )}
-            {deleteLink && (
-                <Box component="span" sx={{ mr: "10px" }} >
-                    <Link underline="hover" href={`${baseURL}/delete/${resourceId}`}><DeleteIcon sx={{ mb: "-5px" }} /></Link>
-                </Box>
-            )}
-        </>
-    )
-}
 function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath: string }) {
     console.log("TeacherViewAllComponent");
     const { loading, error, dataError, teachers, reexecuteQueryTeachers } = useQueryTeachers();
@@ -114,14 +76,15 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
             field: "actions",
             headerName: "Actions",
             flex: 1,
-            maxWidth: 200,
+            maxWidth: 300,
             sortable: false,
             renderCell: (params: GridRenderCellParams<any, string>) => (
                 <>
                     <CRUDLinksComponent
                         baseURL={singleTeacherPath}
                         resourceId={params.row.id}
-                        createLink={true}
+                        createLink={false}
+                        hasText={false}
                     />
 
                 </>
@@ -559,8 +522,8 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
                     </Button>
                 </Box>
             </form>
-            {mutationStatus === "error" && <div>Update Error</div>}
-            {mutationStatus === "success" && <div>Update Succeed</div>}
+            {mutationStatus === "error" && <Alert severity="error">Update Error</Alert >}
+            {mutationStatus === "success" && <Alert severity="success">Update successful</Alert >}
 
         </>
     )
@@ -570,6 +533,7 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
     console.log("TeacherUpdateComponent");
     const { loading, error, dataError, teacher, reexecuteQueryTeacher } = useQueryOneTeacher(orgId);
     const [executeDeleteTeacher] = useDeleteTeacher();
+    const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
 
     if (loading) {
         return (
@@ -612,8 +576,8 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
         <>
             <Alert severity="warning">
                 <AlertTitle>Warning</AlertTitle>
-                Are you sure to delete teacher <strong>{orgId} - {teacher.name.last}, {teacher.name.first} </strong>
-                <Button onClick={deleteTeacher}>Delete</Button>
+                Are you sure to <u><i>permanently</i></u> delete teacher <strong>{orgId} - {teacher.name.last}, {teacher.name.first}? </strong>
+                <Button onClick={deleteTeacher}>delete</Button>
             </Alert>
         </>
     )

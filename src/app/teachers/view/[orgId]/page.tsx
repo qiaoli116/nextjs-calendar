@@ -5,6 +5,7 @@ import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import CRUDLinksComponent from '../../../../components/Controls/CRUDLinks';
 
 export default function TeachersViewOnePage({ params }: { params: { orgId: string } }) {
     console.log("params", params);
@@ -16,19 +17,22 @@ export default function TeachersViewOnePage({ params }: { params: { orgId: strin
                 </Link>
                 <Typography color="text.primary">{params.orgId} (view)</Typography>
             </Breadcrumbs>
-            <h2>View teacher</h2>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <h2>View teacher</h2>
+                <Box sx={{ px: "5px" }}></Box>
+                <CRUDLinksComponent
+                    baseURL="/teachers"
+                    resourceId={params.orgId}
+                    createLink={false}
+                    readLink={false}
+                    hasText={false}
+                />
+            </Box>
+
             <TeacherViewOneComponent
                 orgId={params.orgId}
             />
-            <Box component="span" sx={{ mr: "10px" }} >
-                <Link href={`/teachers/view/${params.orgId}`}>View</Link>
-            </Box>
-            <Box component="span" sx={{ mr: "10px" }} >
-                <Link href={`/teachers/edit/${params.orgId}`}>Edit</Link>
-            </Box>
-            <Box component="span" sx={{ mr: "10px" }} >
-                <Link href={`/teachers/delete/${params.orgId}`}>Delete</Link>
-            </Box>
+
 
         </>
 

@@ -6,6 +6,7 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import { ITeacher } from '../../../../types';
 import Box from '@mui/material/Box';
+import CRUDLinksComponent from '../../../../components/Controls/CRUDLinks';
 
 
 
@@ -22,20 +23,22 @@ export default function TeachersUpdatePage({ params }: { params: { orgId: string
                 </Link>
                 <Typography color="text.primary">{params.orgId} (edit)</Typography>
             </Breadcrumbs>
-            <h2>Edit teacher</h2>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <h2>Edit teacher</h2>
+                <Box sx={{ px: "5px" }}></Box>
+                <CRUDLinksComponent
+                    baseURL="/teachers"
+                    resourceId={params.orgId}
+                    createLink={false}
+                    updateLink={false}
+                    hasText={false}
+                />
+            </Box>
             <TeacherUpdateComponent
                 orgId={params.orgId}
                 onUpdateSuccess={onTeacherUpdateSuccess}
             />
-            <Box component="span" sx={{ mr: "10px" }} >
-                <Link href={`/teachers/view/${params.orgId}`}>View</Link>
-            </Box>
-            <Box component="span" sx={{ mr: "10px" }} >
-                <Link href={`/teachers/edit/${params.orgId}`}>Edit</Link>
-            </Box>
-            <Box component="span" sx={{ mr: "10px" }} >
-                <Link href={`/teachers/delete/${params.orgId}`}>Delete</Link>
-            </Box>
+
         </>
 
     );
