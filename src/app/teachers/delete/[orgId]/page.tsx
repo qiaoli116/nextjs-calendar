@@ -11,6 +11,8 @@ import CRUDLinksComponent from '../../../../components/Controls/CRUDLinks';
 
 export default function TeachersDeletePage({ params }: { params: { orgId: string } }) {
     console.log("params", params);
+    // if deleted, the CRUD links will be hidden
+    const [deleted, setDeleted] = React.useState(false);
     return (
         <>
             <Breadcrumbs aria-label="breadcrumb">
@@ -21,17 +23,22 @@ export default function TeachersDeletePage({ params }: { params: { orgId: string
             </Breadcrumbs>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <h2>Delete teacher</h2>
-                <Box sx={{ px: "5px" }}></Box>
-                <CRUDLinksComponent
-                    baseURL="/teachers"
-                    resourceId={params.orgId}
-                    createLink={false}
-                    deleteLink={false}
-                    hasText={false}
-                />
+                {!deleted && <>
+                    <Box sx={{ px: "5px" }}></Box>
+                    <CRUDLinksComponent
+                        baseURL="/teachers"
+                        resourceId={params.orgId}
+                        createLink={false}
+                        deleteLink={false}
+                        hasText={false}
+                    />
+                </>
+
+                }
             </Box>
             <TeacherDeleteComponent
                 orgId={params.orgId}
+                onDeleteSuccess={(_deleted: boolean) => setDeleted(_deleted)}
             />
         </>
 

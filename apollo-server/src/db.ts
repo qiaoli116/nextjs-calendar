@@ -2,7 +2,9 @@ import { BlobOptions } from 'buffer';
 import { MongoClient } from 'mongodb';
 import { ObjectId } from 'mongodb';
 
-const url = 'mongodb://localhost:27017';
+console.log("process.env.DB_STRING", process.env.DB_STRING)
+const url = process.env.DB_STRING ? process.env.DB_STRING : 'mongodb://localhost:27017';
+console.log("url is set to", url)
 const dbName = 'appdb';
 const dbClient = new MongoClient(url);
 const collationCaseInsensitive = { locale: 'en', strength: 2 }

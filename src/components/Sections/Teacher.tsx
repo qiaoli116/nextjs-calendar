@@ -24,7 +24,7 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
     if (loading) {
         return (
             <Alert severity="info">
-                <CircularProgress color="inherit" size={20} /> Loading Teacher List ...
+                <CircularProgress color="inherit" size={20} />&nbsp;&nbsp;Loading Teacher List ...
             </Alert>
         )
     };
@@ -39,7 +39,7 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
     }
     if (dataError) {
         return (
-            <Alert severity="info">
+            <Alert severity="error">
                 Failed to load teacher list
             </Alert >
         )
@@ -153,7 +153,7 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
         return (
             <>
                 <Alert severity="info">
-                    <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+                    <CircularProgress color="inherit" size={20} />&nbsp;&nbsp;Loading Teacher {orgId} ...
                 </Alert>
             </>
 
@@ -173,7 +173,7 @@ function TeacherViewOneComponent({ orgId }: { orgId: string }) {
     if (dataError || teacher === null) {
         return (
             <>
-                <Alert severity="info">
+                <Alert severity="error">
                     Failed to load teacher <strong>{orgId}</strong>
                 </Alert>
             </>
@@ -267,7 +267,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
             firstName: teacher.name.first,
             lastName: teacher.name.last
         };
-        sleep(2000)
         const result = await executeCreateTeacher(_teacher);
         console.log("handleSubmit - ", "result", result)
         if (!!result.error) {
@@ -286,7 +285,7 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
     };
     const resetForm = async () => {
 
-        //setTeacher(emptyTeacher);
+        setTeacher(emptyTeacher);
     };
     return (
         <>
@@ -294,7 +293,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
-                            id="outlined-read-only-input"
                             fullWidth
                             label="Org ID"
                             name='orgId'
@@ -306,7 +304,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
-                            id="outlined-read-only-input"
                             fullWidth
                             label="First Name"
                             name='name.first'
@@ -318,7 +315,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
-                            id="outlined-read-only-input"
                             fullWidth
                             label="Last Name"
                             name='name.last'
@@ -330,7 +326,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
-                            id="outlined-read-only-input"
                             fullWidth
                             label="Email"
                             name='email'
@@ -342,7 +337,6 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
                 <Box sx={{ py: "8px" }}>
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
-                            id="outlined-read-only-input"
                             fullWidth
                             label="User Name"
                             name='userName'
@@ -352,17 +346,16 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
                     </FormControl>
                 </Box>
                 <Box sx={{ py: "8px" }}>
-                    <Button type='submit'>
-                        {mutationStatus === "loading" ? <>Creating <CircularProgress color="inherit" size={20} /></> : "Create"}
+                    <Button type='submit' disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Creating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Create"}
                     </Button>
                     <Button onClick={resetForm}>
                         Reset
                     </Button>
                 </Box>
             </form>
-            {mutationStatus === "error" && <div>Mutation Error</div>}
-            {mutationStatus === "success" && <div>Mutation Succeed</div>}
-
+            {mutationStatus === "error" && <Alert severity="error">Create Error</Alert >}
+            {mutationStatus === "success" && <Alert severity="success">Create successful</Alert >}
         </>
     )
 }
@@ -435,7 +428,7 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
         return (
             <>
                 <Alert severity="info">
-                    <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+                    <CircularProgress color="inherit" size={20} />&nbsp;&nbsp;Loading Teacher {orgId} ...
                 </Alert>
             </>
         )
@@ -454,7 +447,7 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
     if (dataError || teacherCurrent === null) {
         return (
             <>
-                <Alert severity="info">
+                <Alert severity="error">
                     Failed to load teacher <strong>{orgId}</strong>
                 </Alert>
             </>
@@ -514,8 +507,8 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
                     </FormControl>
                 </Box>
                 <Box sx={{ py: "8px" }}>
-                    <Button type='submit'>
-                        {mutationStatus === "loading" ? <>Updating <CircularProgress color="inherit" size={20} /></> : "Save"}
+                    <Button type='submit' disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Updating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Save"}
                     </Button>
                     <Button onClick={resetForm}>
                         Reload
@@ -529,7 +522,7 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
     )
 }
 
-function TeacherDeleteComponent({ orgId }: { orgId: string }) {
+function TeacherDeleteComponent({ orgId, onDeleteSuccess }: { orgId: string, onDeleteSuccess?: (deleted: boolean) => void }) {
     console.log("TeacherUpdateComponent");
     const { loading, error, dataError, teacher, reexecuteQueryTeacher } = useQueryOneTeacher(orgId);
     const [executeDeleteTeacher] = useDeleteTeacher();
@@ -539,7 +532,7 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
         return (
             <>
                 <Alert severity="info">
-                    <CircularProgress color="inherit" size={20} /> Loading Teacher {orgId} ...
+                    <CircularProgress color="inherit" size={20} />&nbsp;&nbsp;Loading Teacher {orgId} ...
                 </Alert>
             </>
         )
@@ -559,7 +552,7 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
     if (dataError || teacher === null) {
         return (
             <>
-                <Alert severity="info">
+                <Alert severity="error">
                     Failed to load teacher <strong>{orgId}</strong>
                 </Alert>
             </>
@@ -567,18 +560,39 @@ function TeacherDeleteComponent({ orgId }: { orgId: string }) {
     }
     const deleteTeacher = async () => {
         console.log("deleteTeacher - ", "teacher", orgId);
+        setMutationStatus("loading");
         const result = await executeDeleteTeacher({ orgId });
         console.log("deleteTeacher - ", "result", result)
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.teacherDelete == null || result.data.teacherDelete == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onDeleteSuccess) {
+                    onDeleteSuccess(result.data.teacherDelete);
+                }
+            }
 
+        }
     }
-
+    const teacherInfo = `${orgId} - ${teacher.name.last}, ${teacher.name.first}`;
     return (
         <>
-            <Alert severity="warning">
-                <AlertTitle>Warning</AlertTitle>
-                Are you sure to <u><i>permanently</i></u> delete teacher <strong>{orgId} - {teacher.name.last}, {teacher.name.first}? </strong>
-                <Button onClick={deleteTeacher}>delete</Button>
-            </Alert>
+            {mutationStatus === "error" && <Alert severity="error">Delete Error</Alert >}
+            {mutationStatus === "success" && <Alert severity="success">Delete successful (teacherInfo)</Alert >}
+            {mutationStatus === "loading" || mutationStatus === "idle" ?
+                <Alert severity="warning">
+                    <AlertTitle>Warning</AlertTitle>
+                    Are you sure to <u><i>permanently</i></u> delete teacher <strong>{orgId} - {teacher.name.last}, {teacher.name.first}? </strong>
+                    <Button onClick={deleteTeacher} disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Deleting&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Delete"}
+                    </Button>
+                </Alert>
+                : ""
+            }
+
         </>
     )
 }

@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
-    "dev": "nodemon --exec 'npm run start'",
+    "dev": "nodemon --exec \"npm run start\"",
     "db:init": "npm run compile && node ./dist/dataSource/dbInit.js",
     "db:start": "sudo docker start mongo",
     "db:shell": "sudo docker exec -it mongo mongosh"
