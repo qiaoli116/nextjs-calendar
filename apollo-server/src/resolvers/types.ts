@@ -9,7 +9,7 @@ export interface ITeacher {
 }
 
 export interface IRoom {
-    roomNum: string;
+    roomNumber: string;
     type: string;
 }
 

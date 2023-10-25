@@ -6,15 +6,15 @@ async function readAllRooms(): Promise<IRoom[] | null> {
     return await readAllDocuments<IRoom>(collectionName);
 }
 
-async function readRoomByRoomNum(roomNum: string): Promise<IRoom | null> {
-    return await readOneDocumentByIndex(collectionName, { roomNum: roomNum });;
+async function readRoomByRoomNum(roomNumber: string): Promise<IRoom | null> {
+    return await readOneDocumentByIndex(collectionName, { roomNumber: roomNumber });;
 }
 const RoomsQuery = {
     Query: {
         rooms: async () => { return await readAllRooms() },
         room: async (parent, args, context, info) => {
-            const { roomNum } = args;
-            return await readRoomByRoomNum(roomNum);
+            const { roomNumber } = args;
+            return await readRoomByRoomNum(roomNumber);
         }
     },
     Children: {

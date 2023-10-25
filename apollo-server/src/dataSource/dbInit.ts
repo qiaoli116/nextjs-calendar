@@ -14,14 +14,20 @@ async function initCollection(collectionName: string, index: {}, documents: any[
     const collection = db.collection(collectionName);
     try {
         await collection.drop();
+    }
+    catch (e) {
+        console.log(e);
+    }
+
+    try {
         await db.createCollection(collectionName);
         await collection.createIndex(index, { unique: true, collation: { locale: 'en', strength: 2 } });
         await collection.insertMany(documents);
     }
-    catch(e){
+    catch (e) {
         console.log(e);
     }
-    
+
 }
 
 await initCollection(dbCollections.teachers.name, dbCollections.teachers.index, teachers);

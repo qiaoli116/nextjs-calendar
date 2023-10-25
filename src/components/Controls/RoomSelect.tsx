@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 // custom filter options
 // search by any substring of first name, last name, orgId, or userName
 const filterOptions = createFilterOptions({
-    stringify: (option: IRoom) => (option.roomNum + " " + option.type),
+    stringify: (option: IRoom) => (option.roomNumber + " " + option.type),
 });
 
 export default function RoomSelect({ value, name, onChange }: { value: string, name?: string, onChange?: (e: any) => void }) {
@@ -60,24 +60,24 @@ export default function RoomSelect({ value, name, onChange }: { value: string, n
                 setOpen(false);
             }}
             filterOptions={filterOptions}
-            isOptionEqualToValue={(option, value) => option.roomNum === value.roomNum}
-            getOptionLabel={(option) => option.roomNum}
+            isOptionEqualToValue={(option, value) => option.roomNumber === value.roomNumber}
+            getOptionLabel={(option) => option.roomNumber}
             renderOption={(props, option) => (
                 <Box component="li" {...props}>
-                    {option.roomNum} ({option.type})
+                    {option.roomNumber} ({option.type})
                 </Box>
             )}
             options={options}
             loading={loading}
             renderInput={(params) => {
-                const room = Rooms.find(t => t.roomNum === value);
+                const room = Rooms.find(t => t.roomNumber === value);
                 return (
                     <TextField
                         {...params}
                         label="Room"
                         inputProps={{
                             ...params.inputProps,
-                            value: room ? `${room.roomNum} (${room.type})` : value
+                            value: room ? `${room.roomNumber} (${room.type})` : value
                         }}
                         InputProps={{
                             ...params.InputProps,

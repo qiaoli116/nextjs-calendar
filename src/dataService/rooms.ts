@@ -2,7 +2,7 @@ import Rooms from "../jsonDb/rooms"
 import { sleep } from "./utils";
 
 export interface IRoom {
-    roomNum: string;
+    roomNumber: string;
     type: string;
 }
 
@@ -11,8 +11,8 @@ const getAllRooms = async (): Promise<IRoom[]> => {
     return Rooms;
 }
 
-const getOneRoomByRoomNum = async (roomNum: string): Promise<IRoom | undefined> => {
-    return Rooms.find((room) => room.roomNum === roomNum);
+const getOneRoomByRoomNum = async (roomNumber: string): Promise<IRoom | undefined> => {
+    return Rooms.find((room) => room.roomNumber === roomNumber);
 }
 
 export default {

@@ -28,7 +28,7 @@ type Mutation {
 }
 
 type Room{
-    roomNum: String!
+    roomNumber: String!
     type: String!
 }
 type Name {

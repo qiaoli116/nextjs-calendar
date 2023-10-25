@@ -27,7 +27,7 @@ const dbCollections = {
     },
     rooms: {
         name: 'rooms',
-        index: { roomNum: 1 },
+        index: { roomNumber: 1 },
     },
 };
 
