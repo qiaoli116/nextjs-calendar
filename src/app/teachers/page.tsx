@@ -1,7 +1,7 @@
 "use client"
-import Link from '@mui/material/Link';
 import { TeacherViewAllComponent } from '../../components/Sections/Teacher';
-import Box from '@mui/material/Box';
+import React from 'react';
+
 
 export default function TeachersViewAll() {
     return (

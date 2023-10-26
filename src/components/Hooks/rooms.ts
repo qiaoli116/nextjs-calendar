@@ -54,8 +54,8 @@ export function useQueryOneRoom(roomNumber: string) {
         loading,
         error,
         dataError,
-        room: dataError ? {} : data.room,
-        reexecuteQueryOneRoom: executeQuery,
+        room: dataError ? null : data.room,
+        reexecuteQueryRoom: executeQuery,
     };
 }
 

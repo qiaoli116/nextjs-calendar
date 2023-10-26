@@ -145,6 +145,7 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
         </>
     )
 }
+
 function TeacherViewOneComponent({ orgId }: { orgId: string }) {
     console.log("TeacherViewOneComponent");
     const { loading, error, dataError, teacher, reexecuteQueryTeacher } = useQueryOneTeacher(orgId);
