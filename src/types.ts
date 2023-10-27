@@ -9,7 +9,8 @@ export interface ITeacher {
 }
 
 
-export type TRoomType = "CAIT" | "General PC";
+export const RoomTypes = ["Unknown", "CAIT", "General PC"] as const;
+export type TRoomType = typeof RoomTypes[number];
 export interface IRoom {
     roomNumber: string;
     type: TRoomType;

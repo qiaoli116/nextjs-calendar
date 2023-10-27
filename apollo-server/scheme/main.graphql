@@ -17,7 +17,9 @@ type Mutation {
     teacherCreate(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
     teacherUpdate(orgId: String, userName: String, email: String, firstName: String, lastName: String): Teacher
     teacherDelete(orgId: String): Boolean
-
+    roomCreate(roomNumber: String, type: String): Room
+    roomUpdate(roomNumber: String, type: String): Room
+    roomDelete(roomNumber: String): Boolean
 #   addRoom(roomNumber: String, type: String): Room
 #   addTAS(year: String, department: String, qualificationCode: String): TAS
 #   addTASSubject(year: String, department: String, qualificationCode: String, subjectCode: String, subjectTitle: String): TAS

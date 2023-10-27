@@ -586,7 +586,7 @@ function TeacherDeleteComponent({ orgId, onDeleteSuccess }: { orgId: string, onD
             {mutationStatus === "loading" || mutationStatus === "idle" ?
                 <Alert severity="warning">
                     <AlertTitle>Warning</AlertTitle>
-                    Are you sure to <u><i>permanently</i></u> delete teacher <strong>{orgId} - {teacher.name.last}, {teacher.name.first}? </strong>
+                    Are you sure to <u><i>permanently</i></u> delete teacher <strong>{teacherInfo}? </strong>
                     <Button onClick={deleteTeacher} disabled={mutationStatus === "loading"}>
                         {mutationStatus === "loading" ? <>Deleting&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Delete"}
                     </Button>

@@ -20,6 +20,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import SupportIcon from '@mui/icons-material/Support';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ArticleIcon from '@mui/icons-material/Article';
+import GroupsIcon from '@mui/icons-material/Groups';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry';
 
 // export const metadata = {
@@ -31,8 +33,8 @@ const DRAWER_WIDTH = 240;
 
 const LINKS = [
   { text: 'Home', href: '/', icon: HomeIcon },
-  { text: 'Starred', href: '/starred', icon: StarIcon },
-  { text: 'Tasks', href: '/tasks', icon: ChecklistIcon },
+  { text: 'Teachers', href: '/teachers', icon: GroupsIcon },
+  { text: 'Rooms', href: '/rooms', icon: MeetingRoomIcon },
   { text: 'CRNs', href: '/crns', icon: ArticleIcon },
 ];
 

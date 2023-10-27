@@ -64,13 +64,15 @@ export interface ICreateRoomMutationVariables {
     type: string;
 }
 type CreateRoomMutationData = { roomCreate: IRoom } | undefined | null;
-export function useMutationCreateRoom(): [UseMutationExecute<CreateRoomMutationData, ICreateRoomMutationVariables>] {
+export function useCreateRoom(): [UseMutationExecute<CreateRoomMutationData, ICreateRoomMutationVariables>] {
     const ROOM_CREATE_MUTATION = gql`
         mutation RoomCreate($roomNumber: String, $type: String) {
             roomCreate(roomNumber: $roomNumber, type: $type) {
                 roomNumber
                 type
-            }`
+            }
+        }
+    `;
     const [result, executeMutation] = useMutation<CreateRoomMutationData, ICreateRoomMutationVariables>(ROOM_CREATE_MUTATION);
     return [executeMutation];
 }
@@ -80,13 +82,15 @@ export interface IUpdateRoomMutationVariables {
     type: string;
 }
 type UpdateRoomMutationData = { roomUpdate: IRoom } | undefined | null;
-export function useMutationUpdateRoom() {
+export function useUpdateRoom() {
     const ROOM_UPDATE_MUTATION = gql`
         mutation RoomUpdate($roomNumber: String, $type: String) {
             roomUpdate(roomNumber: $roomNumber, type: $type) {
                 roomNumber
                 type
-            }`
+            }
+        }
+    `
     const [result, executeMutation] = useMutation<UpdateRoomMutationData, IUpdateRoomMutationVariables>(ROOM_UPDATE_MUTATION);
     return [executeMutation];
 }
@@ -94,14 +98,13 @@ export function useMutationUpdateRoom() {
 export interface IDeleteRoomMutationVariables {
     roomNumber: string;
 }
-type DeleteRoomMutationData = { roomDelete: IRoom } | undefined | null;
-export function useMutationDeleteRoom() {
+type DeleteRoomMutationData = { roomDelete: boolean } | undefined | null;
+export function useDeleteRoom() {
     const ROOM_DELETE_MUTATION = gql`
         mutation RoomDelete($roomNumber: String) {
-            roomDelete(roomNumber: $roomNumber) {
-                roomNumber
-                type
-            }`
+            roomDelete(roomNumber: $roomNumber) 
+        }
+    `
     const [result, executeMutation] = useMutation<DeleteRoomMutationData, IDeleteRoomMutationVariables>(ROOM_DELETE_MUTATION);
     return [executeMutation];
 }
