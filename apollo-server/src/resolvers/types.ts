@@ -36,6 +36,7 @@ export interface ITASQualification {
     code: string;
     title: string;
 }
+
 export interface ITAS {
     year: string;
     department: string;

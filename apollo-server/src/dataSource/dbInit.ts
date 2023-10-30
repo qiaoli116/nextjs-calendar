@@ -5,6 +5,7 @@ import subjects from './subjects.js';
 import rooms from './rooms.js';
 import tas from './tas.js';
 import sessions from './sessions.js';
+import qualificatoins from './qualifications.js';
 
 await dbClient.connect();
 console.log('Connected to MongoDB');
@@ -35,6 +36,7 @@ await initCollection(dbCollections.subjects.name, dbCollections.subjects.index, 
 await initCollection(dbCollections.rooms.name, dbCollections.rooms.index, rooms);
 await initCollection(dbCollections.tas.name, dbCollections.tas.index, tas);
 await initCollection(dbCollections.sessions.name, dbCollections.sessions.index, sessions);
+await initCollection(dbCollections.qualifications.name, dbCollections.qualifications.index, qualificatoins);
 
 await dbClient.close();
 

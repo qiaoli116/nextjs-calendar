@@ -1,4 +1,10 @@
-import { dbClient, dbCollections, readAllDocuments } from '../db.js'
+import {
+    dbClient,
+    dbCollections,
+    readAllDocuments,
+    insertOneDocument,
+} from '../db.js'
+
 import { ITAS, ITASSubject } from './types.js'
 const collectionName = dbCollections.tas.name;
 async function readAllTAS(): Promise<ITAS[] | null> {
@@ -44,6 +50,18 @@ async function readTASSubject(
     return tas;
 }
 
+async function createTAS(tas: ITAS): Promise<ITAS | null> {
+    // new TAS has no subjects, they are added later.
+    // the subjects included in the parameter are ignored.
+    const tasInit = {
+        year: tas.year,
+        department: tas.department,
+        qualification: tas.qualification,
+        subjects: [],
+    }
+    return insertOneDocument<ITAS>(collectionName, tasInit);
+}
+
 const TASQuery = {
     Query: {
         tases: async () => { return await readAllTAS() },
@@ -56,6 +74,18 @@ const TASQuery = {
             return readTASSubject(year, department, qualificationCode, subjectCode);
         }
     },
+    Mutation: {
+        tasCreate: (parent, args, context, info) => {
+            console.log("addTAS", args);
+            const tas: ITAS = {
+                year: args.year,
+                department: args.department,
+                qualification: args.qualification,
+                subjects: [],
+            };
+            return createTAS(tas);
+        },
+    },
     Children: {
 
     }
@@ -64,5 +94,6 @@ const TASQuery = {
 const TASCRUD = {
     readAllTAS,
     readTAS,
+    createTAS,
 }
 export { TASQuery, TASCRUD };

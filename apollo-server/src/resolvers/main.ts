@@ -16,6 +16,7 @@ const resolvers = {
     Mutation: {
         ...TeachersQuery.Mutation,
         ...RoomsQuery.Mutation,
+        ...TASQuery.Mutation,
     },
     ...TeachersQuery.Children,
     ...TASQuery.Children,

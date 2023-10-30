@@ -29,6 +29,10 @@ const dbCollections = {
         name: 'rooms',
         index: { roomNumber: 1 },
     },
+    qualifications: {
+        name: 'qualifications',
+        index: { code: 1 },
+    }
 };
 
 const readAllDocuments = async <T>(collectionName: string, query: any = {}): Promise<T[] | null> => {
