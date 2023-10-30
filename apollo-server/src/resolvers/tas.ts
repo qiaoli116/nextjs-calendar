@@ -3,9 +3,10 @@ import {
     dbCollections,
     readAllDocuments,
     insertOneDocument,
+    udpateOneDocument,
 } from '../db.js'
 
-import { ITAS, ITASSubject } from './types.js'
+import { ITAS, ITASIndex, ITASSubject } from './types.js'
 const collectionName = dbCollections.tas.name;
 async function readAllTAS(): Promise<ITAS[] | null> {
     return await readAllDocuments<ITAS>(collectionName);
@@ -62,6 +63,12 @@ async function createTAS(tas: ITAS): Promise<ITAS | null> {
     return insertOneDocument<ITAS>(collectionName, tasInit);
 }
 
+async function addTASSubject(
+    tasIndex: ITASIndex, subject: ITASSubject
+): Promise<ITAS | null> {
+    return udpateOneDocument<ITAS>(collectionName, tasIndex, subject, "$push");
+}
+
 const TASQuery = {
     Query: {
         tases: async () => { return await readAllTAS() },
@@ -85,6 +92,21 @@ const TASQuery = {
             };
             return createTAS(tas);
         },
+        tasAddSubject: (parent, args, context, info) => {
+            console.log("addTASSubject", args);
+            const { tasIndex, subject } = args;
+            const _tasIndex: ITASIndex = {
+                year: tasIndex.year,
+                department: tasIndex.department,
+                qualificationCode: tasIndex.qualificationCode,
+            }
+            const _subject: ITASSubject = {
+                code: subject.code,
+                title: subject.title,
+                units: subject.units,
+            }
+            return addTASSubject(_tasIndex, _subject);
+        }
     },
     Children: {
 
@@ -95,5 +117,6 @@ const TASCRUD = {
     readAllTAS,
     readTAS,
     createTAS,
+    addTASSubject
 }
 export { TASQuery, TASCRUD };

@@ -21,11 +21,11 @@ async function readRoomByRoomNumber(roomNumber: string): Promise<IRoom | null> {
 
 
 async function createRoom(room: IRoom): Promise<IRoom | null> {
-    return insertOneDocument<IRoom>(collectionName, room);
+    return await insertOneDocument<IRoom>(collectionName, room);
 }
 
 async function updateRoomByRoomNumber(roomNumber: string, updates: {}): Promise<IRoom | null> {
-    return await udpateOneDocument<IRoom>(collectionName, { roomNumber: roomNumber }, updates);
+    return await udpateOneDocument<IRoom>(collectionName, { roomNumber: roomNumber }, updates, "$set");
 }
 
 async function deleteRoomByRoomNumber(roomNumber: string): Promise<boolean> {

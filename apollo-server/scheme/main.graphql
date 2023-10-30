@@ -21,6 +21,7 @@ type Mutation {
     roomUpdate(roomNumber: String, type: String): Room
     roomDelete(roomNumber: String): Boolean
     tasCreate(year: String, department: String, qualificationInput: TASQualificationInput): TAS
+    tasAddSubject(tasIndex: TASIndexInput, subject: TASSubjectInput): TAS
 #   addRoom(roomNumber: String, type: String): Room
 #   addTAS(year: String, department: String, qualificationCode: String): TAS
 #   addTASSubject(year: String, department: String, qualificationCode: String, subjectCode: String, subjectTitle: String): TAS
@@ -71,6 +72,11 @@ interface Unit {
     code: String!
     title: String!
 }
+
+input TASUnitInput {
+    code: String!
+    title: String!
+}
 type TASUnit implements Unit{
     code: String!
     title: String!
@@ -81,10 +87,20 @@ type SubjectUnit implements Unit{
     crn: String!
 }
 
+input TASSubjectInput {
+    code: String!
+    title: String!
+    units: [TASUnitInput]!
+}
 type TASSubject {
     code: String!
     title: String!
     units: [TASUnit]!
+}
+input TASIndexInput {
+    year: String!
+    department: String!
+    qualificationCode: String!
 }
 type TAS {
     year: String!

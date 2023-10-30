@@ -19,10 +19,13 @@ export interface IUnit {
 }
 
 export interface ITASUnit extends IUnit {
-
+    // code: string;
+    // title: string;
 }
 
 export interface ISubjectUnit extends IUnit {
+    // code: string;
+    // title: string;
     crn: string;
 }
 
@@ -37,6 +40,11 @@ export interface ITASQualification {
     title: string;
 }
 
+export interface ITASIndex {
+    year: string;
+    department: string;
+    qualificationCode: string;
+}
 export interface ITAS {
     year: string;
     department: string;

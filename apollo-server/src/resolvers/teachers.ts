@@ -20,11 +20,11 @@ async function readTeacherByOrgId(orgId: string): Promise<ITeacher | null> {
 }
 
 async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
-    return insertOneDocument<ITeacher>(collectionName, teacher);
+    return await insertOneDocument<ITeacher>(collectionName, teacher);
 }
 
 async function updateTeacher(orgId: string, updates: {}): Promise<ITeacher | null> {
-    return await udpateOneDocument<ITeacher>(collectionName, { orgId: orgId }, updates);
+    return await udpateOneDocument<ITeacher>(collectionName, { orgId: orgId }, updates, "$set");
 }
 
 async function deleteTeacherByOrgId(orgId: string): Promise<boolean> {
