@@ -265,8 +265,10 @@ function TeacherCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (teache
             orgId: teacher.orgId,
             userName: teacher.userName,
             email: teacher.email,
-            firstName: teacher.name.first,
-            lastName: teacher.name.last
+            name: {
+                first: teacher.name.first,
+                last: teacher.name.last
+            }
         };
         const result = await executeCreateTeacher(_teacher);
         console.log("handleSubmit - ", "result", result)
@@ -394,8 +396,10 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
             orgId: teacher.orgId,
             userName: teacher.userName,
             email: teacher.email,
-            firstName: teacher.name.first,
-            lastName: teacher.name.last
+            name: {
+                first: teacher.name.first,
+                last: teacher.name.last
+            }
         };
         const result = await executeUpdateTeacher(_teacher);
         console.log("handleSubmit - ", "result", result)

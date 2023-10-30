@@ -70,19 +70,18 @@ export function useQueryOneTeacher(orgId: string) {
   };
 }
 
-export interface ICreateTeacherMutationVariables {
-  orgId: string;
-  userName: string;
-  email: string;
-  firstName: string;
-  lastName: string;
+export interface ICreateTeacherMutationVariables extends ITeacher {
+  // orgId: string;
+  // userName: string;
+  // email: string;
+  // name: { first: string; last: string }
 }
 type CreateTeacherMutationData = { teacherCreate: ITeacher } | undefined | null;
 // executeMutation({ orgId, userName, email, firstName, lastName })
 export function useCreateTeacher(): [UseMutationExecute<CreateTeacherMutationData, ICreateTeacherMutationVariables>] {
   const TEACHER_CREATE_MUTATION = gql`
-    mutation Mutation($orgId: String, $userName: String, $email: String, $firstName: String, $lastName: String) {
-      teacherCreate(orgId: $orgId, userName: $userName, email: $email, firstName: $firstName, lastName: $lastName) {
+    mutation Mutation($orgId: String, $userName: String, $email: String, $name: NameInput) {
+      teacherCreate(orgId: $orgId, userName: $userName, email: $email, name: $name) {
         email
         name {
           first
@@ -101,19 +100,18 @@ export function useCreateTeacher(): [UseMutationExecute<CreateTeacherMutationDat
   ];
 }
 
-export interface IUpdateTeacherMutationVariables {
-  orgId: string;
-  userName: string;
-  email: string;
-  firstName: string;
-  lastName: string;
+export interface IUpdateTeacherMutationVariables extends ITeacher {
+  // orgId: string;
+  // userName: string;
+  // email: string;
+  // name: { first: string; last: string }
 }
 type UpdateTeacherMutationData = { teacherUpdate: ITeacher } | undefined | null;
 // executeMutation({ orgId, userName, email, firstName, lastName })
 export function useUpdateTeacher(): [UseMutationExecute<UpdateTeacherMutationData, IUpdateTeacherMutationVariables>] {
   const TEACHER_UPDATE_MUTATION = gql`
-    mutation Mutation($orgId: String, $userName: String, $email: String, $firstName: String, $lastName: String) {
-      teacherUpdate(orgId: $orgId, userName: $userName, email: $email, firstName: $firstName, lastName: $lastName) {
+    mutation Mutation($orgId: String, $userName: String, $email: String, $name: NameInput) {
+      teacherUpdate(orgId: $orgId, userName: $userName, email: $email, name: $name) {
         email
         name {
           first

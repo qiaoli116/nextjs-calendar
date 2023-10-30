@@ -46,8 +46,8 @@ const TeachersQuery = {
                 userName: args.userName,
                 email: args.email,
                 name: {
-                    first: args.firstName,
-                    last: args.lastName
+                    first: args.name.first,
+                    last: args.name.last
                 }
             };
             return createTeacher(teacher);
@@ -59,8 +59,8 @@ const TeachersQuery = {
                 userName: args.userName,
                 email: args.email,
                 name: {
-                    first: args.firstName,
-                    last: args.lastName
+                    first: args.name.first,
+                    last: args.name.last
                 }
             };
             return updateTeacher(orgId, updates);

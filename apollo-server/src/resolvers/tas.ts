@@ -80,7 +80,7 @@ const TASQuery = {
             const tas: ITAS = {
                 year: args.year,
                 department: args.department,
-                qualification: args.qualification,
+                qualification: args.qualificationInput,
                 subjects: [],
             };
             return createTAS(tas);
