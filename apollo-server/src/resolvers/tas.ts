@@ -63,27 +63,36 @@ async function createTAS(tas: ITAS): Promise<ITAS | null> {
     return insertOneDocument<ITAS>(collectionName, tasInit);
 }
 
-async function addTASSubjects(
-    tasIndex: ITASIndex, subjects: ITASSubject[]
-): Promise<ITAS | null> {
+async function addTASSubjects(tasIndex: ITASIndex, subjects: ITASSubject[]): Promise<ITAS | null> {
     const updates = { subjects: { "$each": subjects } }
     return udpateOneDocument<ITAS>(collectionName, tasIndex, updates, "$push");
+}
+
+async function deleteTASSubjects(tasIndex: ITASIndex, subjectCodes: string[]): Promise<ITAS | null> {
+    const updates = {
+        "subjects": {
+            "code": {
+                "$in": subjectCodes
+            }
+        }
+    }
+    return udpateOneDocument<ITAS>(collectionName, tasIndex, updates, "$pull");
 }
 
 const TASQuery = {
     Query: {
         tases: async () => { return await readAllTAS() },
-        tas: (parent, args, context, info) => {
+        tas: async (parent, args, context, info) => {
             const { year, department, qualificationCode } = args;
-            return readTAS(year, department, qualificationCode);
+            return await readTAS(year, department, qualificationCode);
         },
-        tasSubject: (parent, args, context, info) => {
+        tasSubject: async (parent, args, context, info) => {
             const { year, department, qualificationCode, subjectCode } = args;
-            return readTASSubject(year, department, qualificationCode, subjectCode);
+            return await readTASSubject(year, department, qualificationCode, subjectCode);
         }
     },
     Mutation: {
-        tasCreate: (parent, args, context, info) => {
+        tasCreate: async (parent, args, context, info) => {
             console.log("addTAS", args);
             const tas: ITAS = {
                 year: args.year,
@@ -91,9 +100,9 @@ const TASQuery = {
                 qualification: args.qualificationInput,
                 subjects: [],
             };
-            return createTAS(tas);
+            return await createTAS(tas);
         },
-        tasAddSubjects: (parent, args, context, info) => {
+        tasAddSubjects: async (parent, args, context, info) => {
             console.log("addTASSubject", args);
             const { tasIndex, subjects } = args;
             const _tasIndex: ITASIndex = {
@@ -114,7 +123,20 @@ const TASQuery = {
                     units: subject.units,
                 }
             })
-            return addTASSubjects(_tasIndex, _subjects);
+            return await addTASSubjects(_tasIndex, _subjects);
+        },
+        tasDeleteSubjects: async (parent, args, context, info) => {
+            console.log("deleteTASSubject", args);
+            const { tasIndex, subjectCodes } = args;
+            const _tasIndex: ITASIndex = {
+                year: tasIndex.year,
+                department: tasIndex.department,
+                "qualification.code": tasIndex.qualificationCode,
+            }
+            const _subjectCodes: string[] = subjectCodes.map((subjectCode: any) => {
+                return subjectCode
+            })
+            return await deleteTASSubjects(_tasIndex, _subjectCodes);
         }
     },
     Children: {

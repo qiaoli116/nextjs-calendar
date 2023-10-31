@@ -22,6 +22,7 @@ type Mutation {
     roomDelete(roomNumber: String): Boolean
     tasCreate(year: String, department: String, qualificationInput: TASQualificationInput): TAS
     tasAddSubjects(tasIndex: TASIndexInput, subjects: [TASSubjectInput]): TAS
+    tasDeleteSubjects(tasIndex: TASIndexInput, subjectCodes: [String]): TAS
 #   addRoom(roomNumber: String, type: String): Room
 #   addTAS(year: String, department: String, qualificationCode: String): TAS
 #   addTASSubject(year: String, department: String, qualificationCode: String, subjectCode: String, subjectTitle: String): TAS

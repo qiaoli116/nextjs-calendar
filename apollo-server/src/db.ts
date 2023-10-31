@@ -131,7 +131,7 @@ const insertOneDocument = async <T>(collectionName: string, document: T): Promis
     return documentCreated;
 }
 
-export type DBUpdateOperations = '$set' | '$push';
+export type DBUpdateOperations = '$set' | '$push' | '$pull';
 const udpateOneDocument = async <T>(collectionName: string, indexQuery: object, updates: object, operation: DBUpdateOperations): Promise<T | null> => {
     console.log('Update query:')
     console.log("collectionName", collectionName)
@@ -145,7 +145,7 @@ const udpateOneDocument = async <T>(collectionName: string, indexQuery: object, 
 
         const db = dbClient.db('appdb');
         const collection = db.collection(collectionName);
-
+        console.log("{ [operation]: updates }", { [operation]: updates })
         const result = await collection.updateOne(indexQuery, { [operation]: updates });
         console.log('Update result:', result);
         if (result.modifiedCount == 1) {
