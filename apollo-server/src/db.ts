@@ -133,6 +133,11 @@ const insertOneDocument = async <T>(collectionName: string, document: T): Promis
 
 export type DBUpdateOperations = '$set' | '$push';
 const udpateOneDocument = async <T>(collectionName: string, indexQuery: object, updates: object, operation: DBUpdateOperations): Promise<T | null> => {
+    console.log('Update query:')
+    console.log("collectionName", collectionName)
+    console.log("indexQuery", indexQuery)
+    console.log("updates", updates)
+    console.log("operation", operation)
     let documentUpdated = null;
     try {
         await dbClient.connect();

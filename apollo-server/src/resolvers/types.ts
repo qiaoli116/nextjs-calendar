@@ -43,7 +43,7 @@ export interface ITASQualification {
 export interface ITASIndex {
     year: string;
     department: string;
-    qualificationCode: string;
+    "qualification.code": string;
 }
 export interface ITAS {
     year: string;

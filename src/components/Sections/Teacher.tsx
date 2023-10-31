@@ -414,7 +414,6 @@ function TeacherUpdateComponent({ orgId, onUpdateSuccess }: { orgId: string, onU
                     onUpdateSuccess(result.data.teacherUpdate);
                 }
             }
-
         }
     };
     const resetForm = async () => {

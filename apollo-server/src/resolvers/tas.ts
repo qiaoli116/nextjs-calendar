@@ -6,7 +6,7 @@ import {
     udpateOneDocument,
 } from '../db.js'
 
-import { ITAS, ITASIndex, ITASSubject } from './types.js'
+import { ITAS, ITASIndex, ITASSubject, ITASUnit } from './types.js'
 const collectionName = dbCollections.tas.name;
 async function readAllTAS(): Promise<ITAS[] | null> {
     return await readAllDocuments<ITAS>(collectionName);
@@ -63,10 +63,11 @@ async function createTAS(tas: ITAS): Promise<ITAS | null> {
     return insertOneDocument<ITAS>(collectionName, tasInit);
 }
 
-async function addTASSubject(
-    tasIndex: ITASIndex, subject: ITASSubject
+async function addTASSubjects(
+    tasIndex: ITASIndex, subjects: ITASSubject[]
 ): Promise<ITAS | null> {
-    return udpateOneDocument<ITAS>(collectionName, tasIndex, subject, "$push");
+    const updates = { subjects: { "$each": subjects } }
+    return udpateOneDocument<ITAS>(collectionName, tasIndex, updates, "$push");
 }
 
 const TASQuery = {
@@ -92,20 +93,28 @@ const TASQuery = {
             };
             return createTAS(tas);
         },
-        tasAddSubject: (parent, args, context, info) => {
+        tasAddSubjects: (parent, args, context, info) => {
             console.log("addTASSubject", args);
-            const { tasIndex, subject } = args;
+            const { tasIndex, subjects } = args;
             const _tasIndex: ITASIndex = {
                 year: tasIndex.year,
                 department: tasIndex.department,
-                qualificationCode: tasIndex.qualificationCode,
+                "qualification.code": tasIndex.qualificationCode,
             }
-            const _subject: ITASSubject = {
-                code: subject.code,
-                title: subject.title,
-                units: subject.units,
-            }
-            return addTASSubject(_tasIndex, _subject);
+            const _subjects: ITASSubject[] = subjects.map((subject: any) => {
+                const _units: ITASUnit[] = subject.units.map((unit: any) => {
+                    return {
+                        code: unit.code,
+                        title: unit.title,
+                    }
+                })
+                return {
+                    code: subject.code,
+                    title: subject.title,
+                    units: subject.units,
+                }
+            })
+            return addTASSubjects(_tasIndex, _subjects);
         }
     },
     Children: {
@@ -117,6 +126,6 @@ const TASCRUD = {
     readAllTAS,
     readTAS,
     createTAS,
-    addTASSubject
+    addTASSubjects
 }
 export { TASQuery, TASCRUD };
