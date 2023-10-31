@@ -110,6 +110,7 @@ const TASQuery = {
                 department: tasIndex.department,
                 "qualification.code": tasIndex.qualificationCode,
             }
+
             const _subjects: ITASSubject[] = subjects.map((subject: any) => {
                 const _units: ITASUnit[] = subject.units.map((unit: any) => {
                     return {
