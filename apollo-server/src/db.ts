@@ -131,13 +131,11 @@ const insertOneDocument = async <T>(collectionName: string, document: T): Promis
     return documentCreated;
 }
 
-export type DBUpdateOperations = '$set' | '$push' | '$pull';
-const udpateOneDocument = async <T>(collectionName: string, indexQuery: object, updates: object, operation: DBUpdateOperations): Promise<T | null> => {
+const updateOneDocument = async <T>(collectionName: string, indexQuery: object, update: object, options: object = {}): Promise<T | null> => {
     console.log('Update query:')
     console.log("collectionName", collectionName)
     console.log("indexQuery", indexQuery)
-    console.log("updates", updates)
-    console.log("operation", operation)
+    console.log("updates", update)
     let documentUpdated = null;
     try {
         await dbClient.connect();
@@ -145,8 +143,7 @@ const udpateOneDocument = async <T>(collectionName: string, indexQuery: object, 
 
         const db = dbClient.db('appdb');
         const collection = db.collection(collectionName);
-        console.log("{ [operation]: updates }", { [operation]: updates })
-        const result = await collection.updateOne(indexQuery, { [operation]: updates });
+        const result = await collection.updateOne(indexQuery, update, options);
         console.log('Update result:', result);
         if (result.modifiedCount == 1) {
             const docs = await collection.find(indexQuery).collation(collationCaseInsensitive).toArray();
@@ -199,7 +196,7 @@ export {
     readOneDocumentByIndex,
     readOneDocumentById,
     insertOneDocument,
-    udpateOneDocument,
+    updateOneDocument as udpateOneDocument,
     deleteOneDocumentByIndex,
     collationCaseInsensitive,
 

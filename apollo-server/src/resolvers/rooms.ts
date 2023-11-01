@@ -25,7 +25,8 @@ async function createRoom(room: IRoom): Promise<IRoom | null> {
 }
 
 async function updateRoomByRoomNumber(roomNumber: string, updates: {}): Promise<IRoom | null> {
-    return await udpateOneDocument<IRoom>(collectionName, { roomNumber: roomNumber }, updates, "$set");
+    const updateObj = { "$set": updates }
+    return await udpateOneDocument<IRoom>(collectionName, { roomNumber: roomNumber }, updateObj);
 }
 
 async function deleteRoomByRoomNumber(roomNumber: string): Promise<boolean> {

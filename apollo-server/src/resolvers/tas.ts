@@ -4,6 +4,7 @@ import {
     readAllDocuments,
     insertOneDocument,
     udpateOneDocument,
+    deleteOneDocumentByIndex
 } from '../db.js'
 
 import { ITAS, ITASIndex, ITASSubject, ITASUnit } from './types.js'
@@ -11,7 +12,7 @@ const collectionName = dbCollections.tas.name;
 async function readAllTAS(): Promise<ITAS[] | null> {
     return await readAllDocuments<ITAS>(collectionName);
 }
-async function readTAS(year: string, department: string, qualificationCode: string): Promise<ITAS | null> {
+async function readTAS(tasIndex: ITASIndex): Promise<ITAS | null> {
     let tas = null;
     try {
         await dbClient.connect();
@@ -19,9 +20,8 @@ async function readTAS(year: string, department: string, qualificationCode: stri
 
         const db = dbClient.db('appdb'); // Replace with your database name
         const collection = db.collection('tas'); // Replace with your collection name
-        const query = { "year": year, "department": department, "qualification.code": qualificationCode };
-        console.log('Query:', query);
-        const docs = await collection.find(query).collation({ locale: 'en', strength: 2 }).toArray();
+        console.log('tasIndex:', tasIndex);
+        const docs = await collection.find(tasIndex).collation({ locale: 'en', strength: 2 }).toArray();
         console.log('Found documents:', docs);
         if (docs.length > 0) {
             tas = docs[0];
@@ -36,9 +36,9 @@ async function readTAS(year: string, department: string, qualificationCode: stri
 }
 
 async function readTASSubject(
-    year: string, department: string, qualificationCode: string, subjectCode: string
+    tasIndex: ITASIndex, subjectCode: string
 ): Promise<ITAS | null> {
-    const tas: ITAS = await readTAS(year, department, qualificationCode);
+    const tas: ITAS = await readTAS(tasIndex);
     if (!tas) {
         return null;
     }
@@ -64,31 +64,51 @@ async function createTAS(tas: ITAS): Promise<ITAS | null> {
 }
 
 async function addTASSubjects(tasIndex: ITASIndex, subjects: ITASSubject[]): Promise<ITAS | null> {
-    const updates = { subjects: { "$each": subjects } }
-    return udpateOneDocument<ITAS>(collectionName, tasIndex, updates, "$push");
+    const updateObj = {
+        "$push": { subjects: { "$each": subjects } }
+    }
+
+    return udpateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
 }
 
 async function deleteTASSubjects(tasIndex: ITASIndex, subjectCodes: string[]): Promise<ITAS | null> {
-    const updates = {
-        "subjects": {
-            "code": {
-                "$in": subjectCodes
+    const updateObj = {
+        "$pull": {
+            "subjects": {
+                "code": {
+                    "$in": subjectCodes
+                }
             }
         }
     }
-    return udpateOneDocument<ITAS>(collectionName, tasIndex, updates, "$pull");
+    return udpateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
+}
+
+async function deleteTAS(tasIndex: ITASIndex): Promise<boolean> {
+    return await deleteOneDocumentByIndex(collectionName, tasIndex);
 }
 
 const TASQuery = {
     Query: {
         tases: async () => { return await readAllTAS() },
         tas: async (parent, args, context, info) => {
-            const { year, department, qualificationCode } = args;
-            return await readTAS(year, department, qualificationCode);
+            const { tasIndex, subjects } = args;
+            const _tasIndex: ITASIndex = {
+                year: tasIndex.year,
+                department: tasIndex.department,
+                "qualification.code": tasIndex.qualificationCode,
+            }
+
+            return await readTAS(_tasIndex);
         },
         tasSubject: async (parent, args, context, info) => {
-            const { year, department, qualificationCode, subjectCode } = args;
-            return await readTASSubject(year, department, qualificationCode, subjectCode);
+            const { tasIndex, subjectCode } = args;
+            const _tasIndex: ITASIndex = {
+                year: tasIndex.year,
+                department: tasIndex.department,
+                "qualification.code": tasIndex.qualificationCode,
+            }
+            return await readTASSubject(_tasIndex, subjectCode);
         }
     },
     Mutation: {
@@ -138,6 +158,16 @@ const TASQuery = {
                 return subjectCode
             })
             return await deleteTASSubjects(_tasIndex, _subjectCodes);
+        },
+        tasDelete: async (parent, args, context, info) => {
+            console.log("deleteTAS", args);
+            const { tasIndex } = args;
+            const _tasIndex: ITASIndex = {
+                year: tasIndex.year,
+                department: tasIndex.department,
+                "qualification.code": tasIndex.qualificationCode,
+            }
+            return await deleteTAS(_tasIndex);
         }
     },
     Children: {

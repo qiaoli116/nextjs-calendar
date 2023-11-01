@@ -24,7 +24,8 @@ async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
 }
 
 async function updateTeacher(orgId: string, updates: {}): Promise<ITeacher | null> {
-    return await udpateOneDocument<ITeacher>(collectionName, { orgId: orgId }, updates, "$set");
+    const updateObj = { "$set": updates }
+    return await udpateOneDocument<ITeacher>(collectionName, { orgId: orgId }, updateObj);
 }
 
 async function deleteTeacherByOrgId(orgId: string): Promise<boolean> {

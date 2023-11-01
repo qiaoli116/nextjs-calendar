@@ -5,8 +5,8 @@ type Query {
     rooms: [Room]
     room(roomNumber: String): Room
     tases: [TAS]
-    tas(year: String, department: String, qualificationCode: String): TAS
-    tasSubject(year: String, department: String, qualificationCode: String, subjectCode: String): TAS
+    tas(tasIndex: TASIndexInput): TAS
+    tasSubject(tasIndex: TASIndexInput, subjectCode: String): TAS
     sessions: [Session]
     session(reference: String): Session
     subjects: [Subject]
@@ -23,13 +23,7 @@ type Mutation {
     tasCreate(year: String, department: String, qualificationInput: TASQualificationInput): TAS
     tasAddSubjects(tasIndex: TASIndexInput, subjects: [TASSubjectInput]): TAS
     tasDeleteSubjects(tasIndex: TASIndexInput, subjectCodes: [String]): TAS
-#   addRoom(roomNumber: String, type: String): Room
-#   addTAS(year: String, department: String, qualificationCode: String): TAS
-#   addTASSubject(year: String, department: String, qualificationCode: String, subjectCode: String, subjectTitle: String): TAS
-#   addSubject(reference: String, code: String, title: String, term: String, department: String, block: String, qualificationCode: String, deliveryMode: String, startDate: String, endDate: String): Subject
-#   addSession(reference: String, date: String, teacherOrgId: String, roomNumber: String, timeslots: [String]): Session
-#   addSubjectUnit(reference: String, code: String, title: String, crn: String): Subject
-#   addTASUnit(year: String, department: String, qualificationCode: String, subjectCode: String, code: String, title: String): TAS
+    tasDelete(tasIndex: TASIndexInput): Boolean
 }
 
 type Room{
