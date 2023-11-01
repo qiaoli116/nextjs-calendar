@@ -16,4 +16,37 @@ export interface IRoom {
     type: TRoomType;
 }
 
+export interface IUnit {
+    code: string;
+    title: string;
+}
+
+export interface ITASUnit extends IUnit {
+    // code: string;
+    // title: string;
+}
+export interface ITASSubject {
+    code: string;
+    title: string;
+    units: ITASUnit[];
+}
+
+export interface ITASQualification {
+    code: string;
+    title: string;
+}
+
+export interface ITASCreateInput {
+    year: string;
+    department: string;
+    qualification: ITASQualification;
+}
+
+export interface ITAS {
+    year: string;
+    department: string;
+    qualification: ITASQualification;
+    subjects: ITASSubject[];
+}
+
 export type MutationStatus = "idle" | "loading" | "success" | "error";

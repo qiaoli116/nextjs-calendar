@@ -117,7 +117,10 @@ const TASQuery = {
             const tas: ITAS = {
                 year: args.year,
                 department: args.department,
-                qualification: args.qualificationInput,
+                qualification: {
+                    code: args.qualification.code,
+                    title: args.qualification.title
+                },
                 subjects: [],
             };
             return await createTAS(tas);

@@ -20,7 +20,7 @@ export default function CRUDLinksComponent({ baseURL = "/", resourceId = "", cre
     }) {
     const style1 = {
         "display": "flex",
-        "align-items": "center"
+        "alignItems": "center"
     }
     return (
         <>

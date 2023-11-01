@@ -8,13 +8,12 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 
 
-export default function TeachersCreatePage({ params }: { params: { orgId: string } }) {
+export default function TeachersCreatePage() {
     const router = useRouter();
     const onTeacherCreateSuccess = (teacher: ITeacher) => {
         console.log("onTeacherCreateSuccess - ", "teacher", teacher);
         router.push(`/teachers/view/${teacher.orgId}`);
     }
-    console.log("params", params);
     return (
         <>
 
