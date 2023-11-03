@@ -39,7 +39,12 @@ export interface ITASQualification {
     code: string;
     title: string;
 }
+export interface ITASIndex {
+    year: string;
+    department: string;
+    qualificationCode: string;
 
+}
 export interface ITASDBIndex {
     year: string;
     department: string;
@@ -59,6 +64,7 @@ export interface IDateRange {
 }
 export interface ISubject {
     reference: string;
+    tasIndex: ITASIndex
     code: string
     title: string;
     term: string;
@@ -77,6 +83,11 @@ export interface ISession {
     room: string | null;
     timeslots: string[];
     subjects: string[];
+}
+
+export const refPrefix = {
+    subject: "SUBJECT.",
+    session: "SESSION."
 }
 
 export default {

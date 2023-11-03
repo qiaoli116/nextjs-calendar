@@ -1,4 +1,4 @@
-import { dbClient, dbCollections, readAllDocuments } from '../db.js'
+import { dbClient, dbCollections, insertOneDocument, readAllDocuments } from '../db.js'
 import { ISubject } from './types.js';
 import { SessionsCRUD } from './sessions.js';
 const collectionName = dbCollections.subjects.name;
@@ -29,6 +29,34 @@ async function readSubjectByOrgId(reference: string): Promise<ISubject | null> {
     }
     return subject;
 }
+
+async function createSubject(): Promise<ISubject | null> {
+    const subjectInit: ISubject = {
+        reference: "",
+        tasIndex: {
+            year: "",
+            department: "",
+            qualificationCode: "",
+        },
+        code: "",
+        title: "",
+        term: "",
+        department: '',
+        block: "",
+        qualification: {
+            code: "",
+            title: "",
+        },
+        deliveryMode: "",
+        dateRange: {
+            startDate: "",
+            endDate: "",
+        },
+        units: [],
+        sessions: [],
+    };
+    return insertOneDocument<ISubject>(collectionName, subjectInit);
+}
 const SubjectsQuery = {
     Query: {
         subjects: async () => { return await readAllSubjects() },
@@ -36,6 +64,9 @@ const SubjectsQuery = {
             const { orgId } = args;
             return readSubjectByOrgId(orgId);
         }
+    },
+    Mutation: {
+        subjectCreate: async (parent, args, context, info) => { },
     },
     Children: {
         Subject: {
