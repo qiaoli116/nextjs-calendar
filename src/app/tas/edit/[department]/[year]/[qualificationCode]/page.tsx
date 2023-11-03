@@ -21,7 +21,9 @@ export default function TASUpdatePage({ params }: { params: { department: string
                 <Link underline="hover" href="/tas">
                     TAS List
                 </Link>
-                <Typography color="text.primary">{`${params.department.toUpperCase()}_${params.year}_${params.qualificationCode.toUpperCase()}`} (view)</Typography>
+                <Typography color="text.primary">
+                    {`${params.department.toUpperCase()}_${params.year}_${params.qualificationCode.toUpperCase()}`} (edit)
+                </Typography>
             </Breadcrumbs>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <h2>Edit TAS</h2>
@@ -34,12 +36,9 @@ export default function TASUpdatePage({ params }: { params: { department: string
                     hasText={false}
                 />
             </Box>
-
             <TASUpdateComponent
                 tasIndex={tasIndex}
             />
-
-
         </>
 
     );

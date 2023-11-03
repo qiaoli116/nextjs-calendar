@@ -2,7 +2,7 @@
 import { DataGrid, GridColDef, GridValueGetterParams, GridToolbar, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useQueryTASes, useQueryOneTAS, useCreateTAS, useCreateTASSubject, ICreateTASSubjectMutationVariables } from '../Hooks/tases';
+import { useQueryTASes, useQueryOneTAS, useCreateTAS, useCreateTASSubject, ICreateTASSubjectMutationVariables, useDeleteTASSubject, IDeleteTASSubjectMutationVariables } from '../Hooks/tases';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
@@ -407,6 +407,7 @@ function TASSubjectCreateComponent({ tasIndex, onCreateSuccess }: { tasIndex: IT
                     <FormControl sx={{ minWidth: "200px", mr: "10px" }}>
                         <TextField
                             fullWidth
+                            required
                             label="Subject Code"
                             name='code'
                             value={tasSubject.code}
@@ -416,6 +417,7 @@ function TASSubjectCreateComponent({ tasIndex, onCreateSuccess }: { tasIndex: IT
                     <FormControl sx={{ minWidth: "580px" }}>
                         <TextField
                             fullWidth
+                            required
                             label="Subject Title"
                             name='title'
                             value={tasSubject.title}
@@ -489,16 +491,56 @@ function TASSubjectCreateComponent({ tasIndex, onCreateSuccess }: { tasIndex: IT
                     </Accordion>
                 </Box >
             }
-
-
-
-
             {mutationStatus === "error" && <Alert severity="error">Add Error</Alert >
             }
             {mutationStatus === "success" && <Alert severity="success">Add successful</Alert >}
         </>
     )
 
+}
+
+function TASSubjectDeleteComponent({ tasIndex, subjectCode, onDeleteSuccess }: { tasIndex: ITASIndex, subjectCode: string, onDeleteSuccess?: (tas: ITAS) => void }) {
+    console.log("TASSubjectDeleteComponent");
+    const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
+    const [executeDeleteTASSubject] = useDeleteTASSubject();
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit - ", "tasIndex", tasIndex);
+        setMutationStatus("loading");
+        const mutationVariable: IDeleteTASSubjectMutationVariables = {
+            tasIndex: {
+                department: tasIndex.department,
+                year: tasIndex.year,
+                qualificationCode: tasIndex.qualificationCode
+            },
+            subjectCodes: [subjectCode]
+        };
+
+        const result = await executeDeleteTASSubject(mutationVariable);
+        console.log("handleSubmit - ", "result", result)
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.tasDeleteSubjects == null || result.data.tasDeleteSubjects == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onDeleteSuccess) {
+                    onDeleteSuccess(result.data.tasDeleteSubjects);
+                }
+            }
+
+        }
+    };
+    return (
+        <>
+            <Box sx={{ py: "8px" }}>
+                <Button>
+                    Delete
+                </Button>
+            </Box>
+        </>
+    )
 }
 
 function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
@@ -553,7 +595,7 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                 <Box sx={{ pb: "20px", width: "800px" }}>
                     <TextField
                         fullWidth
-                        label="Department"
+                        label="Department (Read Only)"
                         value={tas.department}
                         InputProps={{
                             readOnly: true,
@@ -564,7 +606,7 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
 
                     <TextField
                         fullWidth
-                        label="Year"
+                        label="Year (Read Only)"
                         value={tas.year}
                         InputProps={{
                             readOnly: true,
@@ -574,7 +616,7 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                 <Box sx={{ pb: "20px", width: "800px" }}>
                     <TextField
                         fullWidth
-                        label="Qualification Code"
+                        label="Qualification Code (Read Only)"
                         value={tas.qualification.code}
                         InputProps={{
                             readOnly: true,
@@ -584,7 +626,7 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                 <Box sx={{ width: "800px" }}>
                     <TextField
                         fullWidth
-                        label="Qualification Title"
+                        label="Qualification Title (Read Only)"
                         value={tas.qualification.title}
                         InputProps={{
                             readOnly: true,
@@ -592,15 +634,12 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                     />
                 </Box>
                 <Box sx={{ pb: "20px", width: "800px" }}>
-
                     <Accordion>
                         <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
                             aria-controls="panel1a-content"
                         >
-
                             <p><strong>Subjects List ({tas.subjects.length} subject included)</strong></p>
-
                         </AccordionSummary>
                         <AccordionDetails>
 
@@ -639,8 +678,6 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                                                         })}
                                                     </Box>
                                                 </Box>
-
-
                                             </AccordionSummary>
                                             <AccordionDetails>
                                                 {subject.units.map((unit: ITASUnit, index: number) => {
@@ -650,20 +687,12 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                                                 })}
                                             </AccordionDetails>
                                         </Accordion>
-
-
                                     </>
-
                                 )
                             })}
                         </AccordionDetails>
                     </Accordion>
-
-
-
-
                 </Box>
-
             </Box>
             <Box>
                 <TASSubjectCreateComponent

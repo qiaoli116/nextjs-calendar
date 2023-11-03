@@ -156,3 +156,41 @@ export function useCreateTASSubject(): [UseMutationExecute<CreateTASSubjectMutat
         executeMutation
     ];
 }
+
+export interface IDeleteTASSubjectMutationVariables {
+    tasIndex: {
+        department: string;
+        year: string;
+        qualificationCode: string;
+    };
+    subjectCodes: string[];
+}
+type DeleteTASSubjectMutationData = { tasDeleteSubjects: ITAS } | undefined | null;
+export function useDeleteTASSubject(): [UseMutationExecute<DeleteTASSubjectMutationData, IDeleteTASSubjectMutationVariables>] {
+    const TAS_DELETE_MUTATION = gql`
+        mutation TasDeleteSubjects($tasIndex: TASIndexInput, $subjectCodes: [String]) {
+            tasDeleteSubjects(tasIndex: $tasIndex, subjectCodes: $subjectCodes) {
+                subjects {
+                    code
+                    title
+                    units {
+                        code
+                        title
+                    }
+                }
+                department
+                qualification {
+                    code
+                    title
+                }
+                year
+            }
+        }
+    `;
+
+    const [result, executeMutation] = useMutation<DeleteTASSubjectMutationData, IDeleteTASSubjectMutationVariables>(TAS_DELETE_MUTATION);
+
+    return [
+        executeMutation
+    ];
+}
