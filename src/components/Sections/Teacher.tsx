@@ -8,13 +8,11 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import React from 'react';
 import _ from 'lodash';
-import { ITeacher } from '../../types';
+import { ITeacher, MutationStatus } from '@/types';
 import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
-import { sleep } from '../../dataService/utils';
-import { MutationStatus } from '../../types';
 import { Alert, AlertTitle } from '@mui/material';
-import CRUDLinksComponent from '../Controls/CRUDLinks';
+import CRUDLinksComponent from '@/components/Controls/CRUDLinks';
 
 
 function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath: string }) {
@@ -585,7 +583,7 @@ function TeacherDeleteComponent({ orgId, onDeleteSuccess }: { orgId: string, onD
     return (
         <>
             {mutationStatus === "error" && <Alert severity="error">Delete Error</Alert >}
-            {mutationStatus === "success" && <Alert severity="success">Delete successful (teacherInfo)</Alert >}
+            {mutationStatus === "success" && <Alert severity="success">Delete successful ({teacherInfo})</Alert >}
             {mutationStatus === "loading" || mutationStatus === "idle" ?
                 <Alert severity="warning">
                     <AlertTitle>Warning</AlertTitle>

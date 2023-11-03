@@ -1,5 +1,5 @@
 import { gql, useQuery, useMutation, CombinedError, UseMutationExecute } from 'urql';
-import { ITAS, ITASCreateInput, ITASSubject } from "../../types"
+import { ITAS, ITASCreateInput, ITASIndex, ITASSubject } from "../../types"
 
 export function useQueryTASes() {
     const TASES_QUERY = gql`
@@ -42,25 +42,25 @@ export function useQueryTASes() {
 }
 
 
-export function useQueryOneTAS(department: string, year: string, qualificationCode: string) {
-    console.log("useQueryOneTAS ", department, year, qualificationCode)
+export function useQueryOneTAS(tasIndex: ITASIndex) {
+    console.log("useQueryOneTAS ", tasIndex)
     const TAS_QUERY = gql`
         query Tas($tasIndex: TASIndexInput) {
             tas(tasIndex: $tasIndex) {
-            department
-            year
-            qualification {
-                code
-                title
-            }
-            subjects {
-                code
-                title
-                units {
+                department
+                year
+                qualification {
                     code
                     title
                 }
-            }
+                subjects {
+                    code
+                    title
+                    units {
+                        code
+                        title
+                    }
+                }
             }
         }
     `;
@@ -68,11 +68,7 @@ export function useQueryOneTAS(department: string, year: string, qualificationCo
     const [result, executeQuery] = useQuery<{ tas: ITAS } | undefined | null>({
         query: TAS_QUERY,
         variables: {
-            tasIndex: {
-                department,
-                qualificationCode,
-                year
-            }
+            tasIndex
         },
     });
     const { data, fetching: loading, error } = result;
@@ -120,11 +116,7 @@ export function useCreateTAS(): [UseMutationExecute<CreateTASMutationData, ICrea
 }
 
 export interface ICreateTASSubjectMutationVariables {
-    tasIndex: {
-        department: string;
-        year: string;
-        qualificationCode: string;
-    };
+    tasIndex: ITASIndex;
     subjects: ITASSubject[];
 }
 type CreateTASSubjectMutationData = { tasAddSubjects: ITAS } | undefined | null;
@@ -158,11 +150,7 @@ export function useCreateTASSubject(): [UseMutationExecute<CreateTASSubjectMutat
 }
 
 export interface IDeleteTASSubjectMutationVariables {
-    tasIndex: {
-        department: string;
-        year: string;
-        qualificationCode: string;
-    };
+    tasIndex: ITASIndex;
     subjectCodes: string[];
 }
 type DeleteTASSubjectMutationData = { tasDeleteSubjects: ITAS } | undefined | null;
@@ -189,6 +177,24 @@ export function useDeleteTASSubject(): [UseMutationExecute<DeleteTASSubjectMutat
     `;
 
     const [result, executeMutation] = useMutation<DeleteTASSubjectMutationData, IDeleteTASSubjectMutationVariables>(TAS_DELETE_MUTATION);
+
+    return [
+        executeMutation
+    ];
+}
+
+export interface IDeleteTASMutationVariables {
+    tasIndex: ITASIndex;
+}
+type DeleteTASMutationData = { tasDelete: boolean } | undefined | null;
+export function useDeleteTAS(): [UseMutationExecute<DeleteTASMutationData, IDeleteTASMutationVariables>] {
+    const TAS_DELETE_MUTATION = gql`
+        mutation TasDelete($tasIndex: TASIndexInput) {
+            tasDelete(tasIndex: $tasIndex)
+        }
+    `;
+
+    const [result, executeMutation] = useMutation<DeleteTASMutationData, IDeleteTASMutationVariables>(TAS_DELETE_MUTATION);
 
     return [
         executeMutation

@@ -2,7 +2,7 @@
 import { DataGrid, GridColDef, GridValueGetterParams, GridToolbar, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useQueryTASes, useQueryOneTAS, useCreateTAS, useCreateTASSubject, ICreateTASSubjectMutationVariables, useDeleteTASSubject, IDeleteTASSubjectMutationVariables } from '../Hooks/tases';
+import { useDeleteTAS, useQueryTASes, useQueryOneTAS, useCreateTAS, useCreateTASSubject, ICreateTASSubjectMutationVariables, useDeleteTASSubject, IDeleteTASSubjectMutationVariables } from '../Hooks/tases';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
@@ -14,9 +14,10 @@ import Button from '@mui/material/Button';
 import { sleep } from '../../dataService/utils';
 import { MutationStatus, ITASIndex } from '@/types';
 import { Alert, AlertTitle } from '@mui/material';
-import CRUDLinksComponent from '../Controls/CRUDLinks';
+import CRUDLinksComponent from '@/components/Controls/CRUDLinks';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteIcon from '@mui/icons-material/Delete';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 
 
@@ -51,8 +52,9 @@ function TASViewAllComponent({ singleTASPath = "" }: { singleTASPath: string }) 
 
     const columns: GridColDef[] = [
         { field: 'department', headerName: 'Department', flex: 1, maxWidth: 100 },
-        { field: 'year', headerName: 'Year', flex: 1, maxWidth: 100 },
-        { field: 'qualification', headerName: 'Qualification', flex: 1, maxWidth: 800 },
+        { field: 'year', headerName: 'Year', flex: 1, maxWidth: 80 },
+        { field: 'code', headerName: 'Code', flex: 1, maxWidth: 120 },
+        { field: 'title', headerName: 'Title', flex: 1, maxWidth: 700 },
         {
             field: "actions",
             headerName: "Actions",
@@ -77,7 +79,8 @@ function TASViewAllComponent({ singleTASPath = "" }: { singleTASPath: string }) 
             id: `${tas.department.toLowerCase()}/${tas.year}/${tas.qualification.code.toLowerCase()}`,
             department: tas.department,
             year: tas.year,
-            qualification: `${tas.qualification.code} - ${tas.qualification.title}`,
+            code: tas.qualification.code,
+            title: tas.qualification.title,
         }
     });
     console.log("row", rows);
@@ -126,9 +129,10 @@ function TASViewAllComponent({ singleTASPath = "" }: { singleTASPath: string }) 
     )
 }
 
-function TASViewOneComponent({ department, year, qualificationCode }: { department: string, year: string, qualificationCode: string }) {
+function TASViewOneComponent({ tasIndex }: { tasIndex: ITASIndex }) {
     console.log("TASViewOneComponent");
-    const { loading, error, dataError, tas, reexecuteQueryTAS } = useQueryOneTAS(department, year, qualificationCode);
+    const { department, year, qualificationCode } = tasIndex;
+    const { loading, error, dataError, tas, reexecuteQueryTAS } = useQueryOneTAS(tasIndex);
 
     if (loading) {
         return (
@@ -164,7 +168,7 @@ function TASViewOneComponent({ department, year, qualificationCode }: { departme
 
     return (
         <>
-            <Box sx={{ pb: "20px", width: "400px" }}>
+            <Box sx={{ pb: "20px", width: "800px" }}>
                 <TextField
                     fullWidth
                     label="Department"
@@ -174,7 +178,7 @@ function TASViewOneComponent({ department, year, qualificationCode }: { departme
                     }}
                 />
             </Box>
-            <Box sx={{ pb: "20px", width: "400px" }}>
+            <Box sx={{ pb: "20px", width: "800px" }}>
 
                 <TextField
                     fullWidth
@@ -185,7 +189,7 @@ function TASViewOneComponent({ department, year, qualificationCode }: { departme
                     }}
                 />
             </Box>
-            <Box sx={{ pb: "20px", width: "400px" }}>
+            <Box sx={{ pb: "20px", width: "800px" }}>
                 <TextField
                     fullWidth
                     label="Qualification Code"
@@ -195,7 +199,7 @@ function TASViewOneComponent({ department, year, qualificationCode }: { departme
                     }}
                 />
             </Box>
-            <Box sx={{ pb: "20px", width: "400px" }}>
+            <Box sx={{ pb: "20px", width: "800px" }}>
                 <TextField
                     fullWidth
                     label="Qualification Title"
@@ -205,7 +209,69 @@ function TASViewOneComponent({ department, year, qualificationCode }: { departme
                     }}
                 />
             </Box>
+            <Box sx={{ pb: "20px", width: "800px" }}>
+                <Accordion>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                    >
+                        <p><strong>Subjects List ({tas.subjects.length} subjects included)</strong></p>
+                    </AccordionSummary>
+                    <AccordionDetails>
 
+                        {tas.subjects.map((subject: ITASSubject, index: number) => {
+                            return (
+                                <>
+                                    <Accordion
+                                        sx={{
+                                            ".Mui-expanded .m-unit": {
+                                                display: "none"
+                                            }
+                                        }}
+                                    >
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="panel1a-content"
+                                        >
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: "space-between",
+                                                width: "100%"
+                                            }}>
+                                                <Box >
+                                                    <span>{`${index + 1}. ${subject.code}: ${subject.title}`}</span>
+                                                </Box>
+                                                <Box className="m-unit">
+
+                                                    {subject.units.map((unit: ITASUnit, index: number) => {
+                                                        return (
+                                                            <>
+                                                                <Box component="span" sx={{ mr: "5px", fontSize: "12px" }}>
+                                                                    <i>
+                                                                        <Link underline="hover" target="_blank" href={`https://training.gov.au/training/details/${unit.code}`}>{`${unit.code}`}</Link>
+                                                                    </i>
+                                                                </Box>
+                                                            </>
+                                                        )
+                                                    })}
+                                                </Box>
+                                            </Box>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+
+                                            {subject.units.map((unit: ITASUnit, index: number) => {
+                                                return (
+                                                    <div><Link underline="hover" target="_blank" href={`https://training.gov.au/training/details/${unit.code}`}>{`${unit.code}: ${unit.title}`}</Link></div>
+                                                )
+                                            })}
+                                        </AccordionDetails>
+                                    </Accordion>
+                                </>
+                            )
+                        })}
+                    </AccordionDetails>
+                </Accordion>
+            </Box>
         </>
     )
 }
@@ -271,6 +337,7 @@ function TASCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (tas: ITAS)
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
                             fullWidth
+                            required
                             label="Department"
                             name='department'
                             value={tas.department}
@@ -282,6 +349,7 @@ function TASCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (tas: ITAS)
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
                             fullWidth
+                            required
                             label="Year"
                             name='year'
                             value={tas.year}
@@ -293,6 +361,7 @@ function TASCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (tas: ITAS)
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
                             fullWidth
+                            required
                             label="Qualification Code"
                             name='qualification.code'
                             value={tas.qualification.code}
@@ -304,6 +373,7 @@ function TASCreateComponent({ onCreateSuccess }: { onCreateSuccess?: (tas: ITAS)
                     <FormControl sx={{ minWidth: "400px" }}>
                         <TextField
                             fullWidth
+                            required
                             label="Qualification Title"
                             name='qualification.title'
                             value={tas.qualification.title}
@@ -471,6 +541,7 @@ function TASSubjectCreateComponent({ tasIndex, onCreateSuccess }: { tasIndex: IT
                                     <FormControl sx={{ minWidth: "200px", mr: "10px" }}>
                                         <TextField
                                             fullWidth
+                                            required
                                             label="Unit Code"
                                             name='code'
                                         />
@@ -478,6 +549,7 @@ function TASSubjectCreateComponent({ tasIndex, onCreateSuccess }: { tasIndex: IT
                                     <FormControl sx={{ minWidth: "440px" }}>
                                         <TextField
                                             fullWidth
+                                            required
                                             label="Unit Title"
                                             name='title'
                                         />
@@ -506,8 +578,7 @@ function TASSubjectDeleteComponent({ tasIndex, subjectCode, onDeleteSuccess }: {
     const [showDeleteButton, setShowDeleteButton] = React.useState<boolean>(false);
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        e.stopPropagation();
-        console.log("handleSubmit - ", "tasIndex", tasIndex);
+        console.log("TASSubjectDeleteComponent handleSubmit - ", "tasIndex", tasIndex);
         setMutationStatus("loading");
         const mutationVariable: IDeleteTASSubjectMutationVariables = {
             tasIndex: {
@@ -545,20 +616,18 @@ function TASSubjectDeleteComponent({ tasIndex, subjectCode, onDeleteSuccess }: {
 
             <form onSubmit={handleSubmit}>
                 <Link underline="hover" href="javascript:;" onClick={toggleShowDeleteButton}>
-                    <DeleteIcon sx={{ mb: "-4px" }} />
+                    {showDeleteButton ? <KeyboardDoubleArrowLeftIcon sx={{ mb: "-6px" }} /> : <DeleteIcon sx={{ mb: "-6px" }} />}
                 </Link>
                 {showDeleteButton &&
                     <>
-                        <Button type='submit' disabled={mutationStatus === "loading"} sx={{ p: "0px" }}>
+                        <Button type='submit' disabled={mutationStatus === "loading"} sx={{ p: "0px" }}
+                            onClick={(e) => { console.log("DeleteButton clicked"); e.stopPropagation() }}
+                        >
                             {mutationStatus === "loading" ? <>Deleting&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Delete"}
                         </Button>
                     </>
                 }
-
             </form>
-
-
-
         </>
     )
 }
@@ -566,7 +635,7 @@ function TASSubjectDeleteComponent({ tasIndex, subjectCode, onDeleteSuccess }: {
 function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
     console.log("TASUpdateComponent");
     const { department, year, qualificationCode } = tasIndex;
-    const { loading, error, dataError, tas: tasCurrent, reexecuteQueryTAS } = useQueryOneTAS(department, year, qualificationCode);
+    const { loading, error, dataError, tas: tasCurrent, reexecuteQueryTAS } = useQueryOneTAS(tasIndex);
     const emptyTAS: ITAS = {
         department: "",
         year: "",
@@ -659,7 +728,7 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                             expandIcon={<ExpandMoreIcon />}
                             aria-controls="panel1a-content"
                         >
-                            <p><strong>Subjects List ({tas.subjects.length} subject included)</strong></p>
+                            <p><strong>Subjects List ({tas.subjects.length} subjects included)</strong></p>
                         </AccordionSummary>
                         <AccordionDetails>
 
@@ -742,10 +811,87 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
     )
 }
 
+function TASDeleteComponent({ tasIndex, onDeleteSuccess }: { tasIndex: ITASIndex, onDeleteSuccess?: (deleted: boolean) => void }) {
+    console.log("TeacherUpdateComponent");
+    const { department, year, qualificationCode } = tasIndex;
+    const { loading, error, dataError, tas, reexecuteQueryTAS } = useQueryOneTAS(tasIndex);
+    const [executeDeleteTAS] = useDeleteTAS();
+    const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
+
+    if (loading) {
+        return (
+            <>
+                <Alert severity="info">
+                    <CircularProgress color="inherit" size={20} />&nbsp;&nbsp;Loading TAS {department} {year} {qualificationCode} ...
+                </Alert>
+            </>
+        )
+    };
+    if (error) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load teacher <strong>{department} {year} {qualificationCode}</strong>
+                    <br />
+                    Error Message: {error.message}
+                </Alert>
+            </>
+
+        )
+    }
+    if (dataError || tas === null) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load teacher <strong>{department} {year} {qualificationCode}</strong>
+                </Alert>
+            </>
+        )
+    }
+    const deleteTeacher = async () => {
+        console.log("deleteTAS - ", "tas", department, year, qualificationCode);
+        setMutationStatus("loading");
+        const result = await executeDeleteTAS({ tasIndex });
+        console.log("deleteTAS - ", "result", result)
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.tasDelete == null || result.data.tasDelete == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onDeleteSuccess) {
+                    onDeleteSuccess(result.data.tasDelete);
+                }
+            }
+
+        }
+    }
+    const tasInfo = `${tas.department}_${tas.year}_${tas.qualification.code}`;
+    return (
+        <>
+            {mutationStatus === "error" && <Alert severity="error">Delete Error</Alert >}
+            {mutationStatus === "success" && <Alert severity="success">Delete successful ({tasInfo})</Alert >}
+            {mutationStatus === "loading" || mutationStatus === "idle" ?
+                <Alert severity="warning">
+                    <AlertTitle>Warning</AlertTitle>
+                    Are you sure to <u><i>permanently</i></u> delete TAS <strong>{tasInfo}? </strong>
+                    <Button onClick={deleteTeacher} disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Deleting&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Delete"}
+                    </Button>
+                </Alert>
+                : ""
+            }
+
+        </>
+    )
+}
+
 export {
     TASViewAllComponent,
     TASViewOneComponent,
     TASCreateComponent,
     TASSubjectCreateComponent,
-    TASUpdateComponent
+    TASUpdateComponent,
+    TASDeleteComponent
 };

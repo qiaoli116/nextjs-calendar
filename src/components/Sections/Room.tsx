@@ -465,7 +465,7 @@ function RoomDeleteComponent({ roomNumber, onDeleteSuccess }: { roomNumber: stri
     return (
         <>
             {mutationStatus === "error" && <Alert severity="error">Delete Error</Alert >}
-            {mutationStatus === "success" && <Alert severity="success">Delete successful (teacherInfo)</Alert >}
+            {mutationStatus === "success" && <Alert severity="success">Delete successful ({roomInfo})</Alert >}
             {mutationStatus === "loading" || mutationStatus === "idle" ?
                 <Alert severity="warning">
                     <AlertTitle>Warning</AlertTitle>

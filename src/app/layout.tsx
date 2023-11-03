@@ -22,6 +22,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ArticleIcon from '@mui/icons-material/Article';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry';
 
 // export const metadata = {
@@ -33,9 +34,10 @@ const DRAWER_WIDTH = 240;
 
 const LINKS = [
   { text: 'Home', href: '/', icon: HomeIcon },
-  { text: 'Teachers', href: '/teachers', icon: GroupsIcon },
-  { text: 'Rooms', href: '/rooms', icon: MeetingRoomIcon },
-  { text: 'CRNs', href: '/crns', icon: ArticleIcon },
+  { text: 'TAS', href: '/tas', icon: AssignmentIcon },
+  { text: 'Teacher', href: '/teachers', icon: GroupsIcon },
+  { text: 'Room', href: '/rooms', icon: MeetingRoomIcon },
+
 ];
 
 const PLACEHOLDER_LINKS = [
@@ -57,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Toolbar sx={{ backgroundColor: 'background.paper' }}>
                 <DashboardIcon sx={{ color: '#444', mr: 2, transform: 'translateY(-2px)' }} />
                 <Typography variant="h6" noWrap component="div" color="black">
-                  Next.js App Router
+                  Teaching & Learning Management System
                 </Typography>
               </Toolbar>
             </AppBar>

@@ -9,6 +9,11 @@ import CRUDLinksComponent from '../../../../../../components/Controls/CRUDLinks'
 
 export default function TASViewOnePage({ params }: { params: { department: string, year: string, qualificationCode: string } }) {
     console.log("params", params);
+    const tasIndex = {
+        department: params.department,
+        year: params.year,
+        qualificationCode: params.qualificationCode
+    }
     return (
         <>
             <Breadcrumbs aria-label="breadcrumb">
@@ -30,9 +35,7 @@ export default function TASViewOnePage({ params }: { params: { department: strin
             </Box>
 
             <TASViewOneComponent
-                department={params.department}
-                year={params.year}
-                qualificationCode={params.qualificationCode}
+                tasIndex={tasIndex}
             />
 
 
