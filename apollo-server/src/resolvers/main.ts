@@ -4,7 +4,6 @@ import { SessionsQuery } from './sessions.js';
 import { SubjectsQuery } from './subjects.js';
 import { RoomsQuery } from './rooms.js';
 
-
 const resolvers = {
     Query: {
         ...TeachersQuery.Query,

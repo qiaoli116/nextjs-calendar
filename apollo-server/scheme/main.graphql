@@ -24,6 +24,7 @@ type Mutation {
     tasAddSubjects(tasIndex: TASIndexInput, subjects: [TASSubjectInput]): TAS
     tasDeleteSubjects(tasIndex: TASIndexInput, subjectCodes: [String]): TAS
     tasDelete(tasIndex: TASIndexInput): Boolean
+    subjectCreate(term: String, department:String, block: String, qualification: QualificationInput, tas: TASIndexInput, units: [SubjectUnitInput])
 }
 
 type Room{
@@ -39,6 +40,11 @@ input NameInput {
 type Name {
     first: String
     last: String
+}
+
+input QualificationInput {
+    code: String!
+    title: String!
 }
 
 input TASQualificationInput {
@@ -76,6 +82,13 @@ type TASUnit implements Unit{
     code: String!
     title: String!
 }
+
+input SubjectUnitInput {
+    code: String!
+    title: String!
+    crn: String!
+}
+
 type SubjectUnit implements Unit{
     code: String!
     title: String!
