@@ -7,12 +7,12 @@ import {
     deleteOneDocumentByIndex
 } from '../db.js'
 
-import { ITAS, ITASIndex, ITASSubject, ITASUnit } from './types.js'
+import { ITAS, ITASDBIndex, ITASSubject, ITASUnit } from './types.js'
 const collectionName = dbCollections.tas.name;
 async function readAllTAS(): Promise<ITAS[] | null> {
     return await readAllDocuments<ITAS>(collectionName);
 }
-async function readTAS(tasIndex: ITASIndex): Promise<ITAS | null> {
+async function readTAS(tasIndex: ITASDBIndex): Promise<ITAS | null> {
     let tas = null;
     try {
         await dbClient.connect();
@@ -35,9 +35,7 @@ async function readTAS(tasIndex: ITASIndex): Promise<ITAS | null> {
     return tas;
 }
 
-async function readTASSubject(
-    tasIndex: ITASIndex, subjectCode: string
-): Promise<ITAS | null> {
+async function readTASSubject(tasIndex: ITASDBIndex, subjectCode: string): Promise<ITAS | null> {
     const tas: ITAS = await readTAS(tasIndex);
     if (!tas) {
         return null;
@@ -63,7 +61,7 @@ async function createTAS(tas: ITAS): Promise<ITAS | null> {
     return insertOneDocument<ITAS>(collectionName, tasInit);
 }
 
-async function addTASSubjects(tasIndex: ITASIndex, subjects: ITASSubject[]): Promise<ITAS | null> {
+async function addTASSubjects(tasIndex: ITASDBIndex, subjects: ITASSubject[]): Promise<ITAS | null> {
     const updateObj = {
         "$push": { subjects: { "$each": subjects } }
     }
@@ -71,7 +69,7 @@ async function addTASSubjects(tasIndex: ITASIndex, subjects: ITASSubject[]): Pro
     return udpateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
 }
 
-async function deleteTASSubjects(tasIndex: ITASIndex, subjectCodes: string[]): Promise<ITAS | null> {
+async function deleteTASSubjects(tasIndex: ITASDBIndex, subjectCodes: string[]): Promise<ITAS | null> {
     const updateObj = {
         "$pull": {
             "subjects": {
@@ -84,7 +82,7 @@ async function deleteTASSubjects(tasIndex: ITASIndex, subjectCodes: string[]): P
     return udpateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
 }
 
-async function deleteTAS(tasIndex: ITASIndex): Promise<boolean> {
+async function deleteTAS(tasIndex: ITASDBIndex): Promise<boolean> {
     return await deleteOneDocumentByIndex(collectionName, tasIndex);
 }
 
@@ -93,7 +91,7 @@ const TASQuery = {
         tases: async () => { return await readAllTAS() },
         tas: async (parent, args, context, info) => {
             const { tasIndex, subjects } = args;
-            const _tasIndex: ITASIndex = {
+            const _tasIndex: ITASDBIndex = {
                 year: tasIndex.year,
                 department: tasIndex.department,
                 "qualification.code": tasIndex.qualificationCode,
@@ -103,7 +101,7 @@ const TASQuery = {
         },
         tasSubject: async (parent, args, context, info) => {
             const { tasIndex, subjectCode } = args;
-            const _tasIndex: ITASIndex = {
+            const _tasIndex: ITASDBIndex = {
                 year: tasIndex.year,
                 department: tasIndex.department,
                 "qualification.code": tasIndex.qualificationCode,
@@ -128,7 +126,7 @@ const TASQuery = {
         tasAddSubjects: async (parent, args, context, info) => {
             console.log("addTASSubject", args);
             const { tasIndex, subjects } = args;
-            const _tasIndex: ITASIndex = {
+            const _tasIndex: ITASDBIndex = {
                 year: tasIndex.year,
                 department: tasIndex.department,
                 "qualification.code": tasIndex.qualificationCode,
@@ -152,7 +150,7 @@ const TASQuery = {
         tasDeleteSubjects: async (parent, args, context, info) => {
             console.log("deleteTASSubject", args);
             const { tasIndex, subjectCodes } = args;
-            const _tasIndex: ITASIndex = {
+            const _tasIndex: ITASDBIndex = {
                 year: tasIndex.year,
                 department: tasIndex.department,
                 "qualification.code": tasIndex.qualificationCode,
@@ -165,7 +163,7 @@ const TASQuery = {
         tasDelete: async (parent, args, context, info) => {
             console.log("deleteTAS", args);
             const { tasIndex } = args;
-            const _tasIndex: ITASIndex = {
+            const _tasIndex: ITASDBIndex = {
                 year: tasIndex.year,
                 department: tasIndex.department,
                 "qualification.code": tasIndex.qualificationCode,

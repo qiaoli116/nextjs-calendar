@@ -143,7 +143,7 @@ const updateOneDocument = async <T>(collectionName: string, indexQuery: object, 
 
         const db = dbClient.db('appdb');
         const collection = db.collection(collectionName);
-        const result = await collection.updateOne(indexQuery, update, options);
+        const result = await collection.updateOne(indexQuery, update, { ...options, collation: collationCaseInsensitive });
         console.log('Update result:', result);
         if (result.modifiedCount == 1) {
             const docs = await collection.find(indexQuery).collation(collationCaseInsensitive).toArray();

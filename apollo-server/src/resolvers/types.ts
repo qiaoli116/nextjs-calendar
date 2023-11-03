@@ -40,7 +40,7 @@ export interface ITASQualification {
     title: string;
 }
 
-export interface ITASIndex {
+export interface ITASDBIndex {
     year: string;
     department: string;
     "qualification.code": string;

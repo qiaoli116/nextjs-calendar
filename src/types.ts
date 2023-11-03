@@ -42,11 +42,23 @@ export interface ITASCreateInput {
     qualification: ITASQualification;
 }
 
+export interface ITASIndex {
+    year: string;
+    department: string;
+    qualificationCode: string;
+}
+
 export interface ITAS {
     year: string;
     department: string;
     qualification: ITASQualification;
     subjects: ITASSubject[];
+}
+
+export interface ITASSubject {
+    code: string;
+    title: string;
+    units: ITASUnit[];
 }
 
 export type MutationStatus = "idle" | "loading" | "success" | "error";

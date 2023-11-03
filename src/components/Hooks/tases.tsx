@@ -1,5 +1,5 @@
 import { gql, useQuery, useMutation, CombinedError, UseMutationExecute } from 'urql';
-import { ITAS, ITASCreateInput } from "../../types"
+import { ITAS, ITASCreateInput, ITASSubject } from "../../types"
 
 export function useQueryTASes() {
     const TASES_QUERY = gql`
@@ -98,7 +98,6 @@ export interface ICreateTASMutationVariables extends ITASCreateInput {
     // qualification: ITASQualification;
 }
 type CreateTASMutationData = { tasCreate: ITAS } | undefined | null;
-// executeMutation({ orgId, userName, email, firstName, lastName })
 export function useCreateTAS(): [UseMutationExecute<CreateTASMutationData, ICreateTASMutationVariables>] {
     const TAS_CREATE_MUTATION = gql`
         mutation Mutation($year: String, $department: String, $qualification: TASQualificationInput) {
@@ -114,6 +113,44 @@ export function useCreateTAS(): [UseMutationExecute<CreateTASMutationData, ICrea
     `;
 
     const [result, executeMutation] = useMutation<CreateTASMutationData, ICreateTASMutationVariables>(TAS_CREATE_MUTATION);
+
+    return [
+        executeMutation
+    ];
+}
+
+export interface ICreateTASSubjectMutationVariables {
+    tasIndex: {
+        department: string;
+        year: string;
+        qualificationCode: string;
+    };
+    subjects: ITASSubject[];
+}
+type CreateTASSubjectMutationData = { tasAddSubjects: ITAS } | undefined | null;
+export function useCreateTASSubject(): [UseMutationExecute<CreateTASSubjectMutationData, ICreateTASSubjectMutationVariables>] {
+    const TAS_CREATE_MUTATION = gql`
+        mutation Mutation($tasIndex: TASIndexInput, $subjects: [TASSubjectInput]) {
+            tasAddSubjects(tasIndex: $tasIndex, subjects: $subjects) {
+                department
+                qualification {
+                    code
+                    title
+                }
+                subjects {
+                    code
+                    title
+                    units {
+                        code
+                        title
+                    }
+                }
+                year
+            }
+        }
+    `;
+
+    const [result, executeMutation] = useMutation<CreateTASSubjectMutationData, ICreateTASSubjectMutationVariables>(TAS_CREATE_MUTATION);
 
     return [
         executeMutation
