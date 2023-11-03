@@ -62,6 +62,7 @@ export interface IDateRange {
     startDate: string;
     endDate: string;
 }
+
 export interface ISubject {
     reference: string;
     tasIndex: ITASIndex
