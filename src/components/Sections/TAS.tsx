@@ -503,8 +503,10 @@ function TASSubjectDeleteComponent({ tasIndex, subjectCode, onDeleteSuccess }: {
     console.log("TASSubjectDeleteComponent");
     const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
     const [executeDeleteTASSubject] = useDeleteTASSubject();
+    const [showDeleteButton, setShowDeleteButton] = React.useState<boolean>(false);
     const handleSubmit = async (e: any) => {
         e.preventDefault();
+        e.stopPropagation();
         console.log("handleSubmit - ", "tasIndex", tasIndex);
         setMutationStatus("loading");
         const mutationVariable: IDeleteTASSubjectMutationVariables = {
@@ -525,20 +527,38 @@ function TASSubjectDeleteComponent({ tasIndex, subjectCode, onDeleteSuccess }: {
                 setMutationStatus("error");
             } else {
                 setMutationStatus("success");
+                setShowDeleteButton(!showDeleteButton);
                 if (onDeleteSuccess) {
                     onDeleteSuccess(result.data.tasDeleteSubjects);
                 }
             }
 
         }
+
     };
+    const toggleShowDeleteButton = (e: any) => {
+        setShowDeleteButton(!showDeleteButton);
+        e.stopPropagation();
+    }
     return (
         <>
-            <Box sx={{ py: "8px" }}>
-                <Button>
-                    Delete
-                </Button>
-            </Box>
+
+            <form onSubmit={handleSubmit}>
+                <Link underline="hover" href="javascript:;" onClick={toggleShowDeleteButton}>
+                    <DeleteIcon sx={{ mb: "-4px" }} />
+                </Link>
+                {showDeleteButton &&
+                    <>
+                        <Button type='submit' disabled={mutationStatus === "loading"} sx={{ p: "0px" }}>
+                            {mutationStatus === "loading" ? <>Deleting&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Delete"}
+                        </Button>
+                    </>
+                }
+
+            </form>
+
+
+
         </>
     )
 }
@@ -663,8 +683,22 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                                                     justifyContent: "space-between"
 
                                                 }}>
-                                                    <Box>{`${index + 1}. ${subject.code}: ${subject.title}`}</Box>
+                                                    <Box sx={{
+                                                        display: 'flex',
+
+                                                    }}>
+                                                        <span>{`${index + 1}. ${subject.code}: ${subject.title}`}</span>
+                                                        <TASSubjectDeleteComponent
+                                                            tasIndex={tasIndex}
+                                                            subjectCode={subject.code}
+                                                            onDeleteSuccess={(tas: ITAS) => {
+                                                                console.log("onDeleteSuccess", tas);
+                                                                setTAS(tas);
+                                                            }}
+                                                        />
+                                                    </Box>
                                                     <Box className="m-unit">
+
                                                         {subject.units.map((unit: ITASUnit, index: number) => {
                                                             return (
                                                                 <>
@@ -680,6 +714,7 @@ function TASUpdateComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                                                 </Box>
                                             </AccordionSummary>
                                             <AccordionDetails>
+
                                                 {subject.units.map((unit: ITASUnit, index: number) => {
                                                     return (
                                                         <div><Link underline="hover" target="_blank" href={`https://training.gov.au/training/details/${unit.code}`}>{`${unit.code}: ${unit.title}`}</Link></div>
