@@ -35,9 +35,14 @@ export interface ITASSubject {
     units: ITASUnit[];
 }
 
-export interface ITASQualification {
+export interface IQualification {
     code: string;
     title: string;
+}
+
+export interface ITASQualification extends IQualification {
+    // code: string;
+    // title: string;
 }
 export interface ITASIndex {
     year: string;
@@ -64,7 +69,6 @@ export interface IDateRange {
 }
 
 export interface ISubject {
-    reference: string;
     tasIndex: ITASIndex
     code: string
     title: string;

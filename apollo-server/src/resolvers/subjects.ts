@@ -1,5 +1,5 @@
 import { dbClient, dbCollections, insertOneDocument, readAllDocuments } from '../db.js'
-import { ISubject } from './types.js';
+import { IQualification, ISubject, ITASIndex, IUnit } from './types.js';
 import { SessionsCRUD } from './sessions.js';
 const collectionName = dbCollections.subjects.name;
 
@@ -30,29 +30,43 @@ async function readSubjectByOrgId(reference: string): Promise<ISubject | null> {
     return subject;
 }
 
-async function createSubject(): Promise<ISubject | null> {
+async function createSubject(
+    code: string,
+    title: string,
+    term: string,
+    department: string,
+    block: string,
+    qualification: IQualification,
+    tasIndex: ITASIndex,
+    units: [IUnit]): Promise<ISubject | null> {
+
     const subjectInit: ISubject = {
-        reference: "",
         tasIndex: {
-            year: "",
-            department: "",
-            qualificationCode: "",
+            year: tasIndex.year,
+            department: tasIndex.department,
+            qualificationCode: tasIndex.qualificationCode,
         },
-        code: "",
-        title: "",
-        term: "",
-        department: '',
-        block: "",
+        code: code,
+        title: title,
+        term: term,
+        department: department,
+        block: block,
         qualification: {
-            code: "",
-            title: "",
+            code: qualification.code,
+            title: qualification.title,
         },
         deliveryMode: "",
         dateRange: {
             startDate: "",
             endDate: "",
         },
-        units: [],
+        units: units.map((unit) => {
+            return {
+                code: unit.code,
+                title: unit.title,
+                crn: "",
+            }
+        }),
         sessions: [],
     };
     return insertOneDocument<ISubject>(collectionName, subjectInit);
@@ -66,8 +80,28 @@ const SubjectsQuery = {
         }
     },
     Mutation: {
-        subjectCreate: async (parent, args, context, info) => { },
+        subjectCreate: async (parent, args, context, info) => {
+            console.log("subjectCreate", args);
+            const { code, title, term, department, block, qualification, tasIndex, units } = args;
+            const _qualification = {
+                code: qualification.code,
+                title: qualification.title,
+            };
+            const _tasIndex = {
+                year: tasIndex.year,
+                department: tasIndex.department,
+                qualificationCode: tasIndex.qualificationCode,
+            };
+            const _units = units.map((unit) => {
+                return {
+                    code: unit.code,
+                    title: unit.title,
+                }
+            });
+            return await createSubject(code, title, term, department, block, _qualification, _tasIndex, _units);
+        }
     },
+
     Children: {
         Subject: {
             sessions: (parent, args, context, info) => {

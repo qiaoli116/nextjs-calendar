@@ -31,9 +31,13 @@ export interface ITASSubject {
     units: ITASUnit[];
 }
 
-export interface ITASQualification {
+export interface IQualification {
     code: string;
     title: string;
+}
+export interface ITASQualification extends IQualification {
+    // code: string;
+    // title: string;
 }
 
 export interface ITASCreateInput {
@@ -59,6 +63,40 @@ export interface ITASSubject {
     code: string;
     title: string;
     units: ITASUnit[];
+}
+
+export interface ISubjectUnit extends IUnit {
+    // code: string;
+    // title: string;
+    crn: string;
+}
+export interface ISubjectCreateInput {
+    tasIndex: ITASIndex;
+    code: string;
+    title: string;
+    term: string;
+    department: string;
+    block: string;
+    qualification: IQualification;
+    units: ITASUnit[];
+    sessions: string[];
+}
+export interface ISubject {
+    tasIndex: ITASIndex;
+    code: string;
+    title: string;
+    term: string;
+    department: string;
+    block: string;
+    qualification: IQualification;
+    deliveryMode: string;
+    dateRange: {
+        startDate: string;
+        endDate: string;
+    };
+    units: ISubjectUnit[];
+    sessions: string[];
+
 }
 
 export type MutationStatus = "idle" | "loading" | "success" | "error";

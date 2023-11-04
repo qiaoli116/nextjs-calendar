@@ -19,7 +19,7 @@ const dbCollections = {
     },
     subjects: {
         name: 'subjects',
-        index: { reference: 1 },
+        index: { term: 1, department: 1, block: 1, code: 1 },
     },
     tas: {
         name: 'tas',
