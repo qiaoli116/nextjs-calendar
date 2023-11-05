@@ -12,8 +12,10 @@ console.log('Connected to MongoDB');
 const db = dbClient.db(dbName);
 
 async function initCollection(collectionName: string, index: {}, documents: any[]) {
+    console.log(`### Initializing collection ${collectionName}`)
     const collection = db.collection(collectionName);
     try {
+        console.log(`    Dropping collection`)
         await collection.drop();
     }
     catch (e) {
@@ -21,9 +23,13 @@ async function initCollection(collectionName: string, index: {}, documents: any[
     }
 
     try {
+        console.log(`    Creating collection ${collectionName}`)
         await db.createCollection(collectionName);
+        console.log(`    Creating index`)
         await collection.createIndex(index, { unique: true, collation: { locale: 'en', strength: 2 } });
+        console.log
         await collection.insertMany(documents);
+        console.log(`    Initialization successfull`)
     }
     catch (e) {
         console.log(e);

@@ -81,6 +81,7 @@ export interface ISubjectCreateInput {
     units: ITASUnit[];
     sessions: string[];
 }
+
 export interface ISubject {
     tasIndex: ITASIndex;
     code: string;
