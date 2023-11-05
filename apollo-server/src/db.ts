@@ -6,7 +6,8 @@ console.log("process.env.DB_STRING", process.env.DB_STRING)
 const url = process.env.DB_STRING ? process.env.DB_STRING : 'mongodb://localhost:27017';
 console.log("url is set to", url)
 const dbName = 'appdb';
-const dbClient = new MongoClient(url);
+// pool size need to adjust in the future to better suit the application
+const dbClient = new MongoClient(url, { minPoolSize: 10, maxPoolSize: 100 });
 const collationCaseInsensitive = { locale: 'en', strength: 2 }
 const dbCollections = {
     teachers: {
@@ -44,7 +45,7 @@ const readAllDocuments = async <T>(collectionName: string, query: any = {}): Pro
         const db = dbClient.db(dbName);
         const collection = db.collection(collectionName);
 
-        const docs = await collection.find({}).toArray();
+        const docs = await collection.find(query).toArray();
         console.log('Found documents:', docs);
         documents = docs;
     } catch (err) {

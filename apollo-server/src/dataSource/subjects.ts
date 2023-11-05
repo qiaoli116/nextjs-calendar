@@ -11,7 +11,7 @@ const subjects1: any = [
         "title": "Working in ICT",
         "term": "202310",
         "department": "CAIT",
-        "block": "BLOCK.0000001",
+        "block": "BLOCK.00000abc",
         "qualification": {
             "code": "ICT40120-P",
             "title": "Certificate IV in Information Technology (Programming)"

@@ -1,6 +1,7 @@
 import { dbClient, dbCollections, insertOneDocument, readAllDocuments } from '../db.js'
-import { IQualification, ISubject, ITASIndex, IUnit } from './types.js';
+import { IQualification, ISession, ISubject, ITASIndex, IUnit } from './types.js';
 import { SessionsCRUD } from './sessions.js';
+import sessions from '../dataSource/sessions.js';
 const collectionName = dbCollections.subjects.name;
 
 async function readAllSubjects(query: any = {}): Promise<ISubject[] | null> {
@@ -74,9 +75,9 @@ async function createSubject(
 const SubjectsQuery = {
     Query: {
         subjects: async () => { return await readAllSubjects() },
-        subject: (parent, args, context, info) => {
+        subject: async (parent, args, context, info) => {
             const { orgId } = args;
-            return readSubjectByOrgId(orgId);
+            return await readSubjectByOrgId(orgId);
         }
     },
     Mutation: {
@@ -104,10 +105,23 @@ const SubjectsQuery = {
 
     Children: {
         Subject: {
-            sessions: (parent, args, context, info) => {
-                console.log("Subject.sessions", parent);
-                const { sessions: _sessions } = parent;
-                return SessionsCRUD.readAllSessions({ sessions: { $in: _sessions } });
+            sessions: async (parent, args, context, info) => {
+                const { code, sessions } = parent;
+                console.log("Subject.sessions _sessions", sessions, sessions.length);
+
+                if (sessions === null || sessions === undefined || sessions.length === 0) {
+                    console.log("Subject.sessions sessions is null or undefined or empty")
+                    return [] as ISession[];
+                }
+                const query = {
+                    "reference": {
+                        "$in": sessions
+                    }
+                }
+                console.log("Subject.sessions query", query);
+                const sessionsQueryResult = await SessionsCRUD.readAllSessions(query);
+                console.log("Subject.sessions sessionsQueryResult", code, sessions, sessionsQueryResult);
+                return sessionsQueryResult === null ? [] : sessionsQueryResult;
             }
         }
 
