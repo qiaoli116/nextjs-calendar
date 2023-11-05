@@ -343,7 +343,7 @@ const subjects3: any = [
 
 const subjects = [
     ...subjects1,
-    ...subjects2,
-    ...subjects3
+    //...subjects2,
+    //...subjects3
 ];
 export default subjects;

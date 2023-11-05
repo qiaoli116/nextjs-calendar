@@ -127,7 +127,7 @@ type Subject {
     deliveryMode: String!
     dateRange: DateRange!
     units: [SubjectUnit]!
-    sessions: [Session]!
+    sessions: [Session!]
 }
 
 type Session {
