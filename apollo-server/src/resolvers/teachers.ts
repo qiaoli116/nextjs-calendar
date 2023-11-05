@@ -34,13 +34,13 @@ async function deleteTeacherByOrgId(orgId: string): Promise<boolean> {
 const TeachersQuery = {
     Query: {
         teachers: async () => { return await readAllTeachers() },
-        teacher: (parent, args, context, info) => {
+        teacher: async (parent, args, context, info) => {
             const { orgId } = args;
-            return readTeacherByOrgId(orgId);
+            return await readTeacherByOrgId(orgId);
         }
     },
     Mutation: {
-        teacherCreate: (parent, args, context, info) => {
+        teacherCreate: async (parent, args, context, info) => {
             console.log("addTeacher", args);
             const teacher: ITeacher = {
                 orgId: args.orgId,
@@ -51,9 +51,9 @@ const TeachersQuery = {
                     last: args.name.last
                 }
             };
-            return createTeacher(teacher);
+            return await createTeacher(teacher);
         },
-        teacherUpdate: (parent, args, context, info) => {
+        teacherUpdate: async (parent, args, context, info) => {
             console.log("updateTeacher", args);
             const { orgId } = args;
             const updates: any = {
@@ -64,12 +64,12 @@ const TeachersQuery = {
                     last: args.name.last
                 }
             };
-            return updateTeacher(orgId, updates);
+            return await updateTeacher(orgId, updates);
         },
-        teacherDelete: (parent, args, context, info) => {
+        teacherDelete: async (parent, args, context, info) => {
             console.log("deleteTeacher", args);
             const { orgId } = args;
-            return deleteTeacherByOrgId(orgId);
+            return await deleteTeacherByOrgId(orgId);
         }
     },
     Children: {

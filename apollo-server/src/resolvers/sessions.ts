@@ -2,6 +2,7 @@ import { dbClient, dbCollections, readAllDocuments } from '../db.js'
 import { ISession } from './types.js'
 import { TeachersCRUD } from './teachers.js';
 import { SubjectsCRUD } from './subjects.js';
+import { RoomsCRUD } from './rooms.js';
 const collectionName = dbCollections.sessions.name;
 async function readAllSessions(query: any = {}): Promise<ISession[] | null> {
     return await readAllDocuments<ISession>(collectionName, query);
@@ -30,23 +31,30 @@ async function readSessionByReference(reference: string): Promise<ISession | nul
 }
 const SessionsQuery = {
     Query: {
-        sessions: async () => { return await readAllSessions() },
-        session: (parent, args, context, info) => {
+        sessions: async () => {
+            return await readAllSessions()
+        },
+        session: async (parent, args, context, info) => {
             const { reference } = args;
-            return readSessionByReference(reference);
+            return await readSessionByReference(reference);
         }
     },
     Children: {
         Session: {
-            teacher: (parent, args, context, info) => {
+            teacher: async (parent, args, context, info) => {
                 console.log("Session teacher", parent);
-                const { teacher: _teacher } = parent;
-                return TeachersCRUD.readTeacherByOrgId(_teacher);
+                const { teacher } = parent;
+                return await TeachersCRUD.readTeacherByOrgId(teacher);
             },
-            subjects: (parent, args, context, info) => {
+            room: async (parent, args, context, info) => {
+                console.log("Session room", parent);
+                const { room } = parent;
+                return await RoomsCRUD.readRoomByRoomNumber(room);
+            },
+            subjects: async (parent, args, context, info) => {
                 console.log("Session subject", parent);
-                const { subject: _subject } = parent;
-                return SubjectsCRUD.readSubjectByOrgId(_subject);
+                const { subject } = parent;
+                return await SubjectsCRUD.readSubjectByOrgId(subject);
             }
         }
     }

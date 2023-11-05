@@ -74,7 +74,9 @@ async function createSubject(
 }
 const SubjectsQuery = {
     Query: {
-        subjects: async () => { return await readAllSubjects() },
+        subjects: async () => {
+            return await readAllSubjects()
+        },
         subject: async (parent, args, context, info) => {
             const { orgId } = args;
             return await readSubjectByOrgId(orgId);

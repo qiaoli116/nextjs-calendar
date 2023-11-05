@@ -7,7 +7,20 @@ const url = process.env.DB_STRING ? process.env.DB_STRING : 'mongodb://localhost
 console.log("url is set to", url)
 const dbName = 'appdb';
 // pool size need to adjust in the future to better suit the application
-const dbClient = new MongoClient(url, { minPoolSize: 10, maxPoolSize: 100 });
+const dbClient = new MongoClient(url, { minPoolSize: 10, maxPoolSize: 1000 });
+await dbClient.connect();
+console.log('Connected to MongoDB');
+
+async function closeDbConnection() {
+    console.log('Closing MongoDB connection');
+    await dbClient.close();
+}
+
+// Close the dbClient connection when the application is shutting down
+process.on('SIGINT', closeDbConnection);
+process.on('SIGTERM', closeDbConnection);
+
+
 const collationCaseInsensitive = { locale: 'en', strength: 2 }
 const dbCollections = {
     teachers: {
@@ -39,8 +52,6 @@ const dbCollections = {
 const readAllDocuments = async <T>(collectionName: string, query: any = {}): Promise<T[] | null> => {
     let documents = null;
     try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
 
         const db = dbClient.db(dbName);
         const collection = db.collection(collectionName);
@@ -51,8 +62,7 @@ const readAllDocuments = async <T>(collectionName: string, query: any = {}): Pro
     } catch (err) {
         console.error('Error reading data:', err);
     } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
+
     }
     return documents;
 }
@@ -60,8 +70,6 @@ const readAllDocuments = async <T>(collectionName: string, query: any = {}): Pro
 const readOneDocumentByIndex = async <T>(collectionName: string, indexQuery: object): Promise<T | null> => {
     let document = null;
     try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB, ', collectionName, indexQuery);
 
         const db = dbClient.db('appdb'); // Replace with your database name
         const collection = db.collection(collectionName); // Replace with your collection name
@@ -74,8 +82,7 @@ const readOneDocumentByIndex = async <T>(collectionName: string, indexQuery: obj
     } catch (err) {
         console.error('Error reading data:', err);
     } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
+
     }
     return document;
 }
@@ -83,8 +90,6 @@ const readOneDocumentByIndex = async <T>(collectionName: string, indexQuery: obj
 const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | null> => {
     let document = null;
     try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
 
         const db = dbClient.db('appdb');
         const collection = db.collection(collectionName);
@@ -97,8 +102,7 @@ const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | n
     } catch (err) {
         console.error('Error reading data:', err);
     } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
+
     }
     return document;
 }
@@ -106,8 +110,6 @@ const readOneDocumentById = async <T>(collectionName: string, id): Promise<T | n
 const insertOneDocument = async <T>(collectionName: string, document: T): Promise<T | null> => {
     let documentCreated = null;
     try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
 
         const db = dbClient.db('appdb');
         const collection = db.collection(collectionName);
@@ -126,8 +128,7 @@ const insertOneDocument = async <T>(collectionName: string, document: T): Promis
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
+
     }
     return documentCreated;
 }
@@ -139,8 +140,6 @@ const updateOneDocument = async <T>(collectionName: string, indexQuery: object, 
     console.log("updates", update)
     let documentUpdated = null;
     try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
 
         const db = dbClient.db('appdb');
         const collection = db.collection(collectionName);
@@ -157,8 +156,7 @@ const updateOneDocument = async <T>(collectionName: string, indexQuery: object, 
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
+
     }
     return documentUpdated;
 }
@@ -166,8 +164,6 @@ const updateOneDocument = async <T>(collectionName: string, indexQuery: object, 
 const deleteOneDocumentByIndex = async (collectionName: string, indexQuery: object): Promise<boolean> => {
     let result: boolean = false;
     try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
 
         const db = dbClient.db('appdb'); // Replace with your database name
         const collection = db.collection(collectionName); // Replace with your collection name
@@ -180,8 +176,7 @@ const deleteOneDocumentByIndex = async (collectionName: string, indexQuery: obje
     } catch (err) {
         console.error('Error reading data:', err);
     } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
+
     }
     return result;
 }

@@ -42,26 +42,26 @@ const RoomsQuery = {
         }
     },
     Mutation: {
-        roomCreate: (parent, args, context, info) => {
+        roomCreate: async (parent, args, context, info) => {
             console.log("addRoom", args);
             const room: IRoom = {
                 roomNumber: args.roomNumber,
                 type: args.type,
             };
-            return createRoom(room);
+            return await createRoom(room);
         },
-        roomUpdate: (parent, args, context, info) => {
+        roomUpdate: async (parent, args, context, info) => {
             console.log("updateRoom", args);
             const { roomNumber } = args;
             const updates: any = {
                 type: args.type,
             };
-            return updateRoomByRoomNumber(roomNumber, updates);
+            return await updateRoomByRoomNumber(roomNumber, updates);
         },
-        roomDelete: (parent, args, context, info) => {
+        roomDelete: async (parent, args, context, info) => {
             console.log("deleteRoom", args);
             const { roomNumber } = args;
-            return deleteRoomByRoomNumber(roomNumber);
+            return await deleteRoomByRoomNumber(roomNumber);
         }
     },
     Children: {
