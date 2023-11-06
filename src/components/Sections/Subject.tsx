@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect } from 'react';
-import { ISubject, ISubjectFull } from '../../dataService/subjects';
 import { v4 as uuidv4 } from 'uuid';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -19,6 +18,7 @@ import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { SessionCreateComponent } from './Session';
 import { ISession } from '../../dataService/sessions';
+import { ISubjectCreateInput } from '@/types';
 
 
 const generateSubjectReference = () => {
@@ -36,101 +36,165 @@ interface IInitSusbjectForm {
     numberOfSessions: number,
 }
 
-
-const SubjectCreateComponent = ({ department, term }:
-    { department?: string, term?: string }) => {
-    console.log("SubjectCreateComponent - ", "department", department, "term", term)
-    const generateInitialSubject = (): ISubject => {
-        return {
-            reference: "",
-            code: "",
-            title: "",
-            term: term === undefined ? "" : term,
-            department: "",
-            block: "",
-            qualification: {
-                code: "",
-                title: "",
-            },
-            deliveryMode: "",
-            dateRange: {
-                startDate: "",
-                endDate: "",
-            },
-            units: [],
-            sessions: [],
-        }
-    }
-    const currentYear = new Date().getFullYear();
-    const [subject, setSubject] = React.useState<ISubject>(generateInitialSubject());
-    const [initSubjectForm, setInitSubjectForm] = React.useState<IInitSusbjectForm>({
-        year: currentYear.toString(),
-        department: department === undefined ? "" : department,
+const TASSubjectSelectCompnent = ({ onSubmit }: {
+    onSubmit?: (year: string, department: string, qualificationCode: string, subjectCode: string) => void
+}
+) => {
+    const emptySubject = {
+        year: new Date().getFullYear().toString(),
+        department: "",
         qualificationCode: "",
         subjectCode: "",
-        numberOfSessions: 0,
-    });
-    const handleInputChangeInitSusbject = (e: any) => {
-        const { name, value } = e.target;
-        console.log("handleInputChangeInitSusbject - ", "name", name, "value", value, typeof (value));
-        const obj = { ...initSubjectForm };
-        _.set(obj, name, value);
-        setInitSubjectForm(obj);
-        console.log("handleInputChangeInitSusbject - ", "initSubjectForm", initSubjectForm);
     }
-    // this is a general purpose handler for all input fields
-    const handleInputChange = (e: any) => {
-        const { name, value } = e.target;
-        console.log("handleInputChange - ", "name", name, "value", value);
-        const s = { ...subject };
-        _.set(s, name, value);
-        setSubject(s);
-        console.log("handleInputChange - ", "subject", subject);
-    };
-    const resetForm = () => {
-        console.log("resetForm called");
-        setSubject(generateInitialSubject());
-    };
+    const [subject, setSubject] = React.useState<{
+        year: string,
+        department: string,
+        qualificationCode: string,
+        subjectCode: string,
+    }>(emptySubject);
+
     const handleSubmit = (e: any) => {
         e.preventDefault();
         console.log("handleSubmit", subject);
         console.log("handleSubmit", JSON.stringify(subject, null, 2));
-
-    };
-    const handleSubmitInitSusbject = async (e: any) => {
-        e.preventDefault();
-        const tasSubjectExtended = await TASDataService.getOneSubjectExtended(initSubjectForm.year, initSubjectForm.qualificationCode, initSubjectForm.subjectCode);
-        console.log("handleSubmitInitSusbject", tasSubjectExtended);
-        if (tasSubjectExtended) {
-            const s = generateInitialSubject();
-            s.reference = generateSubjectReference();
-            s.code = tasSubjectExtended.code;
-            s.title = tasSubjectExtended.title;
-            s.department = tasSubjectExtended.department;
-            s.qualification.code = tasSubjectExtended.qualification.code;
-            s.qualification.title = tasSubjectExtended.qualification.title;
-            tasSubjectExtended.units.forEach((u, index) => {
-                s.units[index] = {
-                    code: u.code,
-                    title: u.title,
-                    crn: ""
-                }
-            });
-            for (let i = 0; i < initSubjectForm.numberOfSessions; i++) {
-                s.sessions[i] = "";
-            }
-            setSubject(s);
+        if (onSubmit) {
+            onSubmit(subject.year, subject.department, subject.qualificationCode, subject.subjectCode);
         }
     }
+    return (
+        <>
+            <form onSubmit={handleSubmit}>
+                <Box sx={boxSx}>
+                    <YearSelect
+                        sx={{ minWidth: "100px", pr: "10px" }}
+                        value={subject.year}
+                        name='year'
+                        onChange={handleSubmit}
+                    />
+                    <DepartmentSelect
+                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                        value={subject.department}
+                        name='department'
+                        onChange={handleSubmit}
+                    />
+                    <TASQualificationSelect
+                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                        year={subject.year}
+                        department={subject.department}
+                        value={subject.qualificationCode}
+                        name='qualificationCode'
+                        onChange={handleSubmit}
+                    />
+                    <TASSubjectSelect
+                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                        year={subject.year}
+                        qualification={subject.qualificationCode}
+                        value={subject.subjectCode}
+                        name='subjectCode'
+                        onChange={handleSubmit}
+                    />
+                </Box>
+                <Box sx={boxSx}>
+                    <Button type='submit'>
+                        Create Subject
+                    </Button>
+                </Box>
+            </form>
+        </>
+    )
+}
+
+const SubjectCreateComponent = () => {
+    console.log("SubjectCreateComponent - ")
+    const emptySubjectCreateInput: ISubjectCreateInput = {
+        tasIndex: {
+            year: "",
+            department: "",
+            qualificationCode: "",
+        },
+        code: "",
+        title: "",
+        term: "",
+        department: "",
+        block: "",
+        qualification: {
+            code: "",
+            title: "",
+        },
+        units: [],
+    }
+
+    // const currentYear = new Date().getFullYear();
+    const [subjectCreateInput, setSubjectCreateInput] = React.useState<ISubjectCreateInput>(emptySubjectCreateInput);
+    // const [initSubjectForm, setInitSubjectForm] = React.useState<IInitSusbjectForm>({
+    //     year: currentYear.toString(),
+    //     department: department === undefined ? "" : department,
+    //     qualificationCode: "",
+    //     subjectCode: "",
+    //     numberOfSessions: 0,
+    // });
+    // const handleInputChangeInitSusbject = (e: any) => {
+    //     const { name, value } = e.target;
+    //     console.log("handleInputChangeInitSusbject - ", "name", name, "value", value, typeof (value));
+    //     const obj = { ...initSubjectForm };
+    //     _.set(obj, name, value);
+    //     setInitSubjectForm(obj);
+    //     console.log("handleInputChangeInitSusbject - ", "initSubjectForm", initSubjectForm);
+    // }
+    // this is a general purpose handler for all input fields
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const s = { ...subjectCreateInput };
+        _.set(s, name, value);
+        setSubjectCreateInput(s);
+        console.log("handleInputChange - ", "subjectCreateInput", subjectCreateInput);
+    };
+    const resetForm = () => {
+        console.log("resetForm called");
+        setSubjectCreateInput(emptySubjectCreateInput);
+    };
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit", subjectCreateInput);
+        console.log("handleSubmit", JSON.stringify(subjectCreateInput, null, 2));
+
+    };
+    // const handleSubmitInitSusbject = async (e: any) => {
+    //     e.preventDefault();
+    //     const tasSubjectExtended = await TASDataService.getOneSubjectExtended(initSubjectForm.year, initSubjectForm.qualificationCode, initSubjectForm.subjectCode);
+    //     console.log("handleSubmitInitSusbject", tasSubjectExtended);
+    //     if (tasSubjectExtended) {
+    //         const s = generateInitialSubject();
+    //         s.reference = generateSubjectReference();
+    //         s.code = tasSubjectExtended.code;
+    //         s.title = tasSubjectExtended.title;
+    //         s.department = tasSubjectExtended.department;
+    //         s.qualification.code = tasSubjectExtended.qualification.code;
+    //         s.qualification.title = tasSubjectExtended.qualification.title;
+    //         tasSubjectExtended.units.forEach((u, index) => {
+    //             s.units[index] = {
+    //                 code: u.code,
+    //                 title: u.title,
+    //                 crn: ""
+    //             }
+    //         });
+    //         for (let i = 0; i < initSubjectForm.numberOfSessions; i++) {
+    //             s.sessions[i] = "";
+    //         }
+    //         setSubject(s);
+    //     }
+    // }
 
     // if year or department changes, reset qualification and subject to empty value
-    useEffect(() => {
-        setInitSubjectForm({ ...initSubjectForm, qualificationCode: "", subjectCode: "" })
-    }, [initSubjectForm.year, initSubjectForm.department]);
+
+    // useEffect(() => {
+    //     setInitSubjectForm({ ...initSubjectForm, qualificationCode: "", subjectCode: "" })
+    // }, [initSubjectForm.year, initSubjectForm.department]);
 
     return (
         <>
-            <form onSubmit={handleSubmitInitSusbject}>
+            {/* <form onSubmit={handleSubmitInitSusbject}>
                 <Box sx={boxSx}>
                     <YearSelect
                         sx={{ minWidth: "100px", pr: "10px" }}
@@ -166,27 +230,17 @@ const SubjectCreateComponent = ({ department, term }:
                         Create Subject
                     </Button>
                 </Box>
-            </form>
+            </form> */}
 
             <form onSubmit={handleSubmit}>
 
                 <Box sx={boxSx}>
-                    <FormControl sx={{ minWidth: "440px", pr: "10px" }}>
-                        <TextField
-                            fullWidth
-                            label="Subject ID (Read only)"
-                            name='reference'
-                            value={subject.reference}
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                        />
-                    </FormControl>
+
                     <FormControl sx={{ minWidth: "410px", pr: "10px" }}>
                         <TextField
                             fullWidth
                             label="Subject Code - Title (Read only)"
-                            value={subject.code === "" ? "" : subject.code + " - " + subject.title}
+                            value={subjectCreateInput.code === "" ? "" : subjectCreateInput.code + " - " + subjectCreateInput.title}
                             InputProps={{
                                 readOnly: true,
                             }}
@@ -200,7 +254,7 @@ const SubjectCreateComponent = ({ department, term }:
                             fullWidth
                             label="Term"
                             name='term'
-                            value={subject.term}
+                            value={subjectCreateInput.term}
                             onChange={handleInputChange}
                         />
                     </FormControl>
@@ -208,7 +262,7 @@ const SubjectCreateComponent = ({ department, term }:
                         <TextField
                             fullWidth
                             label="Department (Read only)"
-                            value={subject.department}
+                            value={subjectCreateInput.department}
                             InputProps={{
                                 readOnly: true,
                             }}
@@ -218,23 +272,22 @@ const SubjectCreateComponent = ({ department, term }:
                         <TextField
                             fullWidth
                             label="Qualification Code - Title (Read only)"
-                            value={subject.qualification.code === "" ? "" : subject.qualification.code + " - " + subject.qualification.title}
+                            value={subjectCreateInput.qualification.code === "" ? "" : subjectCreateInput.qualification.code + " - " + subjectCreateInput.qualification.title}
                         />
                     </FormControl>
                 </Box>
 
                 <Box sx={boxSx}>
                     <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
-
                         <TextField
                             fullWidth
                             label="Block"
                             name='block'
-                            value={subject.block}
+                            value={subjectCreateInput.block}
                             onChange={handleInputChange}
                         />
                     </FormControl>
-                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                    {/* <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
                         <DeliveryModeSelect
                             name='deliveryMode'
                             value={subject.deliveryMode}
@@ -265,11 +318,11 @@ const SubjectCreateComponent = ({ department, term }:
                                 shrink: true,
                             }}
                         />
-                    </FormControl>
+                    </FormControl> */}
 
                 </Box>
 
-                {subject.units.map((u, index) => {
+                {subjectCreateInput.units.map((unit, index) => {
                     return (
                         <Box sx={boxSx}>
                             <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
@@ -284,7 +337,7 @@ const SubjectCreateComponent = ({ department, term }:
                                 <TextField
                                     fullWidth
                                     label="Code - Title (Read only)"
-                                    value={u.code === "" ? "" : subject.units[index].code + " - " + subject.units[index].title}
+                                    value={unit.code === "" ? "" : unit.code + " - " + unit.title}
                                 />
                             </FormControl>
                         </Box>
@@ -302,7 +355,7 @@ const SubjectCreateComponent = ({ department, term }:
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
                     <pre>
-                        {JSON.stringify(subject, null, 2) + ","}
+                        {JSON.stringify(subjectCreateInput, null, 2) + ","}
                     </pre>
                 </code>
             </Box>
@@ -396,7 +449,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
         console.log("sessionCreateCallback - ", "session", session);
         if (session !== undefined) {
             const s = { ...subjectFull };
-            s.sessions.push(session);
+            //s.sessions.push(session);
             setSubjectFull(s);
         }
         handleCloseModalCreateSession();

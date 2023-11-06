@@ -70,6 +70,7 @@ export interface ISubjectUnit extends IUnit {
     // title: string;
     crn: string;
 }
+
 export interface ISubjectCreateInput {
     tasIndex: ITASIndex;
     code: string;
@@ -79,7 +80,6 @@ export interface ISubjectCreateInput {
     block: string;
     qualification: IQualification;
     units: ITASUnit[];
-    sessions: string[];
 }
 
 export interface ISubject {
