@@ -4,7 +4,7 @@ type Query {
     teacher(orgId: String): Teacher
     rooms: [Room]
     room(roomNumber: String): Room
-    tases: [TAS]
+    tases(year: String, department: String, qualificationCode: String): [TAS]
     tas(tasIndex: TASIndexInput): TAS
     tasSubject(tasIndex: TASIndexInput, subjectCode: String): TAS
     sessions: [Session]

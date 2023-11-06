@@ -18,7 +18,7 @@ import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { SessionCreateComponent } from './Session';
 import { ISession } from '../../dataService/sessions';
-import { ISubjectCreateInput } from '@/types';
+import { ISubjectCreateInput, ITASSubject } from '@/types';
 
 
 const generateSubjectReference = () => {
@@ -37,30 +37,46 @@ interface IInitSusbjectForm {
 }
 
 const TASSubjectSelectCompnent = ({ onSubmit }: {
-    onSubmit?: (year: string, department: string, qualificationCode: string, subjectCode: string) => void
+    onSubmit?: (year: string, department: string, qualificationCode: string, subject: ITASSubject) => void
 }
 ) => {
     const emptySubject = {
         year: new Date().getFullYear().toString(),
         department: "",
         qualificationCode: "",
-        subjectCode: "",
+        subject: {
+            code: "",
+            title: "",
+            units: [],
+        },
     }
     const [subject, setSubject] = React.useState<{
         year: string,
         department: string,
         qualificationCode: string,
-        subjectCode: string,
+        subject: ITASSubject,
     }>(emptySubject);
-
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const s = { ...subject };
+        _.set(s, name, value);
+        setSubject(s);
+    };
     const handleSubmit = (e: any) => {
         e.preventDefault();
         console.log("handleSubmit", subject);
         console.log("handleSubmit", JSON.stringify(subject, null, 2));
         if (onSubmit) {
-            onSubmit(subject.year, subject.department, subject.qualificationCode, subject.subjectCode);
+            onSubmit(subject.year, subject.department, subject.qualificationCode, subject.subject);
         }
     }
+    // set subject.qualificaitonCode to empty when year or department changes
+    useEffect(() => {
+        console.log("useEffect - set qualificationCode to empty ", "subject.year", subject.year, "subject.department", subject.department)
+        setSubject({ ...subject, qualificationCode: "" })
+    }, [subject.year, subject.department]);
+
     return (
         <>
             <form onSubmit={handleSubmit}>
@@ -69,29 +85,32 @@ const TASSubjectSelectCompnent = ({ onSubmit }: {
                         sx={{ minWidth: "100px", pr: "10px" }}
                         value={subject.year}
                         name='year'
-                        onChange={handleSubmit}
+                        onChange={handleInputChange}
                     />
                     <DepartmentSelect
-                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "800px" }}
                         value={subject.department}
                         name='department'
-                        onChange={handleSubmit}
+                        onChange={handleInputChange}
                     />
                     <TASQualificationSelect
-                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "800px" }}
                         year={subject.year}
                         department={subject.department}
                         value={subject.qualificationCode}
                         name='qualificationCode'
-                        onChange={handleSubmit}
+                        onChange={handleInputChange}
                     />
                     <TASSubjectSelect
                         sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
-                        year={subject.year}
-                        qualification={subject.qualificationCode}
-                        value={subject.subjectCode}
-                        name='subjectCode'
-                        onChange={handleSubmit}
+                        tasIndex={{
+                            year: subject.year,
+                            department: subject.department,
+                            qualificationCode: subject.qualificationCode,
+                        }}
+                        value={subject.subject.code}
+                        name='subject'
+                        onChange={handleInputChange}
                     />
                 </Box>
                 <Box sx={boxSx}>
@@ -231,7 +250,7 @@ const SubjectCreateComponent = () => {
                     </Button>
                 </Box>
             </form> */}
-
+            <TASSubjectSelectCompnent />
             <form onSubmit={handleSubmit}>
 
                 <Box sx={boxSx}>

@@ -56,7 +56,7 @@ const readAllDocuments = async <T>(collectionName: string, query: any = {}): Pro
         const db = dbClient.db(dbName);
         const collection = db.collection(collectionName);
 
-        const docs = await collection.find(query).toArray();
+        const docs = await collection.find(query).collation(collationCaseInsensitive).toArray();
         console.log('Found documents:', docs);
         documents = docs;
     } catch (err) {

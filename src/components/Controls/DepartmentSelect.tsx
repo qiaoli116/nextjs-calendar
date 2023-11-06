@@ -34,7 +34,7 @@ export default function DepartmentSelect({ value, name, onChange, sx }:
                 <InputLabel id={labelId}>{label}</InputLabel>
                 <Select
                     labelId="labelId"
-                    label="Department"
+                    label={label}
                     name={name}
                     value={value}
                     onChange={handleChange}
@@ -43,7 +43,7 @@ export default function DepartmentSelect({ value, name, onChange, sx }:
                     {departments.map((department) => {
                         return (
                             <MenuItem key={department.code.toLowerCase()} value={department.code.toLowerCase()} >
-                                {department.code} - {department.name}
+                                {`${department.code} (${department.name})`}
                             </MenuItem>
                         );
                     })}

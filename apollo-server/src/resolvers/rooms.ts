@@ -37,6 +37,7 @@ const RoomsQuery = {
     Query: {
         rooms: async () => { return await readAllRooms() },
         room: async (parent, args, context, info) => {
+            console.log("room args", args)
             const { roomNumber } = args;
             return await readRoomByRoomNumber(roomNumber);
         }

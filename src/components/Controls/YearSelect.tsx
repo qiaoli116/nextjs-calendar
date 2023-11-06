@@ -25,7 +25,7 @@ export default function YearSelect({ value, name, onChange, sx }:
             <InputLabel id={labelId}>{label}</InputLabel>
             <Select
                 labelId="labelId"
-                label="Year"
+                label={label}
                 name={name}
                 value={value}
                 onChange={handleChange}

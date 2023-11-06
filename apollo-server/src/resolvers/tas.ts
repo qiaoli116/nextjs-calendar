@@ -4,35 +4,17 @@ import {
     readAllDocuments,
     insertOneDocument,
     udpateOneDocument,
-    deleteOneDocumentByIndex
+    deleteOneDocumentByIndex,
+    readOneDocumentByIndex
 } from '../db.js'
 
 import { ITAS, ITASDBIndex, ITASSubject, ITASUnit } from './types.js'
 const collectionName = dbCollections.tas.name;
-async function readAllTAS(): Promise<ITAS[] | null> {
-    return await readAllDocuments<ITAS>(collectionName);
+async function readAllTAS(filter: any = {}): Promise<ITAS[] | null> {
+    return await readAllDocuments<ITAS>(collectionName, filter);
 }
 async function readTAS(tasIndex: ITASDBIndex): Promise<ITAS | null> {
-    let tas = null;
-    try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
-
-        const db = dbClient.db('appdb'); // Replace with your database name
-        const collection = db.collection('tas'); // Replace with your collection name
-        console.log('tasIndex:', tasIndex);
-        const docs = await collection.find(tasIndex).collation({ locale: 'en', strength: 2 }).toArray();
-        console.log('Found documents:', docs);
-        if (docs.length > 0) {
-            tas = docs[0];
-        }
-    } catch (err) {
-        console.error('Error reading data:', err);
-    } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
-    }
-    return tas;
+    return await readOneDocumentByIndex<ITAS>(collectionName, tasIndex);
 }
 
 async function readTASSubject(tasIndex: ITASDBIndex, subjectCode: string): Promise<ITAS | null> {
@@ -88,7 +70,23 @@ async function deleteTAS(tasIndex: ITASDBIndex): Promise<boolean> {
 
 const TASQuery = {
     Query: {
-        tases: async () => { return await readAllTAS() },
+        tases: async (parent, args, context, info) => {
+            const { year, department, qualificationCode } = args;
+            console.log("tases arg", args);
+            console.log("year", year, "department", department, "qualificationCode", qualificationCode);
+            const filter = {};
+            if (year !== undefined && year !== null && year !== "") {
+                filter["year"] = year;
+            }
+            if (department !== undefined && department !== null && department !== "") {
+                filter["department"] = department;
+            }
+            if (qualificationCode !== undefined && qualificationCode !== null && qualificationCode !== "") {
+                filter["qualification.code"] = qualificationCode;
+            }
+            console.log("filter", filter)
+            return await readAllTAS(filter);
+        },
         tas: async (parent, args, context, info) => {
             const { tasIndex, subjects } = args;
             const _tasIndex: ITASDBIndex = {

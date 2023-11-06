@@ -4,34 +4,60 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { v4 as uuidv4 } from 'uuid';
-import TASDataService, { ITASSubject } from '../../dataService/tas';
+import { ITASIndex, ITASSubject } from '@/types';
+import { useQueryOneTAS } from '../Hooks/tases';
+import * as _ from 'lodash';
 
+export default function TASSubjectSelect({ tasIndex, value, name, onChange, sx }:
+    { tasIndex: ITASIndex, value?: string, name?: string, onChange?: (e: any) => void, sx?: any }) {
+    console.log("TASSubjectSelect refreshed: ", tasIndex, value);
 
-export default function TASSubjectSelect({ year, qualification, value, name, onChange, sx }:
-    { year: string, qualification: string, value?: string, name?: string, onChange?: (e: any) => void, sx?: any }) {
-    const [subjects, setSubjects] = useState<ITASSubject[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    console.log("TASSubjectSelect refreshed: ", year, qualification, value);
+    const { department, year, qualificationCode } = tasIndex;
+
+    const labelId = "id-label-" + uuidv4();
+    const label = "Subjects";
+    const emptySubject: ITASSubject = {
+        code: "",
+        title: "",
+        units: []
+    }
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement> | any) => {
+        console.log("TASSubjectSelect handleChange: event.target.value", event.target.value);
+        // case insinsitive search
+        var s = _.find(subjects, function (_s) { return _s.code.toLowerCase() === event.target.value.toLowerCase(); });
+        console.log("TASSubjectSelect handleChange: s find", s, subjects);
         onChange && onChange({
             target: {
                 name: name,
-                value: event.target.value
+                value: s === undefined ? emptySubject : s.code
             }
         });
     };
-    const labelId = "id-label-" + uuidv4();
-    const label = "Subjects";
+    if (department === "" || year === "" || qualificationCode === "") {
+        return (
+            <FormControl sx={sx === undefined ? {} : sx}>
+                <InputLabel id={labelId}>{label}</InputLabel>
+                <Select
+                    labelId="labelId"
+                    label="Subject"
+                    name={name}
+                    onChange={handleChange}
+                    value="">
+                    <MenuItem value=""><em>===None===</em></MenuItem>
+                </Select>
+            </FormControl>
+        )
+    }
+
+    const [subjects, setSubjects] = useState<ITASSubject[]>([]);
+
+    const { loading, error, dataError, tas, reexecuteQueryTAS } = useQueryOneTAS(tasIndex);
+
+
 
     React.useEffect(() => {
-        (async () => {
-            const s = await TASDataService.getAllSubjectsByYearAndQualificationCode(year, qualification);
-            s === undefined ? setSubjects([]) : setSubjects(s);
-
-            setLoading(false);
-        })();
-
-    }, [year, qualification]);
+        tas === null ? setSubjects([]) : setSubjects(tas.subjects)
+    }, [department, year, qualificationCode, loading]);
     return (
         <FormControl sx={sx === undefined ? {} : sx}>
             <InputLabel id={labelId}>{label}</InputLabel>
@@ -42,11 +68,11 @@ export default function TASSubjectSelect({ year, qualification, value, name, onC
                 value={value}
                 onChange={handleChange}
             >
-                <MenuItem value=""><em>===None===</em></MenuItem>
+                {loading ? (<MenuItem value=""><em>Loading...</em></MenuItem>) : (<MenuItem value=""><em>===None===</em></MenuItem>)}
                 {!loading && subjects.map((s) => {
                     return (
                         <MenuItem key={s.code.toLowerCase()} value={s.code.toLowerCase()} >
-                            {s.code} - {s.title}
+                            {s.code}: {s.title}
                         </MenuItem>
                     );
                 })}
