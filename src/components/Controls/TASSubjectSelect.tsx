@@ -8,14 +8,18 @@ import { ITASIndex, ITASSubject } from '@/types';
 import { useQueryOneTAS } from '../Hooks/tases';
 import * as _ from 'lodash';
 
+// the component take value (subject code) as a string from the parameter, 
+// but return a ITASSubject object through the onChange callback.
+// the subject code is traited as case insensitive.
 export default function TASSubjectSelect({ tasIndex, value, name, onChange, sx }:
     { tasIndex: ITASIndex, value?: string, name?: string, onChange?: (e: any) => void, sx?: any }) {
     console.log("TASSubjectSelect refreshed: ", tasIndex, value);
 
+
     const { department, year, qualificationCode } = tasIndex;
 
     const labelId = "id-label-" + uuidv4();
-    const label = "Subjects";
+    const label = "Subject";
     const emptySubject: ITASSubject = {
         code: "",
         title: "",
@@ -29,7 +33,7 @@ export default function TASSubjectSelect({ tasIndex, value, name, onChange, sx }
         onChange && onChange({
             target: {
                 name: name,
-                value: s === undefined ? emptySubject : s.code
+                value: s === undefined ? emptySubject : s
             }
         });
     };
@@ -39,7 +43,7 @@ export default function TASSubjectSelect({ tasIndex, value, name, onChange, sx }
                 <InputLabel id={labelId}>{label}</InputLabel>
                 <Select
                     labelId="labelId"
-                    label="Subject"
+                    label={label}
                     name={name}
                     onChange={handleChange}
                     value="">
@@ -62,16 +66,17 @@ export default function TASSubjectSelect({ tasIndex, value, name, onChange, sx }
         <FormControl sx={sx === undefined ? {} : sx}>
             <InputLabel id={labelId}>{label}</InputLabel>
             <Select
-                labelId="labelId"
-                label="Subject"
+                required
+                labelId={labelId}
+                label={label}
                 name={name}
-                value={value}
+                value={value ? value : ""}
                 onChange={handleChange}
             >
                 {loading ? (<MenuItem value=""><em>Loading...</em></MenuItem>) : (<MenuItem value=""><em>===None===</em></MenuItem>)}
                 {!loading && subjects.map((s) => {
                     return (
-                        <MenuItem key={s.code.toLowerCase()} value={s.code.toLowerCase()} >
+                        <MenuItem key={s.code} value={s.code} >
                             {s.code}: {s.title}
                         </MenuItem>
                     );

@@ -18,6 +18,7 @@ const departments: {
 
 export default function DepartmentSelect({ value, name, onChange, sx }:
     { value?: string, name?: string, onChange?: (e: any) => void, sx?: any }) {
+    console.log("DepartmentSelect refreshed: ", value);
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement> | any) => {
         onChange && onChange({
             target: {
@@ -26,14 +27,15 @@ export default function DepartmentSelect({ value, name, onChange, sx }:
             }
         });
     };
-    const labelId = "id-label-" + uuidv4();
+    const labelId = "id-DepartmentSelect-label-" + uuidv4();
     const label = "Department";
     return (
         <>
             <FormControl sx={sx === undefined ? {} : sx}>
                 <InputLabel id={labelId}>{label}</InputLabel>
                 <Select
-                    labelId="labelId"
+                    required
+                    labelId={labelId}
                     label={label}
                     name={name}
                     value={value}
@@ -42,7 +44,7 @@ export default function DepartmentSelect({ value, name, onChange, sx }:
                     <MenuItem value=""><em>===None===</em></MenuItem>
                     {departments.map((department) => {
                         return (
-                            <MenuItem key={department.code.toLowerCase()} value={department.code.toLowerCase()} >
+                            <MenuItem key={department.code.toLowerCase()} value={department.code} >
                                 {`${department.code} (${department.name})`}
                             </MenuItem>
                         );

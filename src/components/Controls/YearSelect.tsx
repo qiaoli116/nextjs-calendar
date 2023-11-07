@@ -18,13 +18,14 @@ export default function YearSelect({ value, name, onChange, sx }:
             }
         });
     };
-    const labelId = "id-label-" + uuidv4();
+    const labelId = "id-YearSelect-label-" + uuidv4();
     const label = "Year";
     return (
         <FormControl sx={sx === undefined ? {} : sx}>
             <InputLabel id={labelId}>{label}</InputLabel>
             <Select
-                labelId="labelId"
+                required
+                labelId={labelId}
                 label={label}
                 name={name}
                 value={value}
