@@ -110,6 +110,11 @@ input TASIndexInput {
     department: String!
     qualificationCode: String!
 }
+type TASIndex{
+    year: String!
+    department: String!
+    qualificationCode: String!
+}
 type TAS {
     year: String!
     department: String!
@@ -123,6 +128,7 @@ type Subject {
     term: String!
     department: String!
     block: String!
+    tasIndex: TASIndex!
     qualification: TASQualification
     deliveryMode: String!
     dateRange: DateRange!
