@@ -45,9 +45,10 @@ export default function TASQualificationSelect({ year, department, value, name, 
     };
     if (year === "" || department === "") {
         return (
-            <FormControl sx={sx === undefined ? {} : sx}>
+            <FormControl required sx={sx === undefined ? {} : sx}>
                 <InputLabel id={labelId}>{label}</InputLabel>
                 <Select
+                    required
                     labelId={labelId}
                     label={label}
                     name={name}
@@ -74,7 +75,7 @@ export default function TASQualificationSelect({ year, department, value, name, 
     }, [year, department, loading]);
     console.log("TASQualificationSelect qualifications: ", qualifications);
     return (
-        <FormControl sx={sx === undefined ? {} : sx}>
+        <FormControl required sx={sx === undefined ? {} : sx}>
             <InputLabel id={labelId}>{label}</InputLabel>
             <Select
                 required

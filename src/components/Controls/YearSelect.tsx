@@ -21,7 +21,7 @@ export default function YearSelect({ value, name, onChange, sx }:
     const labelId = "id-YearSelect-label-" + uuidv4();
     const label = "Year";
     return (
-        <FormControl sx={sx === undefined ? {} : sx}>
+        <FormControl required sx={sx === undefined ? {} : sx}>
             <InputLabel id={labelId}>{label}</InputLabel>
             <Select
                 required

@@ -31,7 +31,7 @@ export default function DepartmentSelect({ value, name, onChange, sx }:
     const label = "Department";
     return (
         <>
-            <FormControl sx={sx === undefined ? {} : sx}>
+            <FormControl required sx={sx === undefined ? {} : sx}>
                 <InputLabel id={labelId}>{label}</InputLabel>
                 <Select
                     required

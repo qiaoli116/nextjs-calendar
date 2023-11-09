@@ -39,7 +39,7 @@ export default function TASSubjectSelect({ tasIndex, value, name, onChange, sx }
     };
     if (department === "" || year === "" || qualificationCode === "") {
         return (
-            <FormControl sx={sx === undefined ? {} : sx}>
+            <FormControl required sx={sx === undefined ? {} : sx}>
                 <InputLabel id={labelId}>{label}</InputLabel>
                 <Select
                     labelId="labelId"

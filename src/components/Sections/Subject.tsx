@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import * as _ from 'lodash';
 import TASDataService from '../../dataService/tas';
-import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Alert, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import YearSelect from '../Controls/YearSelect';
 import DepartmentSelect from '../Controls/DepartmentSelect';
 import TASQualificationSelect from '../Controls/TASQualificationSelect';
@@ -91,27 +91,31 @@ const TASSubjectSelectComponent = ({ onSubmit }: {
             <form onSubmit={handleSubmit}>
                 <Box sx={boxSx}>
                     <YearSelect
-                        sx={{ minWidth: "100px", pr: "10px" }}
+                        sx={{ width: "200px", pr: "10px" }}
                         value={subject.year}
                         name='year'
                         onChange={handleInputChange}
                     />
                     <DepartmentSelect
-                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "800px" }}
+                        sx={{ width: "600px" }}
                         value={subject.department}
                         name='department'
                         onChange={handleInputChange}
                     />
+                </Box>
+                <Box sx={boxSx}>
                     <TASQualificationSelect
-                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "800px" }}
+                        sx={{ width: "800px" }}
                         year={subject.year}
                         department={subject.department}
                         value={subject.qualification.code}
                         name='qualification'
                         onChange={handleInputChange}
                     />
+                </Box>
+                <Box sx={boxSx}>
                     <TASSubjectSelect
-                        sx={{ minWidth: "200px", pr: "10px", maxWidth: "400px" }}
+                        sx={{ width: "800px" }}
                         tasIndex={{
                             year: subject.year,
                             department: subject.department,
@@ -124,7 +128,7 @@ const TASSubjectSelectComponent = ({ onSubmit }: {
                 </Box>
                 <Box sx={boxSx}>
                     <Button type='submit'>
-                        Create Subject
+                        Select Subject
                     </Button>
                 </Box>
             </form>
@@ -173,7 +177,7 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
         console.log("handleSubmit", subjectCreateInput);
         console.log("handleSubmit", JSON.stringify(subjectCreateInput, null, 2));
         setMutationStatus("loading");
-        const _subject: ISubject = {
+        const _subject: ISubjectCreateInput = {
             tasIndex: {
                 year: subjectCreateInput.tasIndex.year,
                 department: subjectCreateInput.tasIndex.department,
@@ -188,17 +192,10 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                 code: subjectCreateInput.qualification.code,
                 title: subjectCreateInput.qualification.title,
             },
-            deliveryMode: "",
-            dateRange: {
-                startDate: "",
-                endDate: "",
-            },
-            sessions: [],
             units: subjectCreateInput.units.map((u) => {
                 return {
                     code: u.code,
                     title: u.title,
-                    crn: "",
                 }
             })
         };
@@ -238,10 +235,12 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                 return {
                     code: u.code,
                     title: u.title,
-                    crn: "",
                 }
             })
         })
+    }
+    const resetMutationStatus = () => {
+        setMutationStatus("idle");
     }
 
     return (
@@ -253,8 +252,9 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
 
                 <Box sx={boxSx}>
 
-                    <FormControl sx={{ minWidth: "410px", pr: "10px" }}>
+                    <FormControl sx={{ minWidth: "800px" }}>
                         <TextField
+                            required
                             fullWidth
                             label="Subject Code - Title (Read only)"
                             value={subjectCreateInput.code === "" ? "" : subjectCreateInput.code + " - " + subjectCreateInput.title}
@@ -263,30 +263,11 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                             }}
                         />
                     </FormControl>
-
                 </Box>
                 <Box sx={boxSx}>
-                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                    <FormControl sx={{ width: "800px" }}>
                         <TextField
-                            fullWidth
-                            label="Term"
-                            name='term'
-                            value={subjectCreateInput.term}
-                            onChange={handleInputChange}
-                        />
-                    </FormControl>
-                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
-                        <TextField
-                            fullWidth
-                            label="Department (Read only)"
-                            value={subjectCreateInput.department}
-                            InputProps={{
-                                readOnly: true,
-                            }}
-                        />
-                    </FormControl>
-                    <FormControl sx={{ minWidth: "400px" }}>
-                        <TextField
+                            required
                             fullWidth
                             label="Qualification Code - Title (Read only)"
                             value={subjectCreateInput.qualification.code === "" ? "" : subjectCreateInput.qualification.code + " - " + subjectCreateInput.qualification.title}
@@ -295,8 +276,31 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                 </Box>
 
                 <Box sx={boxSx}>
-                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+                    <FormControl sx={{ minWidth: "270px", pr: "10px" }}>
                         <TextField
+                            required
+                            fullWidth
+                            label="Department (Read only)"
+                            value={subjectCreateInput.department}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                    </FormControl>
+
+                    <FormControl sx={{ minWidth: "270px", pr: "10px" }}>
+                        <TextField
+                            required
+                            fullWidth
+                            label="Term"
+                            name='term'
+                            value={subjectCreateInput.term}
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ minWidth: "270px", pr: "10px" }}>
+                        <TextField
+                            required
                             fullWidth
                             label="Block"
                             name='block'
@@ -304,70 +308,35 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                             onChange={handleInputChange}
                         />
                     </FormControl>
-                    {/* <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
-                        <DeliveryModeSelect
-                            name='deliveryMode'
-                            value={subject.deliveryMode}
-                            onChange={handleInputChange}
-                        />
-                    </FormControl>
-                    <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
-                        <TextField
-                            fullWidth
-                            type='date'
-                            label="Start Date"
-                            name='dateRange.startDate'
-                            onChange={handleInputChange}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-
-                    </FormControl>
-                    <FormControl sx={{ minWidth: "200px" }}>
-                        <TextField
-                            fullWidth
-                            type='date'
-                            label="End Date"
-                            name='dateRange.endDate'
-                            onChange={handleInputChange}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                    </FormControl> */}
-
                 </Box>
-
                 {subjectCreateInput.units.map((unit, index) => {
                     return (
                         <Box sx={boxSx}>
-                            <FormControl sx={{ minWidth: "200px", pr: "10px" }}>
+
+                            <FormControl sx={{ minWidth: "800px" }}>
                                 <TextField
+                                    required
                                     fullWidth
-                                    label={`Unit ${(index + 1)} CRN`}
-                                    name={`units[${index}].crn`}
-                                    onChange={handleInputChange}
-                                />
-                            </FormControl>
-                            <FormControl sx={{ minWidth: "620px" }}>
-                                <TextField
-                                    fullWidth
-                                    label="Code - Title (Read only)"
+                                    label={`Unit ${(index + 1)} (Read only)`}
                                     value={unit.code === "" ? "" : unit.code + " - " + unit.title}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
                                 />
                             </FormControl>
                         </Box>
                     )
                 })}
                 <Box sx={boxSx}>
-                    <Button type='submit'>
-                        Save
+                    <Button type='submit' disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Creating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Create"}
                     </Button>
                     <Button onClick={resetForm}>
                         Reset
                     </Button>
                 </Box>
+                {mutationStatus === "error" && <Alert severity="error">Create Error</Alert >}
+                {mutationStatus === "success" && <Alert severity="success">Create successful</Alert >}
             </form>
             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                 <code>
