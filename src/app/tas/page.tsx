@@ -3,7 +3,7 @@ import { TASViewAllComponent } from '../../components/Sections/TAS';
 import React from 'react';
 
 
-export default function TeachersViewAll() {
+export default function TASesViewAll() {
     return (
         <>
             <h2>View all TAS</h2>

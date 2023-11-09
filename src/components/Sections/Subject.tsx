@@ -1,12 +1,13 @@
 "use client"
 import React, { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { GridRenderCellParams, DataGrid, GridColDef, GridValueGetterParams, GridToolbar, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import * as _ from 'lodash';
 import TASDataService from '../../dataService/tas';
-import { Alert, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Alert, FormControl, IconButton, InputLabel, MenuItem, Select } from '@mui/material';
 import YearSelect from '../Controls/YearSelect';
 import DepartmentSelect from '../Controls/DepartmentSelect';
 import TASQualificationSelect from '../Controls/TASQualificationSelect';
@@ -19,12 +20,124 @@ import Modal from '@mui/material/Modal';
 import { SessionCreateComponent } from './Session';
 import { ISession } from '../../dataService/sessions';
 import { ISubject, ISubjectCreateInput, ITAS, ITASQualification, ITASSubject } from '@/types';
-import { useCreateSubject } from '@/components/Hooks/subjects';
+import { useCreateSubject, useQuerySubjects } from '@/components/Hooks/subjects';
+import { AlertBar, AlertLoading } from '../Controls/AlertBar';
+import { useSearchParams } from "next/navigation";
+import { Message } from '@mui/icons-material';
+import CRUDLinksComponent from '../Controls/CRUDLinks';
 
 
-const generateSubjectReference = () => {
-    return "Subject." + uuidv4();
+function SubjectViewAllComponent({ singleSubjectPath = "" }: { singleSubjectPath: string }) {
+    console.log("SubjectViewAllComponent - singleSubjectPath", singleSubjectPath);
+    const { loading, error, dataError, subjects, reexecuteQuerySubjects } = useQuerySubjects();
+    if (loading) {
+        return (
+            <AlertLoading
+                message="Loading Subjects"
+            />
+        )
+    }
+
+    if (error) {
+        return (
+            <Alert severity="error">
+                Failed to load TAS list
+                <br />
+                Error Message: {error.message}
+            </Alert>
+        )
+
+    }
+    if (dataError) {
+        return (
+            <Alert severity="error">
+                Failed to load TAS list
+            </Alert>
+        )
+
+    }
+
+    const columns: GridColDef[] = [
+        { field: 'department', headerName: 'Department', flex: 1, maxWidth: 100 },
+        { field: 'term', headerName: 'Term', flex: 1, maxWidth: 80 },
+        { field: 'block', headerName: 'Block', flex: 1, maxWidth: 150 },
+        { field: 'code', headerName: 'Code', flex: 1, maxWidth: 150 },
+        { field: 'title', headerName: 'Title', flex: 1, maxWidth: 400 },
+        {
+            field: "actions",
+            headerName: "Actions",
+            flex: 1,
+            maxWidth: 300,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams<any, string>) => (
+                <>
+                    <CRUDLinksComponent
+                        baseURL={singleSubjectPath}
+                        resourceId={params.row.id}
+                        createLink={false}
+                        hasText={false}
+                    />
+                </>
+            )
+        }
+    ];
+
+    const rows = subjects.map((subject: ISubject) => {
+        return {
+            id: `${subject.department.toLowerCase()}/${subject.term}/${subject.block.toLowerCase()}/${subject.code.toLowerCase()}`,
+            department: subject.department,
+            term: subject.term,
+            block: subject.block,
+            code: subject.code,
+            title: subject.title,
+        }
+    });
+    console.log("row", rows);
+    return (
+        <>
+            <div style={{ width: '100%' }}>
+                <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    initialState={{
+                        pagination: {
+                            paginationModel: { page: 0, pageSize: 50 },
+                        },
+                    }}
+                    pageSizeOptions={[50, 100]}
+                    disableRowSelectionOnClick
+                    slots={{
+                        toolbar: () => (
+                            <>
+                                <GridToolbarContainer>
+                                    <CRUDLinksComponent
+                                        baseURL={singleSubjectPath}
+                                        createLink={true}
+                                        readLink={false}
+                                        updateLink={false}
+                                        deleteLink={false}
+                                    />
+                                    <GridToolbarExport />
+                                    <Box sx={{ flex: '1 1 0%' }}></Box>
+                                    <GridToolbarQuickFilter />
+
+                                </GridToolbarContainer>
+                            </>
+                        )
+                    }}
+                    slotProps={{
+                        toolbar: {
+                            showQuickFilter: true,
+                        },
+                    }}
+                />
+            </div>
+
+        </>
+    )
 }
+
+
 
 const boxSx = {
     py: "8px"
@@ -138,6 +251,7 @@ const TASSubjectSelectComponent = ({ onSubmit }: {
 
 const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subject: ISubject) => void }) => {
     console.log("SubjectCreateComponent - ")
+    const params = useSearchParams();
     const emptySubjectCreateInput: ISubjectCreateInput = {
         tasIndex: {
             year: "",
@@ -245,13 +359,12 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
 
     return (
         <>
+            <h3>Select a subject from a TAS</h3>
             <TASSubjectSelectComponent
                 onSubmit={tasSubjectSelectOnSubmit}
             />
             <form onSubmit={handleSubmit}>
-
                 <Box sx={boxSx}>
-
                     <FormControl sx={{ minWidth: "800px" }}>
                         <TextField
                             required
@@ -335,16 +448,32 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                         Reset
                     </Button>
                 </Box>
-                {mutationStatus === "error" && <Alert severity="error">Create Error</Alert >}
-                {mutationStatus === "success" && <Alert severity="success">Create successful</Alert >}
+                {mutationStatus === "error" &&
+                    <AlertBar
+                        message="Create Error"
+                        severity="error"
+                        onClick={resetMutationStatus}
+                    />
+                }
+                {mutationStatus === "success" &&
+                    <AlertBar
+                        message="Create Success"
+                        severity="success"
+                        onClick={resetMutationStatus}
+                    />
+                }
             </form>
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        {JSON.stringify(subjectCreateInput, null, 2) + ","}
-                    </pre>
-                </code>
-            </Box>
+            {
+                params.get("debug") !== null && (
+                    <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                        <code>
+                            <pre>
+                                {JSON.stringify(subjectCreateInput, null, 2) + ","}
+                            </pre>
+                        </code>
+                    </Box>
+                )
+            }
         </>
     )
 }
@@ -652,6 +781,7 @@ const SubjectUpdateComponent = ({ reference }: { reference: string }) => {
     )
 }
 export {
+    SubjectViewAllComponent,
     SubjectCreateComponent,
     SubjectViewOneComponent,
     SubjectUpdateComponent

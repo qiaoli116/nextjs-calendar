@@ -67,6 +67,16 @@ export interface IDateRange {
     startDate: string;
     endDate: string;
 }
+export interface ISubjectIndex {
+    term: string;
+    department: string;
+    block: string;
+    code: string;
+}
+
+export interface ISubjectFilter {
+
+}
 
 export interface ISubject {
     tasIndex: ITASIndex

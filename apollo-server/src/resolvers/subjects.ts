@@ -31,6 +31,8 @@ async function readSubjectByOrgId(reference: string): Promise<ISubject | null> {
     return subject;
 }
 
+// async function genSubjectFilterList(): Promise
+
 async function createSubject(
     code: string,
     title: string,
@@ -74,8 +76,25 @@ async function createSubject(
 }
 const SubjectsQuery = {
     Query: {
-        subjects: async () => {
-            return await readAllSubjects()
+        subjects: async (parent, args, context, info) => {
+            const { term, department, block, code } = args;
+            console.log("subjects args", args);
+            console.log("term", term, "department", department, "block", block, "code", code);
+            const filter = {}
+            if (term !== undefined && term !== null && term !== "") {
+                filter["term"] = term;
+            }
+            if (department !== undefined && department !== null && department !== "") {
+                filter["department"] = department;
+            }
+            if (block !== undefined && block !== null && block !== "") {
+                filter["block"] = block;
+            }
+            if (code !== undefined && code !== null && code !== "") {
+                filter["code"] = code;
+            }
+            console.log("subjects filter", filter);
+            return await readAllSubjects(filter)
         },
         subject: async (parent, args, context, info) => {
             const { orgId } = args;

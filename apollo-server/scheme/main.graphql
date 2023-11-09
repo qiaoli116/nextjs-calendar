@@ -9,7 +9,7 @@ type Query {
     tasSubject(tasIndex: TASIndexInput, subjectCode: String): TAS
     sessions: [Session]
     session(reference: String): Session
-    subjects: [Subject]
+    subjects(term: String, department: String, block: String, code: String): [Subject]
     subject(reference: String): Subject
 }
 
@@ -120,6 +120,13 @@ type TAS {
     department: String!
     qualification: TASQualification
     subjects: [TASSubject]
+}
+
+type SubjectIndex {
+    term: String!
+    department: String!
+    block: String!
+    code: String!
 }
 
 type Subject {

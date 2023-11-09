@@ -72,7 +72,7 @@ const TASQuery = {
     Query: {
         tases: async (parent, args, context, info) => {
             const { year, department, qualificationCode } = args;
-            console.log("tases arg", args);
+            console.log("tases args", args);
             console.log("year", year, "department", department, "qualificationCode", qualificationCode);
             const filter = {};
             if (year !== undefined && year !== null && year !== "") {

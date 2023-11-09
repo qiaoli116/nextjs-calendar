@@ -20,6 +20,72 @@ import { ISubject, ISubjectCreateInput } from "@/types";
 import { type } from "os";
 import { gql, useQuery, useMutation, CombinedError, UseMutationExecute } from "urql";
 
+export interface IReadSubjectsQueryVariables {
+    term?: string;
+    department?: string;
+    block?: string;
+    code?: string;
+}
+export function useQuerySubjects<T = ISubject>(
+    options: {
+        queryVariables?: IReadSubjectsQueryVariables,
+        queryString?: string | null,
+    } = { queryVariables: {}, queryString: null }) {
+    const SUBJECTS_QUERY = options.queryString !== undefined && options.queryString !== null && options.queryString !== "" ?
+        gql`${options.queryString}` :
+        gql`
+        query Subjects {
+            subjects {
+                block
+                code
+                title
+                term
+                department
+                tasIndex {
+                    year
+                    department
+                    qualificationCode
+                }
+                qualification {
+                    code
+                    title
+                }
+                deliveryMode
+                dateRange {
+                    startDate
+                    endDate
+                }
+                units {
+                    code
+                    title
+                    crn
+                }
+            }
+        }
+    `;
+    const [result, executeQuery] = useQuery<{ subjects: T[] } | undefined | null>({
+        query: SUBJECTS_QUERY,
+        variables: options.queryVariables
+    });
+
+    const { data, fetching: loading, error } = result;
+    const dataError =
+        data === undefined ||
+        data === null ||
+        data.subjects === undefined ||
+        data.subjects === null ||
+        !Array.isArray(data.subjects);
+
+    return {
+        loading,
+        error,
+        dataError,
+        subjects: dataError ? [] : data.subjects,
+        reexecuteQuerySubjects: executeQuery
+    }
+
+}
+
 export interface ICreateSubjectMutationVariables extends ISubjectCreateInput {
     // tasIndex: ITASIndex;
     // code: string;
