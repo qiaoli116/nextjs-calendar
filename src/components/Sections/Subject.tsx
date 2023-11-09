@@ -18,7 +18,8 @@ import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { SessionCreateComponent } from './Session';
 import { ISession } from '../../dataService/sessions';
-import { ISubjectCreateInput, ITAS, ITASQualification, ITASSubject } from '@/types';
+import { ISubject, ISubjectCreateInput, ITAS, ITASQualification, ITASSubject } from '@/types';
+import { useCreateSubject } from '@/components/Hooks/subjects';
 
 
 const generateSubjectReference = () => {
@@ -131,7 +132,7 @@ const TASSubjectSelectComponent = ({ onSubmit }: {
     )
 }
 
-const SubjectCreateComponent = () => {
+const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subject: ISubject) => void }) => {
     console.log("SubjectCreateComponent - ")
     const emptySubjectCreateInput: ISubjectCreateInput = {
         tasIndex: {
@@ -151,24 +152,10 @@ const SubjectCreateComponent = () => {
         units: [],
     }
 
-    // const currentYear = new Date().getFullYear();
     const [subjectCreateInput, setSubjectCreateInput] = React.useState<ISubjectCreateInput>(emptySubjectCreateInput);
-    // const [initSubjectForm, setInitSubjectForm] = React.useState<IInitSusbjectForm>({
-    //     year: currentYear.toString(),
-    //     department: department === undefined ? "" : department,
-    //     qualificationCode: "",
-    //     subjectCode: "",
-    //     numberOfSessions: 0,
-    // });
-    // const handleInputChangeInitSusbject = (e: any) => {
-    //     const { name, value } = e.target;
-    //     console.log("handleInputChangeInitSusbject - ", "name", name, "value", value, typeof (value));
-    //     const obj = { ...initSubjectForm };
-    //     _.set(obj, name, value);
-    //     setInitSubjectForm(obj);
-    //     console.log("handleInputChangeInitSusbject - ", "initSubjectForm", initSubjectForm);
-    // }
-    // this is a general purpose handler for all input fields
+    const [mutationStatus, setMutationStatus] = React.useState("idle");
+    const [executeCreateSubject] = useCreateSubject();
+
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
         console.log("handleInputChange - ", "name", name, "value", value);
@@ -181,43 +168,55 @@ const SubjectCreateComponent = () => {
         console.log("resetForm called");
         setSubjectCreateInput(emptySubjectCreateInput);
     };
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
         console.log("handleSubmit", subjectCreateInput);
         console.log("handleSubmit", JSON.stringify(subjectCreateInput, null, 2));
-
+        setMutationStatus("loading");
+        const _subject: ISubject = {
+            tasIndex: {
+                year: subjectCreateInput.tasIndex.year,
+                department: subjectCreateInput.tasIndex.department,
+                qualificationCode: subjectCreateInput.tasIndex.qualificationCode,
+            },
+            code: subjectCreateInput.code,
+            title: subjectCreateInput.title,
+            term: subjectCreateInput.term,
+            department: subjectCreateInput.department,
+            block: subjectCreateInput.block,
+            qualification: {
+                code: subjectCreateInput.qualification.code,
+                title: subjectCreateInput.qualification.title,
+            },
+            deliveryMode: "",
+            dateRange: {
+                startDate: "",
+                endDate: "",
+            },
+            sessions: [],
+            units: subjectCreateInput.units.map((u) => {
+                return {
+                    code: u.code,
+                    title: u.title,
+                    crn: "",
+                }
+            })
+        };
+        const result = await executeCreateSubject(_subject);
+        console.log("handleSubmit - result", result);
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.subjectCreate == null || result.data.subjectCreate == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onCreateSuccess) {
+                    onCreateSuccess(result.data.subjectCreate);
+                }
+            }
+        }
     };
-    // const handleSubmitInitSusbject = async (e: any) => {
-    //     e.preventDefault();
-    //     const tasSubjectExtended = await TASDataService.getOneSubjectExtended(initSubjectForm.year, initSubjectForm.qualificationCode, initSubjectForm.subjectCode);
-    //     console.log("handleSubmitInitSusbject", tasSubjectExtended);
-    //     if (tasSubjectExtended) {
-    //         const s = generateInitialSubject();
-    //         s.reference = generateSubjectReference();
-    //         s.code = tasSubjectExtended.code;
-    //         s.title = tasSubjectExtended.title;
-    //         s.department = tasSubjectExtended.department;
-    //         s.qualification.code = tasSubjectExtended.qualification.code;
-    //         s.qualification.title = tasSubjectExtended.qualification.title;
-    //         tasSubjectExtended.units.forEach((u, index) => {
-    //             s.units[index] = {
-    //                 code: u.code,
-    //                 title: u.title,
-    //                 crn: ""
-    //             }
-    //         });
-    //         for (let i = 0; i < initSubjectForm.numberOfSessions; i++) {
-    //             s.sessions[i] = "";
-    //         }
-    //         setSubject(s);
-    //     }
-    // }
-
-    // if year or department changes, reset qualification and subject to empty value
-
-    // useEffect(() => {
-    //     setInitSubjectForm({ ...initSubjectForm, qualificationCode: "", subjectCode: "" })
-    // }, [initSubjectForm.year, initSubjectForm.department]);
 
     const tasSubjectSelectOnSubmit = (year: string, department: string, qualification: ITASQualification, subject: ITASSubject) => {
         console.log("TASSubjectSelectComponent - ", "year", year, "department", department, "qualification", qualification, "subject", subject);
