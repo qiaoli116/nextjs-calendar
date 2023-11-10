@@ -14,11 +14,33 @@ import _ from "lodash";
 import FormControl from '@mui/material/FormControl';
 import { useFetchOneById } from "../Hooks/crud";
 import { AlertLoading } from '../Controls/AlertBar';
+import { Alert } from '@mui/material';
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { useQuerySessions } from '../Hooks/sessions';
+import CRUDLinksComponent from '../Controls/CRUDLinks';
+import Link from '@mui/material/Link';
 
 
-const SessionViewAllComponent = ({ singleSessionPath = "" }: { singleSessionPath: string }) {
+export interface SessionViewAllComponentSingleSession {
+    sessionId: string,
+    date: string,
+    teacher: {
+        orgId: string,
+        name: {
+            first: string,
+            last: string
+        }
+    },
+    room: {
+        roomNumber: string,
+        type: string
+    },
+    timeslots: string[]
+}
+function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "", singleRoomPath = "" }:
+    { singleSessionPath: string, singleTeacherPath: string, singleRoomPath: string }) {
     console.log("SessionViewAllComponent - singleSessionPath", singleSessionPath);
-    const { loading, error, dataError, subjects, reexecuteQuerySubjects } = useQuerySubjects();
+    const { loading, error, dataError, sessions, reexecuteQuerySessions } = useQuerySessions<SessionViewAllComponentSingleSession>();
     if (loading) {
         return (
             <AlertLoading
@@ -47,11 +69,25 @@ const SessionViewAllComponent = ({ singleSessionPath = "" }: { singleSessionPath
     }
 
     const columns: GridColDef[] = [
-        { field: 'department', headerName: 'Department', flex: 1, maxWidth: 100 },
-        { field: 'term', headerName: 'Term', flex: 1, maxWidth: 80 },
-        { field: 'block', headerName: 'Block', flex: 1, maxWidth: 150 },
-        { field: 'code', headerName: 'Code', flex: 1, maxWidth: 150 },
-        { field: 'title', headerName: 'Title', flex: 1, maxWidth: 400 },
+        { field: 'date', headerName: 'Date', flex: 1, maxWidth: 100 },
+        {
+            field: 'teacher',
+            headerName: 'Teacher',
+            flex: 1,
+            maxWidth: 130,
+            renderCell: (params: GridRenderCellParams<SessionViewAllComponentSingleSession, string>) => (
+                <Link target="_blank" underline="hover" href={`${singleTeacherPath}/view/${params.row.teacher.orgId}`}>{`${params.row.teacher.name.last}, ${params.row.teacher.name.first}`}</Link>
+            )
+        },
+        {
+            field: 'room',
+            headerName: 'Room',
+            flex: 1,
+            maxWidth: 130,
+            renderCell: (params: GridRenderCellParams<SessionViewAllComponentSingleSession, string>) => (
+                <Link target="_blank" underline="hover" href={`${singleRoomPath}/view/${params.row.room.roomNumber}`}>{params.row.room.roomNumber}</Link>
+            )
+        },
         {
             field: "actions",
             headerName: "Actions",
@@ -61,7 +97,7 @@ const SessionViewAllComponent = ({ singleSessionPath = "" }: { singleSessionPath
             renderCell: (params: GridRenderCellParams<any, string>) => (
                 <>
                     <CRUDLinksComponent
-                        baseURL={singleSubjectPath}
+                        baseURL={singleSessionPath}
                         resourceId={params.row.id}
                         createLink={false}
                         hasText={false}
@@ -71,14 +107,13 @@ const SessionViewAllComponent = ({ singleSessionPath = "" }: { singleSessionPath
         }
     ];
 
-    const rows = subjects.map((subject: ISubject) => {
+    const rows = sessions.map((session: SessionViewAllComponentSingleSession) => {
         return {
-            id: `${subject.department.toLowerCase()}/${subject.term}/${subject.block.toLowerCase()}/${subject.code.toLowerCase()}`,
-            department: subject.department,
-            term: subject.term,
-            block: subject.block,
-            code: subject.code,
-            title: subject.title,
+            id: session.sessionId,
+            teacher: session.teacher,
+            room: session.room,
+            date: session.date,
+            timeSlots: session.timeslots,
         }
     });
     console.log("row", rows);
@@ -100,7 +135,7 @@ const SessionViewAllComponent = ({ singleSessionPath = "" }: { singleSessionPath
                             <>
                                 <GridToolbarContainer>
                                     <CRUDLinksComponent
-                                        baseURL={singleSubjectPath}
+                                        baseURL={singleSessionPath}
                                         createLink={true}
                                         readLink={false}
                                         updateLink={false}
@@ -499,7 +534,7 @@ const SessionViewAllComponent = ({ singleSessionPath = "" }: { singleSessionPath
 //     )
 // }
 export {
-    // SessionViewOneComponent,
+    SessionViewAllComponent,
     // SessionCreateComponent,
     // SessionUpdateComponent,
 };

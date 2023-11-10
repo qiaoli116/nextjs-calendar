@@ -108,8 +108,8 @@ export interface ISubject {
 export interface ISession {
     sessionId: string;
     date: string;
-    teacher: string | null;
-    room: string | null;
+    teacher: string;
+    room: string;
     timeslots: string[];
     subjects: string[];
 }

@@ -13,7 +13,7 @@ export function useQuerySessions<T = ISession>(
     const SESSIONS_QUERY = options.queryString !== undefined && options.queryString !== null && options.queryString !== "" ?
         gql`${options.queryString}` :
         gql`
-        query Subjects {
+        query Sessions {
             sessions {
                 sessionId
                 date
@@ -33,7 +33,7 @@ export function useQuerySessions<T = ISession>(
         }
     `;
 
-    const [result, executeQuery] = useQuery<{ sessions: ISession[] } | undefined | null>({ query: SESSIONS_QUERY });
+    const [result, executeQuery] = useQuery<{ sessions: T[] } | undefined | null>({ query: SESSIONS_QUERY });
     const { data, fetching: loading, error } = result;
     const dataError =
         data === undefined ||
@@ -46,7 +46,7 @@ export function useQuerySessions<T = ISession>(
         loading,
         error,
         dataError,
-        teachers: dataError ? [] : data.sessions,
+        sessions: dataError ? [] : data.sessions,
         reexecuteQuerySessions: executeQuery,
     };
 }
@@ -61,8 +61,8 @@ export function useQueryOneSession(orgId: string) {
             date
             teacher {
                 name {
-                first
-                last
+                    first
+                    last
                 }
                 email
                 orgId
@@ -79,42 +79,27 @@ export function useQueryOneSession(orgId: string) {
                 department
                 block
                 qualification {
-                code
-                title
-                }
-                tasIndex {
-                year
-                department
-                qualificationCode
-                }
-                deliveryMode
-                dateRange {
-                startDate
-                endDate
-                }
-                units {
-                code
-                title
-                crn
+                    code
+                    title
                 }
                 sessions {
-                sessionId
-                date
-                teacher {
-                    name {
-                    first
-                    last
+                    sessionId
+                    date
+                    teacher {
+                        name {
+                            first
+                            last
+                        }
+                        orgId
+                        email
                     }
-                    orgId
-                    email
+                    room {
+                        roomNumber
+                        type
+                    }
+                    timeslots
+                    }
                 }
-                room {
-                    roomNumber
-                    type
-                }
-                timeslots
-                }
-            }
             }
         }
     `;
