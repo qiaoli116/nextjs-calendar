@@ -1,5 +1,5 @@
-import { dbClient, dbCollections, insertOneDocument, readAllDocuments } from '../db.js'
-import { IQualification, ISession, ISubject, ITASIndex, IUnit } from './types.js';
+import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex } from '../db.js'
+import { IQualification, ISession, ISubject, ISubjectIndex, ITASIndex, IUnit } from './types.js';
 import { SessionsCRUD } from './sessions.js';
 import sessions from '../dataSource/sessions.js';
 const collectionName = dbCollections.subjects.name;
@@ -8,27 +8,8 @@ async function readAllSubjects(query: any = {}): Promise<ISubject[] | null> {
     return await readAllDocuments<ISubject>(collectionName, query);
 }
 
-async function readSubjectByOrgId(reference: string): Promise<ISubject | null> {
-    let subject = null;
-    try {
-        await dbClient.connect();
-        console.log('Connected to MongoDB');
-
-        const db = dbClient.db('appdb'); // Replace with your database name
-        const collection = db.collection('teachers'); // Replace with your collection name
-
-        const docs = await collection.find({ reference: reference }).toArray();
-        console.log('Found documents:', docs);
-        if (docs.length > 0) {
-            subject = docs[0];
-        }
-    } catch (err) {
-        console.error('Error reading data:', err);
-    } finally {
-        await dbClient.close();
-        console.log('Closed MongoDB connection');
-    }
-    return subject;
+async function readSubject(subjectIndex: ISubjectIndex): Promise<ISubject | null> {
+    return await readOneDocumentByIndex<ISubject>(collectionName, subjectIndex);
 }
 
 // async function genSubjectFilterList(): Promise
@@ -97,8 +78,14 @@ const SubjectsQuery = {
             return await readAllSubjects(filter)
         },
         subject: async (parent, args, context, info) => {
-            const { orgId } = args;
-            return await readSubjectByOrgId(orgId);
+            const { subjectIndex } = args;
+            const _subjectIndex: ISubjectIndex = {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            }
+            return await readSubject(_subjectIndex);
         }
     },
     Mutation: {
@@ -151,6 +138,7 @@ const SubjectsQuery = {
 }
 const SubjectsCRUD = {
     readAllSubjects,
-    readSubjectByOrgId
+    readSubject,
+    createSubject,
 }
 export { SubjectsQuery, SubjectsCRUD };

@@ -16,7 +16,7 @@ const filterValues = {
   }
 */
 
-import { ISubject, ISubjectCreateInput } from "@/types";
+import { ISubject, ISubjectCreateInput, ISubjectIndex } from "@/types";
 import { type } from "os";
 import { gql, useQuery, useMutation, CombinedError, UseMutationExecute } from "urql";
 
@@ -85,6 +85,60 @@ export function useQuerySubjects<T = ISubject>(
     }
 
 }
+
+export function useQueryOneSubject(subjectIndex: ISubjectIndex) {
+    console.log("useQueryOneSubject ", subjectIndex)
+    const SUBJECT_QUERY = gql`
+    query Subjects($subjectIndex: SubjectIndexInput) {
+        subject(subjectIndex: $subjectIndex) {
+          code
+          title
+          term
+          department
+          block
+          tasIndex {
+            year
+            department
+            qualificationCode
+          }
+          qualification {
+            code
+            title
+          }
+          deliveryMode
+          dateRange {
+            startDate
+            endDate
+          }
+          units {
+            code
+            title
+            crn
+          }
+        }
+      }`;
+    const [result, executeQuery] = useQuery<{ subject: ISubject } | undefined | null>({
+        query: SUBJECT_QUERY,
+        variables: {
+            subjectIndex
+        },
+    });
+    const { data, fetching: loading, error } = result;
+    const dataError =
+        data === undefined ||
+        data === null ||
+        data.subject === undefined ||
+        data.subject === null;
+
+    return {
+        loading,
+        error,
+        dataError,
+        subject: dataError ? null : data.subject,
+        reexecuteQuerySubject: executeQuery,
+    };
+}
+
 
 export interface ICreateSubjectMutationVariables extends ISubjectCreateInput {
     // tasIndex: ITASIndex;

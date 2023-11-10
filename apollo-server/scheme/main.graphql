@@ -10,7 +10,7 @@ type Query {
     sessions: [Session]
     session(reference: String): Session
     subjects(term: String, department: String, block: String, code: String): [Subject]
-    subject(reference: String): Subject
+    subject(subjectIndex: SubjectIndexInput): Subject
 }
 
 type Mutation {
@@ -120,6 +120,13 @@ type TAS {
     department: String!
     qualification: TASQualification
     subjects: [TASSubject]
+}
+
+input SubjectIndexInput {
+    term: String!
+    department: String!
+    block: String!
+    code: String!
 }
 
 type SubjectIndex {

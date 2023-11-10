@@ -19,14 +19,16 @@ import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { SessionCreateComponent } from './Session';
 import { ISession } from '../../dataService/sessions';
-import { ISubject, ISubjectCreateInput, ITAS, ITASQualification, ITASSubject } from '@/types';
-import { useCreateSubject, useQuerySubjects } from '@/components/Hooks/subjects';
+import { ISubject, ISubjectCreateInput, ISubjectIndex, ITAS, ITASQualification, ITASSubject } from '@/types';
+import { useCreateSubject, useQueryOneSubject, useQuerySubjects } from '@/components/Hooks/subjects';
 import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { useSearchParams } from "next/navigation";
 import { Message } from '@mui/icons-material';
 import CRUDLinksComponent from '../Controls/CRUDLinks';
 
-
+const boxSx = {
+    py: "8px"
+}
 function SubjectViewAllComponent({ singleSubjectPath = "" }: { singleSubjectPath: string }) {
     console.log("SubjectViewAllComponent - singleSubjectPath", singleSubjectPath);
     const { loading, error, dataError, subjects, reexecuteQuerySubjects } = useQuerySubjects();
@@ -137,11 +139,167 @@ function SubjectViewAllComponent({ singleSubjectPath = "" }: { singleSubjectPath
     )
 }
 
+function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex }) {
+    console.log("SubjectViewOneComponent");
+    const { term, department, block, code } = subjectIndex;
+    const { loading, error, dataError, subject, reexecuteQuerySubject } = useQueryOneSubject(subjectIndex);
+
+    if (loading) {
+        return (
+            <>
+                <AlertLoading
+                    message={`Loading subject ${department} ${term} ${block} ${code}`}
+                />
+            </>
+
+        )
+    };
+    if (error) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load subject <strong>{department} {term} {block} {code}</strong>
+                    <br />
+                    Error Message: {error.message}
+                </Alert>
+            </>
+        )
+    }
+    if (dataError || subject === null) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load subject <strong>{department} {term} {block} {code}</strong>
+                </Alert>
+            </>
+        )
+    }
 
 
-const boxSx = {
-    py: "8px"
+    return (
+        <>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "800px" }}>
+                    <TextField
+                        fullWidth
+                        label="Subject (read only)"
+                        defaultValue={`${subject.code}: ${subject.title}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "800px" }}>
+                    <TextField
+                        fullWidth
+                        label="Qualification (read only)"
+                        defaultValue={`${subject.qualification.code}: ${subject.qualification.title}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Department (read only)"
+                        defaultValue={`${subject.department}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Term (read only)"
+                        defaultValue={`${subject.term}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Block (read only)"
+                        defaultValue={`${subject.block}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Mode (read only)"
+                        defaultValue={`${subject.deliveryMode}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Start (read only)"
+                        defaultValue={`${subject.dateRange.startDate}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Start (read only)"
+                        defaultValue={`${subject.dateRange.endDate}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            {subject.units.map((unit, index) => {
+                return (
+                    <Box sx={boxSx}>
+                        <FormControl sx={{ width: "600px", pr: "10px" }}>
+                            <TextField
+                                required
+                                fullWidth
+                                label={`Unit ${(index + 1)} (Read only)`}
+                                defaultValue={unit.code + " - " + unit.title}
+                                InputProps={{
+                                    readOnly: true,
+                                }}
+                            />
+                        </FormControl>
+                        <FormControl sx={{ width: "200px" }}>
+                            <TextField
+                                required
+                                fullWidth
+                                label={`CRN (Read only)`}
+                                defaultValue={unit.crn}
+                                InputProps={{
+                                    readOnly: true,
+                                }}
+                            />
+                        </FormControl>
+                    </Box>
+                )
+            })}
+        </>
+    )
 }
+
+
+
 interface IInitSusbjectForm {
     year: string,
     department: string,
@@ -365,7 +523,7 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
             />
             <form onSubmit={handleSubmit}>
                 <Box sx={boxSx}>
-                    <FormControl sx={{ minWidth: "800px" }}>
+                    <FormControl sx={{ width: "800px" }}>
                         <TextField
                             required
                             fullWidth
@@ -389,7 +547,7 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                 </Box>
 
                 <Box sx={boxSx}>
-                    <FormControl sx={{ minWidth: "270px", pr: "10px" }}>
+                    <FormControl sx={{ width: "270px", pr: "10px" }}>
                         <TextField
                             required
                             fullWidth
@@ -401,7 +559,7 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                         />
                     </FormControl>
 
-                    <FormControl sx={{ minWidth: "270px", pr: "10px" }}>
+                    <FormControl sx={{ width: "270px", pr: "10px" }}>
                         <TextField
                             required
                             fullWidth
@@ -411,7 +569,7 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                             onChange={handleInputChange}
                         />
                     </FormControl>
-                    <FormControl sx={{ minWidth: "270px", pr: "10px" }}>
+                    <FormControl sx={{ width: "270px", pr: "10px" }}>
                         <TextField
                             required
                             fullWidth
@@ -426,7 +584,7 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                     return (
                         <Box sx={boxSx}>
 
-                            <FormControl sx={{ minWidth: "800px" }}>
+                            <FormControl sx={{ width: "800px" }}>
                                 <TextField
                                     required
                                     fullWidth
@@ -474,44 +632,6 @@ const SubjectCreateComponent = ({ onCreateSuccess }: { onCreateSuccess?: (subjec
                     </Box>
                 )
             }
-        </>
-    )
-}
-
-const SubjectViewOneComponent = ({ reference }: { reference: string }) => {
-    // rename "item" to "subject"
-    const { item: subject, loading, error, refresh } = useFetchOneById<ISubject | undefined>(reference, SubjectsDataService.getOneSubjectByReference);
-    if (loading) {
-        return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <CircularProgress color="inherit" size={20} /> Loading... {reference}
-            </Box>
-        )
-    }
-
-    if (error) {
-        return (
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <code>
-                    <pre>
-                        {`Error: Subject ${reference} not found`}
-                    </pre>
-                </code>
-            </Box>
-        )
-    }
-    return (
-        <>
-            <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-                <Button onClick={refresh}>
-                    refresh
-                </Button>
-                <code>
-                    <pre>
-                        {JSON.stringify(subject, null, 2) + ","}
-                    </pre>
-                </code>
-            </Box>
         </>
     )
 }

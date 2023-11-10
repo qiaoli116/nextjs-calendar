@@ -71,6 +71,12 @@ export interface ISubjectUnit extends IUnit {
     crn: string;
 }
 
+export interface ISubjectIndex {
+    term: string;
+    department: string;
+    block: string;
+    code: string;
+}
 export interface ISubjectCreateInput {
     tasIndex: ITASIndex;
     code: string;

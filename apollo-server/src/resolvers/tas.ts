@@ -88,7 +88,7 @@ const TASQuery = {
             return await readAllTAS(filter);
         },
         tas: async (parent, args, context, info) => {
-            const { tasIndex, subjects } = args;
+            const { tasIndex } = args;
             const _tasIndex: ITASDBIndex = {
                 year: tasIndex.year,
                 department: tasIndex.department,

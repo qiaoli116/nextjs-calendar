@@ -6,9 +6,9 @@ import React from 'react';
 export default function SubjectsViewAll() {
     return (
         <>
-            <h2>View all TAS</h2>
+            <h2>View all Subjects</h2>
             <SubjectViewAllComponent
-                singleSubjectPath="/subject"
+                singleSubjectPath="/subjects"
             />
         </>
     )

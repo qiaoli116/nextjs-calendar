@@ -51,11 +51,11 @@ const SessionsQuery = {
                 const { room } = parent;
                 return await RoomsCRUD.readRoomByRoomNumber(room);
             },
-            subjects: async (parent, args, context, info) => {
-                console.log("Session subject", parent);
-                const { subject } = parent;
-                return await SubjectsCRUD.readSubjectByOrgId(subject);
-            }
+            // subjects: async (parent, args, context, info) => {
+            //     console.log("Session subject", parent);
+            //     const { subject } = parent;
+            //     return await SubjectsCRUD.readSubjectByOrgId(subject);
+            // }
         }
     }
 
