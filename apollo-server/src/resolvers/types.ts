@@ -92,12 +92,12 @@ export interface ISubject {
     sessions: string[];
 }
 export interface ISession {
-    reference: string;
+    sessionId: string;
     date: string;
-    teacher: string | null;
-    room: string | null;
+    teacher: string;
+    room: string;
     timeslots: string[];
-    subjects: string[];
+    subjects: ISubjectIndex[];
 }
 
 export const refPrefix = {

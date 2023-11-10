@@ -151,12 +151,12 @@ type Subject {
 }
 
 type Session {
-    reference: String!
+    sessionId: String!
     date: String!
     teacher: Teacher
     room: Room
-    timeslots: [String]!
-    subjects: [Subject]!
+    timeslots: [String!]!
+    subjects: [Subject!]!
 }
 
 

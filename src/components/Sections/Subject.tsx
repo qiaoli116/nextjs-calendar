@@ -182,7 +182,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "800px" }}>
                     <TextField
                         fullWidth
-                        label="Subject (read only)"
+                        label="Subject"
                         defaultValue={`${subject.code}: ${subject.title}`}
                         InputProps={{
                             readOnly: true,
@@ -194,7 +194,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "800px" }}>
                     <TextField
                         fullWidth
-                        label="Qualification (read only)"
+                        label="Qualification"
                         defaultValue={`${subject.qualification.code}: ${subject.qualification.title}`}
                         InputProps={{
                             readOnly: true,
@@ -206,7 +206,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
                     <TextField
                         fullWidth
-                        label="Department (read only)"
+                        label="Department"
                         defaultValue={`${subject.department}`}
                         InputProps={{
                             readOnly: true,
@@ -216,7 +216,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
                     <TextField
                         fullWidth
-                        label="Term (read only)"
+                        label="Term"
                         defaultValue={`${subject.term}`}
                         InputProps={{
                             readOnly: true,
@@ -226,7 +226,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
                     <TextField
                         fullWidth
-                        label="Block (read only)"
+                        label="Block"
                         defaultValue={`${subject.block}`}
                         InputProps={{
                             readOnly: true,
@@ -238,7 +238,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
                     <TextField
                         fullWidth
-                        label="Mode (read only)"
+                        label="Mode"
                         defaultValue={`${subject.deliveryMode}`}
                         InputProps={{
                             readOnly: true,
@@ -248,7 +248,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
                     <TextField
                         fullWidth
-                        label="Start (read only)"
+                        label="Start"
                         defaultValue={`${subject.dateRange.startDate}`}
                         InputProps={{
                             readOnly: true,
@@ -258,7 +258,7 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
                     <TextField
                         fullWidth
-                        label="Start (read only)"
+                        label="Start"
                         defaultValue={`${subject.dateRange.endDate}`}
                         InputProps={{
                             readOnly: true,
@@ -269,22 +269,20 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
             {subject.units.map((unit, index) => {
                 return (
                     <Box sx={boxSx}>
-                        <FormControl sx={{ width: "600px", pr: "10px" }}>
+                        <FormControl sx={{ width: "670px", pr: "10px" }}>
                             <TextField
-                                required
                                 fullWidth
-                                label={`Unit ${(index + 1)} (Read only)`}
+                                label={`Unit ${(index + 1)}`}
                                 defaultValue={unit.code + " - " + unit.title}
                                 InputProps={{
                                     readOnly: true,
                                 }}
                             />
                         </FormControl>
-                        <FormControl sx={{ width: "200px" }}>
+                        <FormControl sx={{ width: "130px" }}>
                             <TextField
-                                required
                                 fullWidth
-                                label={`CRN (Read only)`}
+                                label={`CRN`}
                                 defaultValue={unit.crn}
                                 InputProps={{
                                     readOnly: true,

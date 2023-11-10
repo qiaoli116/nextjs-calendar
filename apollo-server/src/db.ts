@@ -29,7 +29,7 @@ const dbCollections = {
     },
     sessions: {
         name: 'sessions',
-        index: { reference: 1 },
+        index: { sessionId: 1 },
     },
     subjects: {
         name: 'subjects',

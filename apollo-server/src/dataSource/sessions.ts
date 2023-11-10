@@ -1,13 +1,11 @@
 // session id is an uuid
 const sessions: any = [
     {
-        "reference": "Session.a9456e08-d901-4be0-b636-dc29c9fb2ea7",
+        "sessionId": "SESSION.a9456e08-d901-4be0-b636-dc29c9fb2ea7",
         "date": "2023-09-18",
         "teacher": "100613352",
         "room": "B1.2.5",
-        "subjects": [
-            "Subject.6f59b7dd-ab17-4902-8405-8939d177d147"
-        ],
+        "subjects": [],
         "timeslots": [
             "09:00-09:30",
             "09:30-10:00",
@@ -24,13 +22,11 @@ const sessions: any = [
         ]
     },
     {
-        "reference": "Session.a9456e08-d901-4be0-b636-dc29c9fb2ea8",
+        "sessionId": "SESSION.a9456e08-d901-4be0-b636-dc29c9fb2ea8",
         "date": "2023-09-25",
         "teacher": "100613352",
         "room": "B1.2.5",
-        "subjects": [
-            "Subject.6f59b7dd-ab17-4902-8405-8939d177d148"
-        ],
+        "subjects": [],
         "timeslots": [
             "09:00-09:30",
             "09:30-10:00",

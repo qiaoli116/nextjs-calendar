@@ -105,5 +105,13 @@ export interface ISubject {
     sessions: string[];
 
 }
+export interface ISession {
+    sessionId: string;
+    date: string;
+    teacher: string | null;
+    room: string | null;
+    timeslots: string[];
+    subjects: string[];
+}
 
 export type MutationStatus = "idle" | "loading" | "success" | "error";
