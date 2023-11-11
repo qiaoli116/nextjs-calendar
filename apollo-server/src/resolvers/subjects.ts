@@ -9,6 +9,7 @@ async function readAllSubjects(query: any = {}): Promise<ISubject[] | null> {
 }
 
 async function readSubject(subjectIndex: ISubjectIndex): Promise<ISubject | null> {
+    console.log("readSubject", subjectIndex)
     return await readOneDocumentByIndex<ISubject>(collectionName, subjectIndex);
 }
 

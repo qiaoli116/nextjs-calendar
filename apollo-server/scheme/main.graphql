@@ -8,7 +8,7 @@ type Query {
     tas(tasIndex: TASIndexInput): TAS
     tasSubject(tasIndex: TASIndexInput, subjectCode: String): TAS
     sessions: [Session]
-    session(reference: String): Session
+    session(sessionId: String): Session
     subjects(term: String, department: String, block: String, code: String): [Subject]
     subject(subjectIndex: SubjectIndexInput): Subject
 }
@@ -25,6 +25,7 @@ type Mutation {
     tasDeleteSubjects(tasIndex: TASIndexInput, subjectCodes: [String]): TAS
     tasDelete(tasIndex: TASIndexInput): Boolean
     subjectCreate(code: String, title: String, term: String, department: String, block: String, qualification: QualificationInput, tasIndex: TASIndexInput, units: [TASUnitInput]): Subject
+    sessionCreate(date:String, teacherOrgId: String, roomNumber: String, timeslots: [String], subjectIndex: SubjectIndexInput): Session
 }
 
 type Room{
@@ -153,8 +154,8 @@ type Subject {
 type Session {
     sessionId: String!
     date: String!
-    teacher: Teacher
-    room: Room
+    teacher: Teacher!
+    room: Room!
     timeslots: [String!]!
     subjects: [Subject!]!
 }
