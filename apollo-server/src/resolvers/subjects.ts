@@ -123,7 +123,7 @@ const SubjectsQuery = {
                     return [] as ISession[];
                 }
                 const query = {
-                    "reference": {
+                    "sessionId": {
                         "$in": sessions
                     }
                 }

@@ -25,7 +25,7 @@ type Mutation {
     tasDeleteSubjects(tasIndex: TASIndexInput, subjectCodes: [String]): TAS
     tasDelete(tasIndex: TASIndexInput): Boolean
     subjectCreate(code: String, title: String, term: String, department: String, block: String, qualification: QualificationInput, tasIndex: TASIndexInput, units: [TASUnitInput]): Subject
-    sessionCreate(date:String, teacherOrgId: String, roomNumber: String, timeslots: [String], subjectIndex: SubjectIndexInput): Session
+    sessionCreate(date:String, teacherOrgId: String, roomNumber: String, timeslots: [String], subjectIndexes: [SubjectIndexInput]): Session
 }
 
 type Room{

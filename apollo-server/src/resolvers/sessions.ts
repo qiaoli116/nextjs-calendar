@@ -30,18 +30,26 @@ const SessionsQuery = {
     Mutation: {
         sessionCreate: async (parent, args, context, info) => {
             console.log("addSession", args);
-            const subjectIndex: ISubjectIndex = {
-                term: args.subjectIndex.term,
-                department: args.subjectIndex.department,
-                block: args.subjectIndex.block,
-                code: args.subjectIndex.code
+            const { subjectIndexes } = args;
+            const _subjectIndexes: ISubjectIndex[] = [];
+            if (Array.isArray(subjectIndexes)) {
+                subjectIndexes.forEach((subjectIndex) => {
+                    const _subjectIndex: ISubjectIndex = {
+                        term: subjectIndex.term,
+                        department: subjectIndex.department,
+                        block: subjectIndex.block,
+                        code: subjectIndex.code,
+                    }
+                    _subjectIndexes.push(_subjectIndex);
+                })
             }
+
             const session: ISession = {
                 sessionId: genSessionRef(),
                 date: args.date,
                 teacher: args.teacherOrgId,
                 room: args.roomNumber,
-                subjects: [subjectIndex],
+                subjects: _subjectIndexes,
                 timeslots: args.timeslots
             };
             return await createSession(session);

@@ -1,5 +1,7 @@
-import { ISession } from "@/types";
+import { ISession, ISessionExtended } from "@/types";
 import { gql, useQuery } from "urql";
+
+
 
 
 export interface IReadSessionsQueryVariables {
@@ -52,11 +54,11 @@ export function useQuerySessions<T = ISession>(
 }
 
 
-export function useQueryOneSession(orgId: string) {
-    console.log("useQueryOneSession ", orgId)
+export function useQueryOneSession(sessionId: string) {
+    console.log("useQueryOneSession ", sessionId)
     const SESSION_QUERY = gql`
-        query SESSION($reference: String) {
-            session(reference: $reference) {
+        query SESSION($sessionId: String) {
+            session(sessionId: $sessionId) {
             sessionId
             date
             teacher {
@@ -104,9 +106,9 @@ export function useQueryOneSession(orgId: string) {
         }
     `;
 
-    const [result, executeQuery] = useQuery<{ session: ISession } | undefined | null>({
+    const [result, executeQuery] = useQuery<{ session: ISessionExtended } | undefined | null>({
         query: SESSION_QUERY,
-        variables: { orgId },
+        variables: { sessionId },
     });
     const { data, fetching: loading, error } = result;
     const dataError =
@@ -123,3 +125,101 @@ export function useQueryOneSession(orgId: string) {
         reexecuteQuerySession: executeQuery,
     };
 }
+
+
+
+const session_create_query_string_extended = `
+mutation SessionCreate($date: String, $teacherOrgId: String, $roomNumber: String, $timeslots: [String], $subjectIndexes: [SubjectIndexInput]) {
+    sessionCreate(date: $date, teacherOrgId: $teacherOrgId, roomNumber: $roomNumber, timeslots: $timeslots, subjectIndexes: $subjectIndexes) {
+      sessionId
+      date
+      teacher {
+        orgId
+        email
+        name {
+          first
+          last
+        }
+      }
+      room {
+        roomNumber
+        type
+      }
+      timeslots
+      subjects {
+        code
+        title
+        term
+        department
+        block
+        tasIndex {
+          year
+          department
+          qualificationCode
+        }
+        qualification {
+          code
+          title
+        }
+        deliveryMode
+        dateRange {
+          startDate
+          endDate
+        }
+        units {
+          code
+          title
+          crn
+        }
+        sessions {
+          sessionId
+          date
+          teacher {
+            orgId
+            email
+            name {
+              first
+              last
+            }
+          }
+          room {
+            roomNumber
+            type
+          }
+          timeslots
+        }
+      }
+    }
+  }
+`;
+// export interface ICreateTeacherMutationVariables extends ISession {
+//     // sessionId: string;
+//     // date: string;
+//     // teacher: string;
+//     // room: string;
+//     // timeslots: string[];
+//     // subjects: string[];
+// }
+// type CreateTeacherMutationData = { teacherCreate: ITeacher } | undefined | null;
+// // executeMutation({ orgId, userName, email, firstName, lastName })
+// export function useCreateTeacher(): [UseMutationExecute<CreateTeacherMutationData, ICreateTeacherMutationVariables>] {
+//     const TEACHER_CREATE_MUTATION = gql`
+//       mutation Mutation($orgId: String, $userName: String, $email: String, $name: NameInput) {
+//         teacherCreate(orgId: $orgId, userName: $userName, email: $email, name: $name) {
+//           email
+//           name {
+//             first
+//             last
+//           }
+//           orgId
+//           userName
+//         }
+//       }
+//     `;
+
+//     const [result, executeMutation] = useMutation<CreateTeacherMutationData, ICreateTeacherMutationVariables>(TEACHER_CREATE_MUTATION);
+
+//     return [
+//         executeMutation
+//     ];
+// }

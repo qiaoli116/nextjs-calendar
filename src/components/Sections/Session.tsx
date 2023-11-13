@@ -16,10 +16,15 @@ import { useFetchOneById } from "../Hooks/crud";
 import { AlertLoading } from '../Controls/AlertBar';
 import { Alert } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import { useQuerySessions } from '../Hooks/sessions';
+import { useQueryOneSession, useQuerySessions } from '../Hooks/sessions';
 import CRUDLinksComponent from '../Controls/CRUDLinks';
 import Link from '@mui/material/Link';
+import { useSearchParams } from "next/navigation";
 
+
+const boxSx = {
+    py: "8px"
+}
 
 export interface SessionViewAllComponentSingleSession {
     sessionId: string,
@@ -44,7 +49,7 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
     if (loading) {
         return (
             <AlertLoading
-                message="Loading Subjects"
+                message="Loading Sessions"
             />
         )
     }
@@ -52,7 +57,7 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
     if (error) {
         return (
             <Alert severity="error">
-                Failed to load TAS list
+                Failed to load Session list
                 <br />
                 Error Message: {error.message}
             </Alert>
@@ -62,13 +67,22 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
     if (dataError) {
         return (
             <Alert severity="error">
-                Failed to load TAS list
+                Failed to load Session list
             </Alert>
         )
 
     }
 
     const columns: GridColDef[] = [
+        {
+            field: 'id',
+            headerName: 'ID (last 8 chars)',
+            flex: 1,
+            maxWidth: 130,
+            renderCell: (params: GridRenderCellParams<SessionViewAllComponentSingleSession, string>) => (
+                <Link target="_blank" underline="hover" href={`${singleSessionPath}/view/${params.row.sessionId.toLowerCase()}`}>{`${params.row.sessionId.slice(-8)}`}</Link>
+            )
+        },
         { field: 'date', headerName: 'Date', flex: 1, maxWidth: 100 },
         {
             field: 'teacher',
@@ -109,7 +123,8 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
 
     const rows = sessions.map((session: SessionViewAllComponentSingleSession) => {
         return {
-            id: session.sessionId,
+            id: session.sessionId.toLowerCase(),
+            sessionId: session.sessionId,
             teacher: session.teacher,
             room: session.room,
             date: session.date,
@@ -161,6 +176,68 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
     )
 }
 
+const SessionViewOneComponent = ({ sessionId }: { sessionId: string }) => {
+    console.log("SessionViewOneComponent");
+    const { loading, error, dataError, session, reexecuteQuerySession } = useQueryOneSession(sessionId);
+    const params = useSearchParams();
+    if (loading) {
+        return (
+            <>
+                <AlertLoading
+                    message={`Loading subject ${sessionId}`}
+                />
+            </>
+        )
+    };
+    if (error) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load session <strong>{sessionId}</strong>
+                    <br />
+                    Error Message: {error.message}
+                </Alert>
+            </>
+        )
+    }
+    if (dataError || session === null) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load session <strong>{sessionId}</strong>
+                </Alert>
+            </>
+        )
+    }
+
+    return (
+        <>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "800px" }}>
+                    <TextField
+                        fullWidth
+                        label="Session ID"
+                        defaultValue={`${session.sessionId}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            {params.get("debug") !== null && (
+                <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                    <code>
+                        <pre>
+                            {JSON.stringify(session, null, 2) + ","}
+                        </pre>
+                    </code>
+                </Box>
+            )}
+        </>
+    )
+}
+
+
 // const generateSessionReference = () => {
 //     return "Session." + uuidv4();
 // }
@@ -189,65 +266,6 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
 //     py: "8px"
 // }
 
-// const SessionViewOneComponent = ({ reference }: { reference: string }) => {
-//     const [session, setSession] = React.useState<ISession | null>(null);
-//     const [loading, setLoading] = React.useState<boolean>(true);
-//     const [error, setError] = React.useState<boolean>(false);
-//     const fetchData = async () => {
-//         console.log("SessionViewOneComponent useEffect", session, loading, error);
-//         const s = await SessionsDataService.getOneSessionByReference(reference);
-//         if (s !== undefined) {
-//             console.log("SessionViewOneComponent useEffect session fetched", s);
-//             setSession({ ...s });
-//         } else {
-//             setError(true);
-//         }
-//         setLoading(false);
-//     };
-
-//     const refresh = () => {
-//         setSession(null);
-//         setLoading(true);
-//         setError(false);
-//     }
-
-//     React.useEffect(() => {
-//         fetchData();
-//     }, [loading, error]);
-//     if (loading) {
-//         return (
-//             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-//                 <CircularProgress color="inherit" size={20} /> Loading... {reference}
-//             </Box>
-//         )
-//     }
-
-//     if (error) {
-//         return (
-//             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-//                 <code>
-//                     <pre>
-//                         {`Error: Session ${reference} not found`}
-//                     </pre>
-//                 </code>
-//             </Box>
-//         )
-//     }
-//     return (
-//         <>
-//             <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-//                 <Button onClick={refresh}>
-//                     refresh
-//                 </Button>
-//                 <code>
-//                     <pre>
-//                         {JSON.stringify(session, null, 2) + ","}
-//                     </pre>
-//                 </code>
-//             </Box>
-//         </>
-//     )
-// }
 
 // const SessionCreateComponent = ({ date, teacher, room, subject, createResultCallback }: {
 //     date?: string,
@@ -535,6 +553,7 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
 // }
 export {
     SessionViewAllComponent,
+    SessionViewOneComponent,
     // SessionCreateComponent,
     // SessionUpdateComponent,
 };

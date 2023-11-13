@@ -17,7 +17,6 @@ import SubjectsDataService from '../../dataService/subjects';
 import { CircularProgress } from '@mui/material';
 import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
-import { SessionCreateComponent } from './Session';
 import { ISession } from '../../dataService/sessions';
 import { ISubject, ISubjectCreateInput, ISubjectIndex, ITAS, ITASQualification, ITASSubject } from '@/types';
 import { useCreateSubject, useQueryOneSubject, useQuerySubjects } from '@/components/Hooks/subjects';

@@ -113,5 +113,59 @@ export interface ISession {
     timeslots: string[];
     subjects: string[];
 }
+export interface ISessionExtended {
+    sessionId: string;
+    date: string;
+    teacher: {
+        orgId: string;
+        email: string;
+        name: {
+            first: string;
+            last: string;
+        };
+    };
+    room: string;
+    timeslots: string[];
+    subjects: {
+        term: string;
+        department: string;
+        block: string;
+        code: string;
+        title: string;
+        qualification: IQualification;
+        deliveryMode: string;
+        tasIndex: {
+            year: string;
+            department: string;
+            qualificationCode: string;
+        };
+        units: {
+            code: string;
+            title: string;
+            crn: string;
+        }[];
+        dateRange: {
+            startDate: string;
+            endDate: string;
+        };
+        sessions: {
+            sessionId: string;
+            date: string;
+            teacher: {
+                orgId: string;
+                email: string;
+                name: {
+                    first: string;
+                    last: string;
+                };
+            };
+            room: {
+                roomNumber: string;
+                type: string;
+            };
+            timeslots: string[];
+        }[];
+    }[];
+}
 
 export type MutationStatus = "idle" | "loading" | "success" | "error";
