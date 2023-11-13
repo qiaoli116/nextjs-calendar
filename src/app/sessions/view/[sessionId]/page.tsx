@@ -32,6 +32,8 @@ export default function SessionsViewOnePage({ params }: { params: { sessionId: s
 
             <SessionViewOneComponent
                 sessionId={sessionId}
+                singleSessionPath='/sessions'
+                singleSubjectPath='/subjects'
             />
 
 

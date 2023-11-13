@@ -14,12 +14,16 @@ import _ from "lodash";
 import FormControl from '@mui/material/FormControl';
 import { useFetchOneById } from "../Hooks/crud";
 import { AlertLoading } from '../Controls/AlertBar';
-import { Alert } from '@mui/material';
+import { Alert, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { useQueryOneSession, useQuerySessions } from '../Hooks/sessions';
 import CRUDLinksComponent from '../Controls/CRUDLinks';
 import Link from '@mui/material/Link';
 import { useSearchParams } from "next/navigation";
+import { DateField } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 
 const boxSx = {
@@ -176,7 +180,7 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
     )
 }
 
-const SessionViewOneComponent = ({ sessionId }: { sessionId: string }) => {
+const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPath }: { sessionId: string, singleSubjectPath: string, singleSessionPath: string }) => {
     console.log("SessionViewOneComponent");
     const { loading, error, dataError, session, reexecuteQuerySession } = useQueryOneSession(sessionId);
     const params = useSearchParams();
@@ -224,6 +228,97 @@ const SessionViewOneComponent = ({ sessionId }: { sessionId: string }) => {
                     />
                 </FormControl>
             </Box>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "150px", pr: "10px" }}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DateField
+                            fullWidth
+                            label="Date"
+                            defaultValue={dayjs(session.date)}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                    </LocalizationProvider>
+                </FormControl>
+                <FormControl sx={{ width: "250px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Room"
+                        defaultValue={`${session.room.roomNumber} (${session.room.type})`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+                <FormControl sx={{ width: "410px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Teacher"
+                        defaultValue={`${session.teacher.name.last}, ${session.teacher.name.first} (${session.teacher.orgId})`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            <Typography sx={{ fontSize: "16px", fontWeight: "600", mt: "10px" }}>
+                {session.subjects.length} {session.subjects.length > 1 ? "subjects" : "subject"}  associated to this session
+            </Typography>
+            {session.subjects.map((subject, index) => {
+                return (
+                    <Box sx={boxSx}>
+                        <Card sx={{ width: 850 }} variant="outlined">
+                            <CardContent>
+
+                                <Typography display="inline" sx={{ mr: "10px" }} >
+                                    <strong>
+                                        <Link target="_blank" href={`${singleSubjectPath}/${subject.department}/${subject.term}/${subject.block}/${subject.code}`}>{subject.code} - {subject.title}</Link>
+                                    </strong>
+                                </Typography>
+                                <Typography display="inline" sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                    {subject.term} • {subject.block} • {subject.sessions.length} {subject.sessions.length > 1 ? "Sessions" : "Session"}
+                                </Typography>
+
+                            </CardContent>
+                            <CardActions>
+                                <Grid container rowSpacing={1} columnSpacing={1}>
+
+                                    {subject.sessions.map((session, sessionIndex) => {
+                                        return (
+                                            <>
+                                                <Grid xs={3}>
+                                                    <Card sx={{ width: 200 }} variant="outlined">
+                                                        <CardContent sx={{ pb: "14px !important" }}>
+                                                            <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
+                                                            </Typography>
+                                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                {dayjs(session.date).format('DD/MM/YYYY')}
+                                                            </Typography>
+                                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                {session.teacher.name.last}, {session.teacher.name.first}
+                                                            </Typography>
+                                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                                {session.room.roomNumber} ({session.room.type})
+                                                            </Typography>
+                                                        </CardContent>
+                                                    </Card>
+                                                </Grid>
+                                            </>
+                                        )
+                                    })}
+
+
+                                </Grid>
+
+
+                            </CardActions>
+                        </Card>
+                    </Box>
+                )
+            })}
+
             {params.get("debug") !== null && (
                 <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
                     <code>

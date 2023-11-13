@@ -242,7 +242,6 @@ function TASViewOneComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                                                     <span>{`${index + 1}. ${subject.code}: ${subject.title}`}</span>
                                                 </Box>
                                                 <Box className="m-unit">
-
                                                     {subject.units.map((unit: ITASUnit, index: number) => {
                                                         return (
                                                             <>
@@ -258,7 +257,6 @@ function TASViewOneComponent({ tasIndex }: { tasIndex: ITASIndex }) {
                                             </Box>
                                         </AccordionSummary>
                                         <AccordionDetails>
-
                                             {subject.units.map((unit: ITASUnit, index: number) => {
                                                 return (
                                                     <div><Link underline="hover" target="_blank" href={`https://training.gov.au/training/details/${unit.code}`}>{`${unit.code}: ${unit.title}`}</Link></div>

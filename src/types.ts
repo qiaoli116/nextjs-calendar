@@ -124,7 +124,10 @@ export interface ISessionExtended {
             last: string;
         };
     };
-    room: string;
+    room: {
+        roomNumber: string;
+        type: string;
+    };
     timeslots: string[];
     subjects: {
         term: string;
