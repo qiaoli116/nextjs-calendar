@@ -24,6 +24,7 @@ import { DateField } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimeSlotsDisplayHorizontal } from '../Controls/TimeSlotsDisplay';
 
 
 const boxSx = {
@@ -262,24 +263,32 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                     />
                 </FormControl>
             </Box>
+            <Box sx={boxSx}>
+                <TimeSlotsDisplayHorizontal
+                    timeslots={session.timeslots}
+                />
+            </Box>
             <Typography sx={{ fontSize: "16px", fontWeight: "600", mt: "10px" }}>
-                {session.subjects.length} {session.subjects.length > 1 ? "subjects" : "subject"}  associated to this session
+                {session.subjects.length == 0 && "No subject associates with this session"}
+                {session.subjects.length == 1 && "1 subject associates with this session"}
+                {session.subjects.length > 1 && `${session.subjects.length} subjects associate with this session`}
             </Typography>
             {session.subjects.map((subject, index) => {
                 return (
                     <Box sx={boxSx}>
                         <Card sx={{ width: 850 }} variant="outlined">
                             <CardContent>
-
                                 <Typography display="inline" sx={{ mr: "10px" }} >
                                     <strong>
                                         <Link target="_blank" href={`${singleSubjectPath}/${subject.department}/${subject.term}/${subject.block}/${subject.code}`}>{subject.code} - {subject.title}</Link>
                                     </strong>
                                 </Typography>
                                 <Typography display="inline" sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    {subject.term} • {subject.block} • {subject.sessions.length} {subject.sessions.length > 1 ? "Sessions" : "Session"}
+                                    {subject.term}&nbsp;•&nbsp;{subject.block}&nbsp;•&nbsp;
+                                    {subject.sessions.length === 0 && "No session"}
+                                    {subject.sessions.length === 1 && "1 session"}
+                                    {subject.sessions.length > 1 && `${subject.sessions.length} sessions`}
                                 </Typography>
-
                             </CardContent>
                             <CardActions>
                                 <Grid container rowSpacing={1} columnSpacing={1}>
