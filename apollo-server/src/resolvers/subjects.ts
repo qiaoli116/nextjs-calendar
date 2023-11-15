@@ -1,4 +1,4 @@
-import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex } from '../db.js'
+import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex, udpateOneDocument } from '../db.js'
 import { IQualification, ISession, ISubject, ISubjectIndex, ITASIndex, IUnit } from './types.js';
 import { SessionsCRUD } from './sessions.js';
 import sessions from '../dataSource/sessions.js';
@@ -56,6 +56,15 @@ async function createSubject(
     };
     return insertOneDocument<ISubject>(collectionName, subjectInit);
 }
+async function updateSubjectDateRange(subjectIndex: ISubjectIndex, startDate: string, endDate: string): Promise<ISubject | null> {
+    const updateObj = {
+        "$set": {
+            "dateRange.startDate": startDate,
+            "dateRange.endDate": endDate,
+        }
+    }
+    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+}
 const SubjectsQuery = {
     Query: {
         subjects: async (parent, args, context, info) => {
@@ -109,6 +118,28 @@ const SubjectsQuery = {
                 }
             });
             return await createSubject(code, title, term, department, block, _qualification, _tasIndex, _units);
+        },
+        subjectUpdateDateRange: async (parent, args, context, info) => {
+            console.log("subjectUpdateDateRange", args);
+            const { subjectIndex, startDate, endDate } = args;
+            if (subjectIndex === null || subjectIndex === undefined ||
+                subjectIndex.term === null || subjectIndex.term === undefined || subjectIndex.term === "" ||
+                subjectIndex.department === null || subjectIndex.department === undefined || subjectIndex.department === "" ||
+                subjectIndex.block === null || subjectIndex.block === undefined || subjectIndex.block === "" ||
+                subjectIndex.code === null || subjectIndex.code === undefined || subjectIndex.code === "" ||
+                startDate === null || startDate === undefined || startDate === "" ||
+                endDate === null || endDate === undefined || endDate === ""
+            ) {
+                return null;
+            }
+            const _subjectIndex: ISubjectIndex = {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            }
+
+            return await updateSubjectDateRange(_subjectIndex, startDate, endDate);
         }
     },
 
@@ -141,5 +172,6 @@ const SubjectsCRUD = {
     readAllSubjects,
     readSubject,
     createSubject,
+    updateSubjectDateRange,
 }
 export { SubjectsQuery, SubjectsCRUD };

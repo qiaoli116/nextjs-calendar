@@ -1,11 +1,12 @@
 import { Box } from '@mui/material';
 import { getTimeslotsOfWorkDayDict, timeslotsRange } from '../Calendar/timeslotUtils';
 import { time } from 'console';
+import { blue, grey } from '@mui/material/colors';
 
 
 function TimeSlotsDisplayHorizontal({ timeslots }: { timeslots: string[] } = { timeslots: [] }) {
     const SlotBox = ({ occupied }: { occupied: boolean }) => {
-        const bgcolor = occupied ? "red" : "green";
+        const bgcolor = occupied ? blue[700] : grey[400];
         return (
             <Box
                 sx={{
@@ -13,7 +14,7 @@ function TimeSlotsDisplayHorizontal({ timeslots }: { timeslots: string[] } = { t
                     width: "25px",
                     mx: "2px",
                     bgcolor: bgcolor,
-                    border: "1px solid",
+                    border: `1px solid ${grey[400]}`,
                 }}
             ></Box>
         )
@@ -25,8 +26,8 @@ function TimeSlotsDisplayHorizontal({ timeslots }: { timeslots: string[] } = { t
                     height: "10px",
                     width: "25px",
                     mx: "2px",
-                    borderLeft: (label !== "") ? "1px solid grey" : "0px solid",
-                    borderRight: (label !== "") ? "0px solid grey" : "1px solid grey",
+                    borderLeft: (label !== "") ? `1px solid ${grey[400]}` : `0px solid ${grey[400]}`,
+                    borderRight: (label !== "") ? `0px solid ${grey[400]}` : `1px solid ${grey[400]}`,
                     fontSize: "12px",
                     pl: "11px",
                 }}

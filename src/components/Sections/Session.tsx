@@ -234,8 +234,9 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateField
                             fullWidth
-                            label="Date"
+                            label="Date (DD/MM/YYYY)"
                             defaultValue={dayjs(session.date)}
+                            format='DD/MM/YYYY'
                             InputProps={{
                                 readOnly: true,
                             }}

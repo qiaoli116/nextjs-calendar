@@ -24,6 +24,9 @@ import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { useSearchParams } from "next/navigation";
 import { Message } from '@mui/icons-material';
 import CRUDLinksComponent from '../Controls/CRUDLinks';
+import dayjs from 'dayjs';
+import { DateField, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const boxSx = {
     py: "8px"
@@ -245,24 +248,32 @@ function SubjectViewOneComponent({ subjectIndex }: { subjectIndex: ISubjectIndex
                     />
                 </FormControl>
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
-                    <TextField
-                        fullWidth
-                        label="Start"
-                        defaultValue={`${subject.dateRange.startDate}`}
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DateField
+                            fullWidth
+                            label="Start (DD/MM/YYYY)"
+                            defaultValue={dayjs(subject.dateRange.startDate)}
+                            format='DD/MM/YYYY'
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                    </LocalizationProvider>
+
                 </FormControl>
                 <FormControl sx={{ width: "270px", pr: "10px" }}>
-                    <TextField
-                        fullWidth
-                        label="Start"
-                        defaultValue={`${subject.dateRange.endDate}`}
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DateField
+                            fullWidth
+                            label="End (DD/MM/YYYY)"
+                            defaultValue={dayjs(subject.dateRange.endDate)}
+                            format='DD/MM/YYYY'
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                        />
+                    </LocalizationProvider>
+
                 </FormControl>
             </Box>
             {subject.units.map((unit, index) => {
