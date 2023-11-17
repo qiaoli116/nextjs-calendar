@@ -738,6 +738,9 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
     React.useEffect(() => {
         setDateRange(dateRangeDefault);
     }, [dateRangeDefault]);
+    const resetMutationStatus = () => {
+        setMutationStatus("idle");
+    }
 
     return (
         <>
@@ -768,6 +771,26 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
                     </LocalizationProvider>
 
                 </FormControl>
+                <Box sx={boxSx}>
+                    <Button type='submit' disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Updating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Update"}
+                    </Button>
+
+                </Box>
+                {mutationStatus === "error" &&
+                    <AlertBar
+                        message="Create Error"
+                        severity="error"
+                        onClick={resetMutationStatus}
+                    />
+                }
+                {mutationStatus === "success" &&
+                    <AlertBar
+                        message="Create Success"
+                        severity="success"
+                        onClick={resetMutationStatus}
+                    />
+                }
             </form>
         </>
     )
@@ -811,7 +834,17 @@ const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex 
 
     return (
         <>
+            <SubjectUpdateDateRangeComponent
+                subjectIndex={subjectIndex}
+                dateRangeDefault={subject.dateRange}
+                onUpdateSuccess={(newDateRange) => {
+                    setSubject({
+                        ...subject,
+                        dateRange: newDateRange,
+                    })
+                }}
 
+            />
         </>
     )
 }
