@@ -16,7 +16,7 @@ const filterValues = {
   }
 */
 
-import { ISubject, ISubjectCreateInput, ISubjectIndex } from "@/types";
+import { IDateRange, ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex } from "@/types";
 import { type } from "os";
 import { gql, useQuery, useMutation, CombinedError, UseMutationExecute } from "urql";
 
@@ -115,9 +115,26 @@ export function useQueryOneSubject(subjectIndex: ISubjectIndex) {
             title
             crn
           }
+          sessions {
+            sessionId
+            date
+            teacher {
+              orgId
+              email
+              name {
+                first
+                last
+              }
+            }
+            room {
+              roomNumber
+              type
+            }
+            timeslots
+          }
         }
       }`;
-    const [result, executeQuery] = useQuery<{ subject: ISubject } | undefined | null>({
+    const [result, executeQuery] = useQuery<{ subject: ISubjectExtended } | undefined | null>({
         query: SUBJECT_QUERY,
         variables: {
             subjectIndex
@@ -176,6 +193,37 @@ export function useCreateSubject(): [UseMutationExecute<CreateSubjectMutationDat
 
     const [result, executeMutation] = useMutation<CreateSubjectMutationData, ICreateSubjectMutationVariables>(SUBJECT_CREATE_MUTATION);
 
+    return [
+        executeMutation
+    ];
+}
+
+
+export interface IUpdateSubjectDateRangeMutationVariables {
+    subjectIndex: ISubjectIndex;
+    startDate: string;
+    endDate: string;
+}
+type UpdateSubjectDateRangeMutationData = {
+    subjectUpdateDateRange: {
+        dateRange: {
+            startDate: string;
+            endDate: string;
+        };
+    }
+} | undefined | null;
+export function useUpdateSubjectDateRange(): [UseMutationExecute<UpdateSubjectDateRangeMutationData, IUpdateSubjectDateRangeMutationVariables>] {
+    const SUBJECT_UPDATE_DATE_RANGE_MUTATION = gql`
+    mutation Mutation($subjectIndex: SubjectIndexInput, $startDate: String, $endDate: String) {
+        subjectUpdateDateRange(subjectIndex: $subjectIndex, startDate: $startDate, endDate: $endDate) {
+          dateRange {
+            startDate
+            endDate
+          }
+        }
+      }
+    `;
+    const [result, executeMutation] = useMutation<UpdateSubjectDateRangeMutationData, IUpdateSubjectDateRangeMutationVariables>(SUBJECT_UPDATE_DATE_RANGE_MUTATION);
     return [
         executeMutation
     ];

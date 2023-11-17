@@ -37,6 +37,7 @@ export default function SubjectsViewOnePage({ params }: { params: { department: 
 
             <SubjectViewOneComponent
                 subjectIndex={subjectIndex}
+                singleSessionPath="/sessions"
             />
 
 

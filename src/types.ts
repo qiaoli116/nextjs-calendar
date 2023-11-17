@@ -88,6 +88,11 @@ export interface ISubjectCreateInput {
     units: ITASUnit[];
 }
 
+export interface IDateRange {
+    startDate: string;
+    endDate: string;
+}
+
 export interface ISubject {
     tasIndex: ITASIndex;
     code: string;
@@ -103,8 +108,28 @@ export interface ISubject {
     };
     units: ISubjectUnit[];
     sessions: string[];
-
 }
+
+export interface ISubjectExtended extends Omit<ISubject, "sessions"> {
+    sessions: {
+        sessionId: string;
+        date: string;
+        teacher: {
+            orgId: string;
+            email: string;
+            name: {
+                first: string;
+                last: string;
+            };
+        };
+        room: {
+            roomNumber: string;
+            type: string;
+        };
+        timeslots: string[];
+    }[]
+}
+
 export interface ISession {
     sessionId: string;
     date: string;
