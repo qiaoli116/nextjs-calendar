@@ -19,7 +19,7 @@ export function AlertBar({ message, severity, onClick }: {
     onClick?: () => void
 }) {
     return (
-        <Alert severity={severity} sx={{ position: 'relative' }}>
+        <Alert severity={severity} sx={{ position: 'relative', pr: "100px" }}>
             {message}
             <IconButton aria-label="close"
                 sx={{

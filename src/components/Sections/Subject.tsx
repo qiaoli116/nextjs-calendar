@@ -25,7 +25,7 @@ import { useSearchParams } from "next/navigation";
 import { Message } from '@mui/icons-material';
 import CRUDLinksComponent from '../Controls/CRUDLinks';
 import dayjs from 'dayjs';
-import { DateField, LocalizationProvider } from '@mui/x-date-pickers';
+import { DateField, DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const boxSx = {
@@ -690,6 +690,7 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
         endDate: string;
     }) => void
 }) => {
+
     console.log("SubjectUpdateDateRangeComponent - ", "subjectIndex", subjectIndex, "dateRangeDefault", dateRangeDefault);
     const { term, department, block, code } = subjectIndex;
     const emptyDateRange = {
@@ -729,6 +730,7 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
             } else {
                 setMutationStatus("success");
                 if (onUpdateSuccess) {
+                    console.log("handleSubmit - onUpdateSuccess", result.data.subjectUpdateDateRange.dateRange);
                     onUpdateSuccess(result.data.subjectUpdateDateRange.dateRange);
                 }
             }
@@ -741,56 +743,79 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
     const resetMutationStatus = () => {
         setMutationStatus("idle");
     }
-
+    const initStartDate = dayjs(dateRange.startDate);
+    const initEndDate = dayjs(dateRange.endDate);
     return (
         <>
             <form onSubmit={handleSubmit}>
-                <FormControl sx={{ width: "270px", pr: "10px" }}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateField
-                            fullWidth
-                            label="Start (DD/MM/YYYY)"
-                            value={dayjs(dateRange.startDate)}
-                            format='DD/MM/YYYY'
-                            name='startDate'
-                            onChange={handleInputChange}
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                }}>
+                    <FormControl sx={{ width: "200px", pr: "10px" }}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="Start (DD/MM/YYYY)"
+                                value={initStartDate}
+                                format='DD/MM/YYYY'
+                                onChange={(newDate) => {
+                                    const e = {
+                                        target: {
+                                            name: "startDate",
+                                            value: newDate === null ? "" : newDate.format('YYYY-MM-DD'),
+                                        }
+                                    }
+
+                                    handleInputChange(e)
+                                }}
+                            />
+                        </LocalizationProvider>
+
+                    </FormControl>
+                    <FormControl sx={{ width: "200px", pr: "10px" }}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="End (DD/MM/YYYY)"
+                                value={initEndDate}
+                                format='DD/MM/YYYY'
+                                onChange={(newDate) => {
+                                    const e = {
+                                        target: {
+                                            name: "endDate",
+                                            value: newDate === null ? "" : newDate.format('YYYY-MM-DD'),
+                                        }
+                                    }
+
+                                    handleInputChange(e)
+                                }}
+                            />
+                        </LocalizationProvider>
+
+                    </FormControl>
+                    <FormControl sx={{ pr: "10px" }}>
+                        <Button type='submit' disabled={mutationStatus === "loading"}>
+                            {mutationStatus === "loading" ? <>Updating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Update Date Range"}
+                        </Button>
+                    </FormControl>
+
+                    {mutationStatus === "error" &&
+                        <AlertBar
+                            message="Create Error"
+                            severity="error"
+                            onClick={resetMutationStatus}
                         />
-                    </LocalizationProvider>
-
-                </FormControl>
-                <FormControl sx={{ width: "270px", pr: "10px" }}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateField
-                            fullWidth
-                            label="End (DD/MM/YYYY)"
-                            value={dayjs(dateRange.endDate)}
-                            format='DD/MM/YYYY'
-                            name='endDate'
-                            onChange={handleInputChange}
+                    }
+                    {mutationStatus === "success" &&
+                        <AlertBar
+                            message="Create Success"
+                            severity="success"
+                            onClick={resetMutationStatus}
                         />
-                    </LocalizationProvider>
-
-                </FormControl>
-                <Box sx={boxSx}>
-                    <Button type='submit' disabled={mutationStatus === "loading"}>
-                        {mutationStatus === "loading" ? <>Updating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Update"}
-                    </Button>
-
+                    }
                 </Box>
-                {mutationStatus === "error" &&
-                    <AlertBar
-                        message="Create Error"
-                        severity="error"
-                        onClick={resetMutationStatus}
-                    />
-                }
-                {mutationStatus === "success" &&
-                    <AlertBar
-                        message="Create Success"
-                        severity="success"
-                        onClick={resetMutationStatus}
-                    />
-                }
+
+
             </form>
         </>
     )
@@ -798,6 +823,7 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
 
 
 const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex }) => {
+    const params = useSearchParams();
     const { term, department, block, code } = subjectIndex;
     const { loading, error, dataError, subject: subjectCurrent, reexecuteQuerySubject } = useQueryOneSubject(subjectIndex);
     const emptySubject: ISubjectExtended = {
@@ -845,6 +871,17 @@ const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex 
                 }}
 
             />
+            {
+                params.get("debug") !== null && (
+                    <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                        <code>
+                            <pre>
+                                {JSON.stringify(subject, null, 2) + ","}
+                            </pre>
+                        </code>
+                    </Box>
+                )
+            }
         </>
     )
 }

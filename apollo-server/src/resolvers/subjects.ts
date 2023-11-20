@@ -127,8 +127,8 @@ const SubjectsQuery = {
                 subjectIndex.department === null || subjectIndex.department === undefined || subjectIndex.department === "" ||
                 subjectIndex.block === null || subjectIndex.block === undefined || subjectIndex.block === "" ||
                 subjectIndex.code === null || subjectIndex.code === undefined || subjectIndex.code === "" ||
-                startDate === null || startDate === undefined || startDate === "" ||
-                endDate === null || endDate === undefined || endDate === ""
+                startDate === null || startDate === undefined ||
+                endDate === null || endDate === undefined
             ) {
                 return null;
             }
