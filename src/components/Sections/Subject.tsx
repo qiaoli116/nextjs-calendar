@@ -766,7 +766,6 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
                                             value: newDate === null ? "" : newDate.format('YYYY-MM-DD'),
                                         }
                                     }
-
                                     handleInputChange(e)
                                 }}
                             />

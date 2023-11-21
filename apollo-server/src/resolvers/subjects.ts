@@ -65,6 +65,32 @@ async function updateSubjectDateRange(subjectIndex: ISubjectIndex, startDate: st
     }
     return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
 }
+
+async function updateSubjectDeliveryMode(subjectIndex: ISubjectIndex, deliveryMode: string): Promise<ISubject | null> {
+    const updateObj = {
+        "$set": {
+            "deliveryMode": deliveryMode,
+        }
+    }
+    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+}
+
+async function updateSubjectCRN(subjectIndex: ISubjectIndex, unitCode: string, crn: string): Promise<ISubject | null> {
+    const updateObj = {
+        "$set": {
+            "units.$[unit].crn": crn,
+        }
+    }
+    const options = {
+        arrayFilters: [
+            {
+                "unit.code": unitCode,
+            }
+        ]
+    }
+    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj, options);
+}
+
 const SubjectsQuery = {
     Query: {
         subjects: async (parent, args, context, info) => {
@@ -140,7 +166,50 @@ const SubjectsQuery = {
             }
 
             return await updateSubjectDateRange(_subjectIndex, startDate, endDate);
-        }
+        },
+        subjectUpdateDeliveryMode: async (parent, args, context, info) => {
+            console.log("subjectUpdateDeliveryMode", args);
+            const { subjectIndex, deliveryMode } = args;
+            if (subjectIndex === null || subjectIndex === undefined ||
+                subjectIndex.term === null || subjectIndex.term === undefined || subjectIndex.term === "" ||
+                subjectIndex.department === null || subjectIndex.department === undefined || subjectIndex.department === "" ||
+                subjectIndex.block === null || subjectIndex.block === undefined || subjectIndex.block === "" ||
+                subjectIndex.code === null || subjectIndex.code === undefined || subjectIndex.code === "" ||
+                deliveryMode === null || deliveryMode === undefined
+            ) {
+                return null;
+            }
+            const _subjectIndex: ISubjectIndex = {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            }
+
+            return await updateSubjectDeliveryMode(_subjectIndex, deliveryMode);
+        },
+        subjectUpdateCRN: async (parent, args, context, info) => {
+            console.log("subjectUpdateCRN", args);
+            const { subjectIndex, unitCode, crn } = args;
+            if (subjectIndex === null || subjectIndex === undefined ||
+                subjectIndex.term === null || subjectIndex.term === undefined || subjectIndex.term === "" ||
+                subjectIndex.department === null || subjectIndex.department === undefined || subjectIndex.department === "" ||
+                subjectIndex.block === null || subjectIndex.block === undefined || subjectIndex.block === "" ||
+                subjectIndex.code === null || subjectIndex.code === undefined || subjectIndex.code === "" ||
+                unitCode === null || unitCode === undefined || unitCode === "" ||
+                crn === null || crn === undefined
+            ) {
+                return null;
+            }
+            const _subjectIndex: ISubjectIndex = {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            }
+
+            return await updateSubjectCRN(_subjectIndex, unitCode, crn);
+        },
     },
 
     Children: {

@@ -93,6 +93,8 @@ export interface IDateRange {
     endDate: string;
 }
 
+export type TDeliveryMode = "" | "Blended" | "Online" | "Face-to-Face";
+
 export interface ISubject {
     tasIndex: ITASIndex;
     code: string;
@@ -101,7 +103,7 @@ export interface ISubject {
     department: string;
     block: string;
     qualification: IQualification;
-    deliveryMode: string;
+    deliveryMode: TDeliveryMode;
     dateRange: {
         startDate: string;
         endDate: string;

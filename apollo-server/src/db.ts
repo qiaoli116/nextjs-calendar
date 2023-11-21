@@ -138,6 +138,7 @@ const updateOneDocument = async <T>(collectionName: string, indexQuery: object, 
     console.log("collectionName", collectionName)
     console.log("indexQuery", indexQuery)
     console.log("updates", update)
+    console.log("options", options)
     let documentUpdated = null;
     try {
 
