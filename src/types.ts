@@ -93,6 +93,7 @@ export interface IDateRange {
     endDate: string;
 }
 
+export const deliveryModes = ["Blended", "Online", "Face-to-Face"];
 export type TDeliveryMode = "" | "Blended" | "Online" | "Face-to-Face";
 
 export interface ISubject {

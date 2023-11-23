@@ -18,8 +18,8 @@ import { CircularProgress } from '@mui/material';
 import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { ISession } from '../../dataService/sessions';
-import { ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ITAS, ITASQualification, ITASSubject } from '@/types';
-import { IUpdateSubjectDateRangeMutationVariables, useCreateSubject, useQueryOneSubject, useQuerySubjects, useUpdateSubjectDateRange } from '@/components/Hooks/subjects';
+import { ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ITAS, ITASQualification, ITASSubject, TDeliveryMode } from '@/types';
+import { IUpdateSubjectDateRangeMutationVariables, IUpdateSubjectDeliveryModeMutationVariables, useCreateSubject, useQueryOneSubject, useQuerySubjects, useUpdateSubjectDateRange, useUpdateSubjectDeliveryMode } from '@/components/Hooks/subjects';
 import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { useSearchParams } from "next/navigation";
 import { Message } from '@mui/icons-material';
@@ -690,7 +690,6 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
         endDate: string;
     }) => void
 }) => {
-
     console.log("SubjectUpdateDateRangeComponent - ", "subjectIndex", subjectIndex, "dateRangeDefault", dateRangeDefault);
     const { term, department, block, code } = subjectIndex;
     const emptyDateRange = {
@@ -820,6 +819,96 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
     )
 }
 
+const SubjectUpdateDeliveryModeComponent = ({ subjectIndex, defaultDeliveryMode, onUpdateSuccess }: {
+    subjectIndex: ISubjectIndex,
+    defaultDeliveryMode: TDeliveryMode,
+    onUpdateSuccess?: (newDeliveryMode: TDeliveryMode) => void
+}) => {
+    console.log("SubjectUpdateDeliveryModeComponent - ", "subjectIndex", subjectIndex, "defaultDeliveryMode", defaultDeliveryMode);
+    const { term, department, block, code } = subjectIndex;
+    const emptyDeliveryMode = "";
+    const [deliveryMode, setDeliveryMode] = React.useState<TDeliveryMode>(emptyDeliveryMode);
+    const [mutationStatus, setMutationStatus] = React.useState("idle");
+    const [executeUpdateSubjectDeliveryMode] = useUpdateSubjectDeliveryMode();
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const d = value;
+        setDeliveryMode(d);
+        console.log("handleInputChange - ", "deliveryMode", deliveryMode);
+    }
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit", deliveryMode);
+        setMutationStatus("loading");
+        const mutationVariable: IUpdateSubjectDeliveryModeMutationVariables = {
+            subjectIndex: subjectIndex,
+            deliveryMode: deliveryMode,
+        }
+
+        const result = await executeUpdateSubjectDeliveryMode(mutationVariable);
+        console.log("handleSubmit - result", result);
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.subjectUpdateDeliveryMode == null || result.data.subjectUpdateDeliveryMode == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onUpdateSuccess) {
+                    console.log("handleSubmit - onUpdateSuccess", result.data.subjectUpdateDeliveryMode.deliveryMode);
+                    onUpdateSuccess(result.data.subjectUpdateDeliveryMode.deliveryMode);
+                }
+            }
+        }
+    }
+    React.useEffect(() => {
+        setDeliveryMode(defaultDeliveryMode);
+    }, [defaultDeliveryMode]);
+    const resetMutationStatus = () => {
+        setMutationStatus("idle");
+    }
+    return (
+        <>
+            <form onSubmit={handleSubmit}>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                }}>
+                    <FormControl sx={{ width: "200px", pr: "10px" }}>
+                        <DeliveryModeSelect
+                            value={deliveryMode}
+                            name='deliveryMode'
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ pr: "10px" }}>
+                        <Button type='submit' disabled={mutationStatus === "loading"}>
+                            {mutationStatus === "loading" ? <>Updating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Update Delivery Mode"}
+                        </Button>
+                    </FormControl>
+
+                    {mutationStatus === "error" &&
+                        <AlertBar
+                            message="Create Error"
+                            severity="error"
+                            onClick={resetMutationStatus}
+                        />
+                    }
+                    {mutationStatus === "success" &&
+                        <AlertBar
+                            message="Create Success"
+                            severity="success"
+                            onClick={resetMutationStatus}
+                        />
+                    }
+                </Box>
+            </form>
+        </>
+    )
+}
+
 
 const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex }) => {
     const params = useSearchParams();
@@ -859,17 +948,31 @@ const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex 
 
     return (
         <>
-            <SubjectUpdateDateRangeComponent
-                subjectIndex={subjectIndex}
-                dateRangeDefault={subject.dateRange}
-                onUpdateSuccess={(newDateRange) => {
-                    setSubject({
-                        ...subject,
-                        dateRange: newDateRange,
-                    })
-                }}
+            <Box sx={boxSx}>
+                <SubjectUpdateDateRangeComponent
+                    subjectIndex={subjectIndex}
+                    dateRangeDefault={subject.dateRange}
+                    onUpdateSuccess={(newDateRange) => {
+                        setSubject({
+                            ...subject,
+                            dateRange: newDateRange,
+                        })
+                    }}
 
-            />
+                />
+            </Box>
+            <Box sx={boxSx}>
+                <SubjectUpdateDeliveryModeComponent
+                    subjectIndex={subjectIndex}
+                    defaultDeliveryMode={subject.deliveryMode}
+                    onUpdateSuccess={(newDeliveryMode) => {
+                        setSubject({
+                            ...subject,
+                            deliveryMode: newDeliveryMode,
+                        })
+                    }}
+                />
+            </Box>
             {
                 params.get("debug") !== null && (
                     <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>

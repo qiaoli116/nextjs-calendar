@@ -240,14 +240,44 @@ type UpdateSubjectDeliveryModeMutationData = {
 } | undefined | null;
 export function useUpdateSubjectDeliveryMode(): [UseMutationExecute<UpdateSubjectDeliveryModeMutationData, IUpdateSubjectDeliveryModeMutationVariables>] {
   const SUBJECT_UPDATE_DELIVERY_MODE_MUTATION = gql`
-    mutation Mutation($subjectIndex: SubjectIndexInput, $deliveryMode: DeliveryMode) {
-        subjectUpdateDeliveryMode(subjectIndex: $subjectIndex, deliveryMode: $deliveryMode) {
-          deliveryMode
-        }
+    mutation Mutation($subjectIndex: SubjectIndexInput, $deliveryMode: String) {
+      subjectUpdateDeliveryMode(subjectIndex: $subjectIndex, deliveryMode: $deliveryMode) {
+        deliveryMode
       }
+    }
     `;
   const [result, executeMutation] = useMutation<UpdateSubjectDeliveryModeMutationData, IUpdateSubjectDeliveryModeMutationVariables>(SUBJECT_UPDATE_DELIVERY_MODE_MUTATION);
   return [
     executeMutation
   ];
-} 
+}
+
+export interface IUpdateSubjectCRNMutationVariables {
+  subjectIndex: ISubjectIndex;
+  unitCode: string;
+  crn: string;
+}
+type UpdateSubjectCRNMutationData = {
+  subjectUpdateCRN: {
+    units: {
+      code: string;
+      crn: string;
+    }[];
+  }
+} | undefined | null;
+export function useUpdateSubjectCRN(): [UseMutationExecute<UpdateSubjectCRNMutationData, IUpdateSubjectCRNMutationVariables>] {
+  const SUBJECT_UPDATE_CRN_MUTATION = gql`
+    mutation Mutation($subjectIndex: SubjectIndexInput, $unitCode: String, $crn: String) {
+        subjectUpdateCRN(subjectIndex: $subjectIndex, unitCode: $unitCode, crn: $crn) {
+          units {
+            code
+            crn
+          }
+        }
+      }
+    `;
+  const [result, executeMutation] = useMutation<UpdateSubjectCRNMutationData, IUpdateSubjectCRNMutationVariables>(SUBJECT_UPDATE_CRN_MUTATION);
+  return [
+    executeMutation
+  ];
+}

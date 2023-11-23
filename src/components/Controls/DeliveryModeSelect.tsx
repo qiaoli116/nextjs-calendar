@@ -4,8 +4,8 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { v4 as uuidv4 } from 'uuid';
+import { deliveryModes } from '@/types';
 
-const deliveryModes = ["Blended", "Online"];
 
 export default function DeliveryModeSelect({ value, name, onChange, sx }:
     { value?: string, name?: string, onChange?: (e: any) => void, sx?: any }) {
