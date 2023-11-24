@@ -24,7 +24,7 @@ import { DateField } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { TimeSlotsDisplayHorizontal } from '../Controls/TimeSlotsDisplay';
+import { TimeSlotsDisplayHorizontal, TimeSlotsDisplayHorizontalBrief } from '../Controls/TimeSlotsDisplay';
 
 
 const boxSx = {
@@ -218,7 +218,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
     return (
         <>
             <Box sx={boxSx}>
-                <FormControl sx={{ width: "800px" }}>
+                <FormControl sx={{ width: "660px", pr: "10px" }}>
                     <TextField
                         fullWidth
                         label="Session ID"
@@ -228,9 +228,19 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                         }}
                     />
                 </FormControl>
+                <FormControl sx={{ width: "140px" }}>
+                    <TextField
+                        fullWidth
+                        label="Length"
+                        defaultValue={`${session.timeslots.length / 2} hrs`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
             </Box>
             <Box sx={boxSx}>
-                <FormControl sx={{ width: "150px", pr: "10px" }}>
+                <FormControl sx={{ width: "150px" }}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateField
                             fullWidth
@@ -264,6 +274,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                     />
                 </FormControl>
             </Box>
+
             <Box sx={boxSx}>
                 <TimeSlotsDisplayHorizontal
                     timeslots={session.timeslots}
@@ -304,8 +315,11 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                                                                 SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
                                                             </Typography>
                                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                                {dayjs(session.date).format('DD/MM/YYYY')}
+                                                                {dayjs(session.date).format('DD/MM/YYYY')} ({session.timeslots.length / 2} hrs)
                                                             </Typography>
+                                                            <Box sx={{ mb: "8px" }}>
+                                                                <TimeSlotsDisplayHorizontalBrief timeslots={session.timeslots} />
+                                                            </Box>
                                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                                                 {session.teacher.name.last}, {session.teacher.name.first}
                                                             </Typography>

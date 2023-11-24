@@ -16,7 +16,7 @@ const filterValues = {
   }
 */
 
-import { IDateRange, ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, TDeliveryMode } from "@/types";
+import { IDateRange, ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ISubjectUnit, TDeliveryMode } from "@/types";
 import { type } from "os";
 import { gql, useQuery, useMutation, CombinedError, UseMutationExecute } from "urql";
 
@@ -259,10 +259,7 @@ export interface IUpdateSubjectCRNMutationVariables {
 }
 type UpdateSubjectCRNMutationData = {
   subjectUpdateCRN: {
-    units: {
-      code: string;
-      crn: string;
-    }[];
+    units: ISubjectUnit[];
   }
 } | undefined | null;
 export function useUpdateSubjectCRN(): [UseMutationExecute<UpdateSubjectCRNMutationData, IUpdateSubjectCRNMutationVariables>] {

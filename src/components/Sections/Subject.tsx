@@ -18,8 +18,8 @@ import { CircularProgress } from '@mui/material';
 import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { ISession } from '../../dataService/sessions';
-import { ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ITAS, ITASQualification, ITASSubject, TDeliveryMode } from '@/types';
-import { IUpdateSubjectDateRangeMutationVariables, IUpdateSubjectDeliveryModeMutationVariables, useCreateSubject, useQueryOneSubject, useQuerySubjects, useUpdateSubjectDateRange, useUpdateSubjectDeliveryMode } from '@/components/Hooks/subjects';
+import { ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ISubjectUnit, ITAS, ITASQualification, ITASSubject, TDeliveryMode } from '@/types';
+import { IUpdateSubjectCRNMutationVariables, IUpdateSubjectDateRangeMutationVariables, IUpdateSubjectDeliveryModeMutationVariables, useCreateSubject, useQueryOneSubject, useQuerySubjects, useUpdateSubjectCRN, useUpdateSubjectDateRange, useUpdateSubjectDeliveryMode } from '@/components/Hooks/subjects';
 import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { useSearchParams } from "next/navigation";
 import { Message } from '@mui/icons-material';
@@ -27,6 +27,7 @@ import CRUDLinksComponent from '../Controls/CRUDLinks';
 import dayjs from 'dayjs';
 import { DateField, DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimeSlotsDisplayHorizontalBrief } from '../Controls/TimeSlotsDisplay';
 
 const boxSx = {
     py: "8px"
@@ -317,8 +318,11 @@ function SubjectViewOneComponent({ subjectIndex, singleSessionPath }: { subjectI
                                                 SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
                                             </Typography>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {dayjs(session.date).format('DD/MM/YYYY')}
+                                                {dayjs(session.date).format('DD/MM/YYYY')} ({session.timeslots.length / 2} hrs)
                                             </Typography>
+                                            <Box sx={{ mb: "8px" }}>
+                                                <TimeSlotsDisplayHorizontalBrief timeslots={session.timeslots} />
+                                            </Box>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                                 {session.teacher.name.last}, {session.teacher.name.first}
                                             </Typography>
@@ -909,6 +913,99 @@ const SubjectUpdateDeliveryModeComponent = ({ subjectIndex, defaultDeliveryMode,
     )
 }
 
+const SubjectUpdateCRNComponent = ({ subjectIndex, unitCode, defaultCRN, onUpdateSuccess }: {
+    subjectIndex: ISubjectIndex,
+    unitCode: string,
+    defaultCRN: string,
+    onUpdateSuccess?: (units: ISubjectUnit[]) => void
+}) => {
+    console.log("SubjectUpdateCRNComponent - ", "subjectIndex", subjectIndex, "unitCode", unitCode);
+    const { term, department, block, code } = subjectIndex;
+    const emptyCRN = "";
+    const [crn, setCRN] = React.useState<string>(emptyCRN);
+    const [mutationStatus, setMutationStatus] = React.useState("idle");
+    const [executeUpdateSubjectCRN] = useUpdateSubjectCRN();
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const d = value;
+        setCRN(d);
+        console.log("handleInputChange - ", "crn", crn);
+    }
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit", crn);
+        setMutationStatus("loading");
+        const mutationVariable: IUpdateSubjectCRNMutationVariables = {
+            subjectIndex: subjectIndex,
+            unitCode: unitCode,
+            crn: crn,
+        }
+
+        const result = await executeUpdateSubjectCRN(mutationVariable);
+        console.log("handleSubmit - result", result);
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.subjectUpdateCRN == null || result.data.subjectUpdateCRN == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onUpdateSuccess) {
+                    console.log("handleSubmit - onUpdateSuccess", result.data.subjectUpdateCRN);
+                    onUpdateSuccess(result.data.subjectUpdateCRN.units);
+                }
+            }
+        }
+    }
+    React.useEffect(() => {
+        setCRN(defaultCRN);
+    }, [defaultCRN]);
+    const resetMutationStatus = () => {
+        setMutationStatus("idle");
+    }
+    return (
+        <>
+            <form onSubmit={handleSubmit}>
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                }}>
+                    <FormControl sx={{ width: "200px", pr: "10px" }}>
+                        <TextField
+                            required
+                            fullWidth
+                            label={`CRN`}
+                            value={crn}
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                    <FormControl sx={{ pr: "10px" }}>
+                        <Button type='submit' disabled={mutationStatus === "loading"}>
+                            {mutationStatus === "loading" ? <>Updating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Update CRN"}
+                        </Button>
+                    </FormControl>
+
+                    {mutationStatus === "error" &&
+                        <AlertBar
+                            message="Create Error"
+                            severity="error"
+                            onClick={resetMutationStatus}
+                        />
+                    }
+                    {mutationStatus === "success" &&
+                        <AlertBar
+                            message="Create Success"
+                            severity="success"
+                            onClick={resetMutationStatus}
+                        />
+                    }
+                </Box>
+            </form>
+        </>
+    )
+}
 
 const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex }) => {
     const params = useSearchParams();
@@ -945,9 +1042,106 @@ const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex 
         }
     }, [loading]);
 
+    if (loading) {
+        return (
+            <>
+                <AlertLoading
+                    message={`Loading subject ${department} ${term} ${block} ${code}`}
+                />
+            </>
 
+        )
+    };
+    if (error) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load subject <strong>{department} {term} {block} {code}</strong>
+                    <br />
+                    Error Message: {error.message}
+                </Alert>
+            </>
+        )
+    }
+    if (dataError || subject === null) {
+        return (
+            <>
+                <Alert severity="error">
+                    Failed to load subject <strong>{department} {term} {block} {code}</strong>
+                </Alert>
+            </>
+        )
+    }
     return (
         <>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "800px" }}>
+                    <TextField
+                        fullWidth
+                        label="Subject (Read Only)"
+                        value={`${subject.code}: ${subject.title}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "800px" }}>
+                    <TextField
+                        fullWidth
+                        label="Qualification (Read Only)"
+                        value={`${subject.qualification.code}: ${subject.qualification.title}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            <Box sx={boxSx}>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Department (Read Only)"
+                        value={`${subject.department}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Term (Read Only)"
+                        value={`${subject.term}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+                <FormControl sx={{ width: "270px", pr: "10px" }}>
+                    <TextField
+                        fullWidth
+                        label="Block (Read Only)"
+                        value={`${subject.block}`}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                </FormControl>
+            </Box>
+            <Box sx={boxSx}>
+                <SubjectUpdateDeliveryModeComponent
+                    subjectIndex={subjectIndex}
+                    defaultDeliveryMode={subject.deliveryMode}
+                    onUpdateSuccess={(newDeliveryMode) => {
+                        setSubject({
+                            ...subject,
+                            deliveryMode: newDeliveryMode,
+                        })
+                    }}
+                />
+            </Box>
             <Box sx={boxSx}>
                 <SubjectUpdateDateRangeComponent
                     subjectIndex={subjectIndex}
@@ -961,17 +1155,39 @@ const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex 
 
                 />
             </Box>
+
             <Box sx={boxSx}>
-                <SubjectUpdateDeliveryModeComponent
-                    subjectIndex={subjectIndex}
-                    defaultDeliveryMode={subject.deliveryMode}
-                    onUpdateSuccess={(newDeliveryMode) => {
-                        setSubject({
-                            ...subject,
-                            deliveryMode: newDeliveryMode,
-                        })
-                    }}
-                />
+                {subject.units.map((unit, index) => {
+                    return (
+                        <Box sx={{
+                            ...boxSx,
+                            display: "flex",
+                            flexDirection: "row",
+                        }}>
+                            <FormControl sx={{ width: "670px", pr: "10px" }}>
+                                <TextField
+                                    fullWidth
+                                    label={`Unit ${(index + 1)}`}
+                                    value={unit.code + " - " + unit.title}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </FormControl>
+                            <SubjectUpdateCRNComponent
+                                subjectIndex={subjectIndex}
+                                unitCode={unit.code}
+                                defaultCRN={unit.crn}
+                                onUpdateSuccess={(units) => {
+                                    setSubject({
+                                        ...subject,
+                                        units: units,
+                                    })
+                                }}
+                            />
+                        </Box>
+                    )
+                })}
             </Box>
             {
                 params.get("debug") !== null && (
