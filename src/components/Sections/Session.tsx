@@ -356,6 +356,14 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
     )
 }
 
+const SessionCreateComponent = () => {
+    return (
+        <>
+            <h1>Session create</h1>
+        </>
+    )
+
+}
 
 // const generateSessionReference = () => {
 //     return "Session." + uuidv4();

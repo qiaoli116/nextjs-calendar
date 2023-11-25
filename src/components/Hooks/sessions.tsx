@@ -1,5 +1,5 @@
-import { ISession, ISessionExtended } from "@/types";
-import { gql, useQuery } from "urql";
+import { ISession, ISessionExtended, ISubjectIndex } from "@/types";
+import { UseMutationExecute, gql, useMutation, useQuery } from "urql";
 
 
 
@@ -7,14 +7,14 @@ import { gql, useQuery } from "urql";
 export interface IReadSessionsQueryVariables {
 }
 export function useQuerySessions<T = ISession>(
-    options: {
-        queryVariables?: IReadSessionsQueryVariables,
-        queryString?: string | null
-    } = { queryVariables: {}, queryString: null }
+  options: {
+    queryVariables?: IReadSessionsQueryVariables,
+    queryString?: string | null
+  } = { queryVariables: {}, queryString: null }
 ) {
-    const SESSIONS_QUERY = options.queryString !== undefined && options.queryString !== null && options.queryString !== "" ?
-        gql`${options.queryString}` :
-        gql`
+  const SESSIONS_QUERY = options.queryString !== undefined && options.queryString !== null && options.queryString !== "" ?
+    gql`${options.queryString}` :
+    gql`
         query Sessions {
             sessions {
                 sessionId
@@ -35,28 +35,28 @@ export function useQuerySessions<T = ISession>(
         }
     `;
 
-    const [result, executeQuery] = useQuery<{ sessions: T[] } | undefined | null>({ query: SESSIONS_QUERY });
-    const { data, fetching: loading, error } = result;
-    const dataError =
-        data === undefined ||
-        data === null ||
-        data.sessions === undefined ||
-        data.sessions === null ||
-        !Array.isArray(data.sessions);
+  const [result, executeQuery] = useQuery<{ sessions: T[] } | undefined | null>({ query: SESSIONS_QUERY });
+  const { data, fetching: loading, error } = result;
+  const dataError =
+    data === undefined ||
+    data === null ||
+    data.sessions === undefined ||
+    data.sessions === null ||
+    !Array.isArray(data.sessions);
 
-    return {
-        loading,
-        error,
-        dataError,
-        sessions: dataError ? [] : data.sessions,
-        reexecuteQuerySessions: executeQuery,
-    };
+  return {
+    loading,
+    error,
+    dataError,
+    sessions: dataError ? [] : data.sessions,
+    reexecuteQuerySessions: executeQuery,
+  };
 }
 
 
 export function useQueryOneSession(sessionId: string) {
-    console.log("useQueryOneSession ", sessionId)
-    const SESSION_QUERY = gql`
+  console.log("useQueryOneSession ", sessionId)
+  const SESSION_QUERY = gql`
         query SESSION($sessionId: String) {
             session(sessionId: $sessionId) {
             sessionId
@@ -106,24 +106,24 @@ export function useQueryOneSession(sessionId: string) {
         }
     `;
 
-    const [result, executeQuery] = useQuery<{ session: ISessionExtended } | undefined | null>({
-        query: SESSION_QUERY,
-        variables: { sessionId },
-    });
-    const { data, fetching: loading, error } = result;
-    const dataError =
-        data === undefined ||
-        data === null ||
-        data.session === undefined ||
-        data.session === null;
+  const [result, executeQuery] = useQuery<{ session: ISessionExtended } | undefined | null>({
+    query: SESSION_QUERY,
+    variables: { sessionId },
+  });
+  const { data, fetching: loading, error } = result;
+  const dataError =
+    data === undefined ||
+    data === null ||
+    data.session === undefined ||
+    data.session === null;
 
-    return {
-        loading,
-        error,
-        dataError,
-        session: dataError ? null : data.session,
-        reexecuteQuerySession: executeQuery,
-    };
+  return {
+    loading,
+    error,
+    dataError,
+    session: dataError ? null : data.session,
+    reexecuteQuerySession: executeQuery,
+  };
 }
 
 
@@ -192,6 +192,21 @@ mutation SessionCreate($date: String, $teacherOrgId: String, $roomNumber: String
     }
   }
 `;
+export interface ICreateSessionMutationVariables {
+  date: string;
+  teacherOrgId: string;
+  roomNumber: string;
+  timeslots: string;
+  subjectIndexes: ISubjectIndex[];
+}
+type CreateSessionMutationData = { sessionCreate: ISessionExtended } | undefined | null;
+export function useCreateSession(): [UseMutationExecute<CreateSessionMutationData, ICreateSessionMutationVariables>] {
+  const [result, executeMutation] = useMutation<CreateSessionMutationData, ICreateSessionMutationVariables>(session_create_query_string_extended);
+
+  return [
+    executeMutation
+  ];
+}
 // export interface ICreateTeacherMutationVariables extends ISession {
 //     // sessionId: string;
 //     // date: string;

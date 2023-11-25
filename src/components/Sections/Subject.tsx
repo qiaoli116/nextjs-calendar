@@ -345,8 +345,6 @@ function SubjectViewOneComponent({ subjectIndex, singleSessionPath }: { subjectI
     )
 }
 
-
-
 interface IInitSusbjectForm {
     year: string,
     department: string,

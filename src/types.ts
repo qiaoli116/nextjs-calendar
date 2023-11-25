@@ -139,7 +139,7 @@ export interface ISession {
     teacher: string;
     room: string;
     timeslots: string[];
-    subjects: string[];
+    subjects: ISubjectIndex[];
 }
 export interface ISessionExtended {
     sessionId: string;
