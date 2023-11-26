@@ -196,7 +196,7 @@ export interface ICreateSessionMutationVariables {
   date: string;
   teacherOrgId: string;
   roomNumber: string;
-  timeslots: string;
+  timeslots: string[];
   subjectIndexes: ISubjectIndex[];
 }
 type CreateSessionMutationData = { sessionCreate: ISessionExtended } | undefined | null;

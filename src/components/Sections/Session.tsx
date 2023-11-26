@@ -16,7 +16,7 @@ import { useFetchOneById } from "../Hooks/crud";
 import { AlertLoading } from '../Controls/AlertBar';
 import { Alert, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import { useQueryOneSession, useQuerySessions } from '../Hooks/sessions';
+import { ICreateSessionMutationVariables, useCreateSession, useQueryOneSession, useQuerySessions } from '../Hooks/sessions';
 import CRUDLinksComponent from '../Controls/CRUDLinks';
 import Link from '@mui/material/Link';
 import { useSearchParams } from "next/navigation";
@@ -25,6 +25,7 @@ import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimeSlotsDisplayHorizontal, TimeSlotsDisplayHorizontalBrief } from '../Controls/TimeSlotsDisplay';
+import { ISessionExtended, ISubjectIndex, MutationStatus } from '@/types';
 
 
 const boxSx = {
@@ -356,10 +357,99 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
     )
 }
 
-const SessionCreateComponent = () => {
+const SessionCreateComponent = ({
+    subjectIndex,
+    onCreateSuccess
+}: {
+    subjectIndex?: ISubjectIndex,
+    onCreateSuccess?: (session: ISessionExtended) => void,
+}) => {
+    console.log("SessionCreateComponent", "subjectIndex", subjectIndex);
+    const params = useSearchParams();
+    const subjectIndexes = subjectIndex === undefined ||
+        subjectIndex === null ||
+        subjectIndex.code === undefined || subjectIndex.code === null || subjectIndex.code === "" ||
+        subjectIndex.term === undefined || subjectIndex.term === null || subjectIndex.term === "" ||
+        subjectIndex.block === undefined || subjectIndex.block === null || subjectIndex.block === "" ||
+        subjectIndex.department === undefined || subjectIndex.department === null || subjectIndex.department === ""
+        ? [] : [
+            {
+                code: subjectIndex.code,
+                term: subjectIndex.term,
+                block: subjectIndex.block,
+                department: subjectIndex.department,
+            }
+        ];
+
+    const emptySession: ICreateSessionMutationVariables = {
+        date: "",
+        teacherOrgId: "",
+        roomNumber: "",
+        timeslots: [],
+        subjectIndexes: subjectIndexes,
+    }
+    const [session, setSession] = React.useState<ICreateSessionMutationVariables>(emptySession);
+    const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
+    const [executeCreateSession] = useCreateSession();
+    // this is a general purpose handler for all input fields
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const s = { ...session };
+        _.set(s, name, value);
+        setSession(s);
+        console.log("handleInputChange - ", "session", session);
+    };
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit - ", "session", session);
+        setMutationStatus("loading");
+        const _session = { ...session };
+        const result = await executeCreateSession(_session);
+        console.log("handleSubmit - ", "result", result)
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.sessionCreate == null || result.data.sessionCreate == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onCreateSuccess) {
+                    onCreateSuccess(result.data.sessionCreate);
+                }
+            }
+
+        }
+    };
     return (
         <>
-            <h1>Session create</h1>
+            <form onSubmit={handleSubmit}>
+                <Box sx={boxSx}>
+                    <TeacherSelect
+                        value={session.teacherOrgId}
+                        name="teacherOrgId"
+                        onChange={handleInputChange}
+                    />
+                </Box>
+                <Box sx={boxSx}>
+                    <RoomSelect
+                        value={session.roomNumber}
+                        name="room"
+                        onChange={handleInputChange}
+                    />
+                </Box>
+            </form>
+            {
+                params.get("debug") !== null && (
+                    <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                        <code>
+                            <pre>
+                                {JSON.stringify(session, null, 2) + ","}
+                            </pre>
+                        </code>
+                    </Box>
+                )
+            }
         </>
     )
 
@@ -681,6 +771,7 @@ const SessionCreateComponent = () => {
 export {
     SessionViewAllComponent,
     SessionViewOneComponent,
+    SessionCreateComponent,
     // SessionCreateComponent,
     // SessionUpdateComponent,
 };

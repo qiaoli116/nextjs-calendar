@@ -19,6 +19,7 @@ const filterOptions = createFilterOptions({
 });
 
 export default function TeacherSelect({ value, name, onChange }: { value: string, name?: string, onChange?: (e: any) => void }) {
+  console.log("TeacherSelect: value", value)
   const [Teachers, setTeachers] = React.useState<ITeacher[]>([]);
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState<readonly ITeacher[]>([]);
@@ -52,7 +53,9 @@ export default function TeacherSelect({ value, name, onChange }: { value: string
 
   return (
     <Autocomplete
+      inputValue={value}
       onInputChange={(event, newInputValue) => {
+        console.log("TeacherSelect: onInputChange: ", newInputValue)
         onChange && onChange({
           target: {
             name: name,
