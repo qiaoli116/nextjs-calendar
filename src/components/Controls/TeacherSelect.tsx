@@ -5,6 +5,7 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import TeacherDataService, { ITeacher } from '../../dataService/teachers';
 import Box from '@mui/material/Box';
+import { useQueryTeachers } from '../Hooks/teachers';
 
 // interface Film {
 //   title: string;
