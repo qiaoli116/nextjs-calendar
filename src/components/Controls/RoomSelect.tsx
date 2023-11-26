@@ -44,6 +44,7 @@ export default function RoomSelect({ value, name, onChange }: { value: string, n
 
     return (
         <Autocomplete
+            inputValue={value}
             onInputChange={(event, newInputValue) => {
                 onChange && onChange({
                     target: {

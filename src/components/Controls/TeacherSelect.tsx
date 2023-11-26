@@ -19,7 +19,7 @@ const filterOptions = createFilterOptions({
 });
 
 export default function TeacherSelect({ value, name, onChange }: { value: string, name?: string, onChange?: (e: any) => void }) {
-  console.log("TeacherSelect: value", value)
+  console.log("TeacherSelect: value", value, "name", name)
   const [Teachers, setTeachers] = React.useState<ITeacher[]>([]);
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState<readonly ITeacher[]>([]);
@@ -73,11 +73,14 @@ export default function TeacherSelect({ value, name, onChange }: { value: string
       filterOptions={filterOptions}
       isOptionEqualToValue={(option, value) => option.orgId === value.orgId}
       getOptionLabel={(option) => option.orgId}
-      renderOption={(props, option) => (
-        <Box component="li" {...props}>
-          {option.name.last}, {option.name.first} ({option.orgId})
-        </Box>
-      )}
+      renderOption={(props: any, option) => {
+        console.log("TeacherSelect: renderOption: ", props)
+        return (
+          <Box component="li" {...props} key={props.key}>
+            {option.name.last}, {option.name.first} ({option.orgId})
+          </Box>
+        )
+      }}
       options={options}
       loading={loading}
       renderInput={(params) => {
@@ -85,6 +88,7 @@ export default function TeacherSelect({ value, name, onChange }: { value: string
         const teacher = Teachers.find(t => t.orgId === value);
         console.log("TeacherSelect: renderInput: value", value)
         console.log("TeacherSelect: renderInput: teacher", teacher)
+        console.log("TeacherSelect: renderInput: params", params)
         return (
           <TextField
             {...params}

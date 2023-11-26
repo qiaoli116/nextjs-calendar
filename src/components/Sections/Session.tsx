@@ -434,7 +434,7 @@ const SessionCreateComponent = ({
                 <Box sx={boxSx}>
                     <RoomSelect
                         value={session.roomNumber}
-                        name="room"
+                        name="roomNumber"
                         onChange={handleInputChange}
                     />
                 </Box>
