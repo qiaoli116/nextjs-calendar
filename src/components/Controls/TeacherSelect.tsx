@@ -25,6 +25,8 @@ export default function TeacherSelect({ value, name, onChange }: { value: string
   const [options, setOptions] = React.useState<readonly ITeacher[]>([]);
   const loading = open && options.length === 0;
 
+  const { loading: queryLoading, error, dataError, teachers, reexecuteQueryTeachers } = useQueryTeachers();
+
   React.useEffect(() => {
 
     if (!loading) {
