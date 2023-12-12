@@ -91,6 +91,36 @@ async function updateSubjectCRN(subjectIndex: ISubjectIndex, unitCode: string, c
     return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj, options);
 }
 
+async function addSessionToSubject(subjectIndex: ISubjectIndex, sessionId: string): Promise<ISubject | null> {
+    const updateObj = {
+        "$addToSet": {
+            "sessions": sessionId,
+        }
+    }
+    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+}
+
+async function removeSessionToSubject(subjectIndex: ISubjectIndex, sessionId: string): Promise<ISubject | null> {
+    const updateObj = {
+        "$pull": {
+            "sessions": sessionId,
+        }
+    }
+    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+}
+
+async function associateSessionToSubject(subjectIndex: ISubjectIndex, sessionId: string): Promise<ISubject | null> {
+    const subject = await addSessionToSubject(subjectIndex, sessionId);
+    const session = await SessionsCRUD.addSubjectToSession(sessionId, subjectIndex);
+    return subject;
+}
+
+async function disassociateSessionToSubject(subjectIndex: ISubjectIndex, sessionId: string): Promise<ISubject | null> {
+    const subject = await removeSessionToSubject(subjectIndex, sessionId);
+    const session = await SessionsCRUD.removeSubjectFromSession(sessionId, subjectIndex);
+    return subject;
+}
+
 const SubjectsQuery = {
     Query: {
         subjects: async (parent, args, context, info) => {
@@ -210,6 +240,48 @@ const SubjectsQuery = {
 
             return await updateSubjectCRN(_subjectIndex, unitCode, crn);
         },
+        subjectSessionAssociate: async (parent, args, context, info) => {
+            console.log("subjectSessionAssociate", args);
+            const { subjectIndex, sessionId } = args;
+            if (subjectIndex === null || subjectIndex === undefined ||
+                subjectIndex.term === null || subjectIndex.term === undefined || subjectIndex.term === "" ||
+                subjectIndex.department === null || subjectIndex.department === undefined || subjectIndex.department === "" ||
+                subjectIndex.block === null || subjectIndex.block === undefined || subjectIndex.block === "" ||
+                subjectIndex.code === null || subjectIndex.code === undefined || subjectIndex.code === "" ||
+                sessionId === null || sessionId === undefined || sessionId === ""
+            ) {
+                return null;
+            }
+            const _subjectIndex: ISubjectIndex = {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            }
+
+            return await associateSessionToSubject(_subjectIndex, sessionId);
+        },
+        subjectSessionDisassociate: async (parent, args, context, info) => {
+            console.log("subjectSessionDisassociate", args);
+            const { subjectIndex, sessionId } = args;
+            if (subjectIndex === null || subjectIndex === undefined ||
+                subjectIndex.term === null || subjectIndex.term === undefined || subjectIndex.term === "" ||
+                subjectIndex.department === null || subjectIndex.department === undefined || subjectIndex.department === "" ||
+                subjectIndex.block === null || subjectIndex.block === undefined || subjectIndex.block === "" ||
+                subjectIndex.code === null || subjectIndex.code === undefined || subjectIndex.code === "" ||
+                sessionId === null || sessionId === undefined || sessionId === ""
+            ) {
+                return null;
+            }
+            const _subjectIndex: ISubjectIndex = {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            }
+
+            return await disassociateSessionToSubject(_subjectIndex, sessionId);
+        }
     },
 
     Children: {

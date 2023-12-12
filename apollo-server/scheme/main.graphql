@@ -28,6 +28,8 @@ type Mutation {
     subjectUpdateDateRange(subjectIndex: SubjectIndexInput, startDate: String, endDate: String): Subject
     subjectUpdateDeliveryMode(subjectIndex: SubjectIndexInput, deliveryMode: String): Subject
     subjectUpdateCRN(subjectIndex: SubjectIndexInput, unitCode: String, crn: String): Subject
+    subjectSessionAssociate(subjectIndex: SubjectIndexInput, sessionId: String): Subject
+    subjectSessionDisassociate(subjectIndex: SubjectIndexInput, sessionId: String): Subject
     sessionCreate(date:String, teacherOrgId: String, roomNumber: String, timeslots: [String], subjectIndexes: [SubjectIndexInput]): Session
 }
 

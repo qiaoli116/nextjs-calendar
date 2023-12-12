@@ -1,4 +1,4 @@
-import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex } from '../db.js'
+import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex, udpateOneDocument } from '../db.js'
 import { ISession, ISubjectIndex } from './types.js'
 import { TeachersCRUD } from './teachers.js';
 import { SubjectsCRUD } from './subjects.js';
@@ -15,6 +15,34 @@ async function readSessionBySessionId(sessionId: string): Promise<ISession | nul
 
 async function createSession(session: ISession): Promise<ISession | null> {
     return await insertOneDocument<ISession>(collectionName, session);
+}
+
+async function addSubjectToSession(sessionId: String, subjectIndex: ISubjectIndex): Promise<ISession | null> {
+    const updateObj = {
+        "$addToSet": {
+            "subjects": {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            },
+        }
+    };
+    return await udpateOneDocument<ISession>(collectionName, { sessionId }, updateObj);
+}
+
+async function removeSubjectFromSession(sessionId: String, subjectIndex: ISubjectIndex): Promise<ISession | null> {
+    const updateObj = {
+        "$pull": {
+            "subjects": {
+                term: subjectIndex.term,
+                department: subjectIndex.department,
+                block: subjectIndex.block,
+                code: subjectIndex.code,
+            },
+        }
+    };
+    return await udpateOneDocument<ISession>(collectionName, { sessionId }, updateObj);
 }
 
 const SessionsQuery = {
@@ -85,6 +113,9 @@ const SessionsQuery = {
 }
 const SessionsCRUD = {
     readAllSessions,
-    readSessionBySessionId
+    readSessionBySessionId,
+    createSession,
+    addSubjectToSession,
+    removeSubjectFromSession
 }
 export { SessionsQuery, SessionsCRUD };

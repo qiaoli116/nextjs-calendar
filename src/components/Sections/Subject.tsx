@@ -305,8 +305,14 @@ function SubjectViewOneComponent({ subjectIndex, singleSessionPath }: { subjectI
                     )
                 })}
             </Box>
-            <Box sx={{ width: 850 }}>
-                <h3>Sessions</h3>
+            <h3>Sessions</h3>
+            <Typography sx={{ fontSize: "16px", fontWeight: "600", mt: "10px" }}>
+                {subject.sessions.length == 0 && "No session associates with this subject"}
+                {subject.sessions.length == 1 && "1 session associates with this subject"}
+                {subject.sessions.length > 1 && `${subject.sessions.length} sessions associate with this subject`}
+            </Typography>
+            <Box sx={{ width: 850, mt: "10px" }}>
+
                 <Grid container rowSpacing={1} columnSpacing={1}>
                     {subject.sessions.map((session, sessionIndex) => {
                         return (
@@ -744,8 +750,8 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
     const resetMutationStatus = () => {
         setMutationStatus("idle");
     }
-    const initStartDate = dayjs(dateRange.startDate);
-    const initEndDate = dayjs(dateRange.endDate);
+    const initStartDate = dateRange.startDate === "" ? undefined : dayjs(dateRange.startDate);
+    const initEndDate = dateRange.endDate === "" ? undefined : dayjs(dateRange.endDate);
     return (
         <>
             <form onSubmit={handleSubmit}>
@@ -754,7 +760,7 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
                     flexDirection: "row",
                     alignItems: "center",
                 }}>
-                    <FormControl sx={{ width: "200px", pr: "10px" }}>
+                    <FormControl sx={{ width: "250px", pr: "10px" }}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 label="Start (DD/MM/YYYY)"
@@ -773,7 +779,7 @@ const SubjectUpdateDateRangeComponent = ({ subjectIndex, dateRangeDefault, onUpd
                         </LocalizationProvider>
 
                     </FormControl>
-                    <FormControl sx={{ width: "200px", pr: "10px" }}>
+                    <FormControl sx={{ width: "250px", pr: "10px" }}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 label="End (DD/MM/YYYY)"
@@ -878,13 +884,14 @@ const SubjectUpdateDeliveryModeComponent = ({ subjectIndex, defaultDeliveryMode,
                     flexDirection: "row",
                     alignItems: "center",
                 }}>
-                    <FormControl sx={{ width: "200px", pr: "10px" }}>
+                    <FormControl sx={{ width: "250px", pr: "10px" }}>
                         <DeliveryModeSelect
                             value={deliveryMode}
                             name='deliveryMode'
                             onChange={handleInputChange}
                         />
                     </FormControl>
+
                     <FormControl sx={{ pr: "10px" }}>
                         <Button type='submit' disabled={mutationStatus === "loading"}>
                             {mutationStatus === "loading" ? <>Updating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Update Delivery Mode"}

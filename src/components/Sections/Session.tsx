@@ -26,6 +26,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimeSlotsDisplayHorizontal, TimeSlotsDisplayHorizontalBrief } from '../Controls/TimeSlotsDisplay';
 import { ISessionExtended, ISubjectIndex, MutationStatus } from '@/types';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 const boxSx = {
@@ -293,7 +294,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                             <CardContent>
                                 <Typography display="inline" sx={{ mr: "10px" }} >
                                     <strong>
-                                        <Link target="_blank" href={`${singleSubjectPath}/${subject.department}/${subject.term}/${subject.block}/${subject.code}`}>{subject.code} - {subject.title}</Link>
+                                        <Link target="_blank" href={`${singleSubjectPath}/view/${subject.department}/${subject.term}/${subject.block}/${subject.code}`}>{subject.code} - {subject.title}</Link>
                                     </strong>
                                 </Typography>
                                 <Typography display="inline" sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
@@ -425,18 +426,46 @@ const SessionCreateComponent = ({
         <>
             <form onSubmit={handleSubmit}>
                 <Box sx={boxSx}>
-                    <TeacherSelect
-                        value={session.teacherOrgId}
-                        name="teacherOrgId"
-                        onChange={handleInputChange}
-                    />
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="Date"
+                                format='DD/MM/YYYY'
+                                value={session.date === "" ? undefined : dayjs(session.date)}
+                                onChange={
+                                    (d) => {
+                                        const e = {
+                                            target: {
+                                                name: "date",
+                                                value: d === null || d === undefined ? "" : d.format('YYYY-MM-DD'),
+                                            }
+                                        }
+                                        handleInputChange(e)
+                                    }
+                                }
+                            />
+                        </LocalizationProvider>
+                    </FormControl>
+                </Box>
+
+                <Box sx={boxSx}>
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+                        <TeacherSelect
+                            value={session.teacherOrgId}
+                            name="teacherOrgId"
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
                 </Box>
                 <Box sx={boxSx}>
-                    <RoomSelect
-                        value={session.roomNumber}
-                        name="roomNumber"
-                        onChange={handleInputChange}
-                    />
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+
+                        <RoomSelect
+                            value={session.roomNumber}
+                            name="roomNumber"
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
                 </Box>
             </form>
             {
