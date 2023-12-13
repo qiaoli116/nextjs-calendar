@@ -19,7 +19,7 @@ import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { ISession } from '../../dataService/sessions';
 import { ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ISubjectUnit, ITAS, ITASQualification, ITASSubject, TDeliveryMode } from '@/types';
-import { IUpdateSubjectCRNMutationVariables, IUpdateSubjectDateRangeMutationVariables, IUpdateSubjectDeliveryModeMutationVariables, useCreateSubject, useQueryOneSubject, useQuerySubjects, useUpdateSubjectCRN, useUpdateSubjectDateRange, useUpdateSubjectDeliveryMode } from '@/components/Hooks/subjects';
+import { IUpdateSubjectCRNMutationVariables, IUpdateSubjectDateRangeMutationVariables, IUpdateSubjectDeliveryModeMutationVariables, useAssociateSubjectSession, useCreateSubject, useQueryOneSubject, useQuerySubjects, useUpdateSubjectCRN, useUpdateSubjectDateRange, useUpdateSubjectDeliveryMode } from '@/components/Hooks/subjects';
 import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { useSearchParams } from "next/navigation";
 import { Message } from '@mui/icons-material';
@@ -28,6 +28,7 @@ import dayjs from 'dayjs';
 import { DateField, DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimeSlotsDisplayHorizontalBrief } from '../Controls/TimeSlotsDisplay';
+import { SessionCreateComponent } from './Session';
 
 const boxSx = {
     py: "8px"
@@ -1012,10 +1013,11 @@ const SubjectUpdateCRNComponent = ({ subjectIndex, unitCode, defaultCRN, onUpdat
     )
 }
 
-const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex }) => {
+const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIndex: ISubjectIndex, singleSessionPath: string }) => {
     const params = useSearchParams();
     const { term, department, block, code } = subjectIndex;
     const { loading, error, dataError, subject: subjectCurrent, reexecuteQuerySubject } = useQueryOneSubject(subjectIndex);
+    const [executeAssociateSubjectSession] = useAssociateSubjectSession();
     const emptySubject: ISubjectExtended = {
         tasIndex: {
             year: "",
@@ -1193,6 +1195,65 @@ const SubjectUpdateComponent = ({ subjectIndex }: { subjectIndex: ISubjectIndex 
                         </Box>
                     )
                 })}
+            </Box>
+            <h3>Sessions</h3>
+            <Typography sx={{ fontSize: "16px", fontWeight: "600", mt: "10px" }}>
+                {subject.sessions.length == 0 && "No session associates with this subject"}
+                {subject.sessions.length == 1 && "1 session associates with this subject"}
+                {subject.sessions.length > 1 && `${subject.sessions.length} sessions associate with this subject`}
+            </Typography>
+            <Box sx={{ width: 850, mt: "10px" }}>
+
+                <Grid container rowSpacing={1} columnSpacing={1}>
+                    {subject.sessions.map((session, sessionIndex) => {
+                        return (
+                            <>
+                                <Grid xs={3}>
+                                    <Card sx={{ width: 200 }} variant="outlined">
+                                        <CardContent sx={{ pb: "14px !important" }}>
+                                            <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
+                                                SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
+                                            </Typography>
+                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                {dayjs(session.date).format('DD/MM/YYYY')} ({session.timeslots.length / 2} hrs)
+                                            </Typography>
+                                            <Box sx={{ mb: "8px" }}>
+                                                <TimeSlotsDisplayHorizontalBrief timeslots={session.timeslots} />
+                                            </Box>
+                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                {session.teacher.name.last}, {session.teacher.name.first}
+                                            </Typography>
+                                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                                {session.room.roomNumber} ({session.room.type})
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            </>
+                        )
+                    })}
+
+
+                </Grid>
+
+            </Box>
+            <Box sx={boxSx}>
+                <h3>Create Session</h3>
+                <SessionCreateComponent
+                    subjectIndex={subjectIndex}
+                    onCreateSuccess={async (session) => {
+                        const s = await executeAssociateSubjectSession({
+                            subjectIndex: subjectIndex,
+                            sessionId: session.sessionId,
+                        });
+                        if (s.error || s.data === null || s.data === undefined || s.data.subjectSessionAssociate === null || s.data.subjectSessionAssociate === undefined) {
+                            console.log("SubjectUpdateComponent - executeAssociateSubjectSession with error - s", s);
+                        } else {
+                            console.log("SubjectUpdateComponent - executeAssociateSubjectSession successfully - s", s);
+                            setSubject({ ...s.data.subjectSessionAssociate })
+                        }
+                    }}
+                />
             </Box>
             {
                 params.get("debug") !== null && (

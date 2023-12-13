@@ -13,7 +13,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import _ from "lodash";
 import FormControl from '@mui/material/FormControl';
 import { useFetchOneById } from "../Hooks/crud";
-import { AlertLoading } from '../Controls/AlertBar';
+import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { Alert, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { ICreateSessionMutationVariables, useCreateSession, useQueryOneSession, useQuerySessions } from '../Hooks/sessions';
@@ -49,6 +49,7 @@ export interface SessionViewAllComponentSingleSession {
     },
     timeslots: string[]
 }
+
 function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "", singleRoomPath = "" }:
     { singleSessionPath: string, singleTeacherPath: string, singleRoomPath: string }) {
     console.log("SessionViewAllComponent - singleSessionPath", singleSessionPath);
@@ -422,6 +423,9 @@ const SessionCreateComponent = ({
 
         }
     };
+    const resetMutationStatus = () => {
+        setMutationStatus("idle");
+    }
     return (
         <>
             <form onSubmit={handleSubmit}>
@@ -467,6 +471,36 @@ const SessionCreateComponent = ({
                         />
                     </FormControl>
                 </Box>
+                <Box sx={boxSx}>
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+                        <TimeSlotsSelect
+                            values={session.timeslots}
+                            name="timeslots"
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                </Box>
+                <FormControl sx={{ pr: "10px" }}>
+                    <Button type='submit' disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Creating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Create"}
+                    </Button>
+                </FormControl>
+
+                {mutationStatus === "error" &&
+                    <AlertBar
+                        message="Create Error"
+                        severity="error"
+                        onClick={resetMutationStatus}
+                    />
+                }
+                {mutationStatus === "success" &&
+                    <AlertBar
+                        message="Create Success"
+                        severity="success"
+                        onClick={resetMutationStatus}
+                    />
+                }
+
             </form>
             {
                 params.get("debug") !== null && (

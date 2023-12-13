@@ -278,3 +278,64 @@ export function useUpdateSubjectCRN(): [UseMutationExecute<UpdateSubjectCRNMutat
     executeMutation
   ];
 }
+
+export interface IAssociateSubjectSessionMutationVariables {
+  subjectIndex: ISubjectIndex;
+  sessionId: string;
+}
+type AssociateSubjectSessionMutationData = {
+  subjectSessionAssociate: ISubjectExtended;
+} | undefined | null;
+export function useAssociateSubjectSession(): [UseMutationExecute<AssociateSubjectSessionMutationData, IAssociateSubjectSessionMutationVariables>] {
+  const SUBJECT_ASSOCIATE_SESSION_MUTATION = gql`
+      mutation Mutation($subjectIndex: SubjectIndexInput, $sessionId: String) {
+        subjectSessionAssociate(subjectIndex: $subjectIndex, sessionId: $sessionId) {
+          code
+          title
+          term
+          department
+          block
+          tasIndex {
+            year
+            department
+            qualificationCode
+          }
+          qualification {
+            code
+            title
+          }
+          deliveryMode
+          dateRange {
+            startDate
+            endDate
+          }
+          units {
+            code
+            title
+            crn
+          }
+          sessions {
+            sessionId
+            date
+            teacher {
+              orgId
+              email
+              name {
+                first
+                last
+              }
+            }
+            room {
+              roomNumber
+              type
+            }
+            timeslots
+          }
+        }
+      }
+    `;
+  const [result, executeMutation] = useMutation<AssociateSubjectSessionMutationData, IAssociateSubjectSessionMutationVariables>(SUBJECT_ASSOCIATE_SESSION_MUTATION);
+  return [
+    executeMutation
+  ];
+}
