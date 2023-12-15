@@ -96,19 +96,37 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
             field: 'teacher',
             headerName: 'Teacher',
             flex: 1,
-            maxWidth: 130,
-            renderCell: (params: GridRenderCellParams<SessionViewAllComponentSingleSession, string>) => (
-                <Link target="_blank" underline="hover" href={`${singleTeacherPath}/view/${params.row.teacher.orgId}`}>{`${params.row.teacher.name.last}, ${params.row.teacher.name.first}`}</Link>
-            )
+            maxWidth: 230,
+            renderCell: (params: GridRenderCellParams<SessionViewAllComponentSingleSession, string>) => {
+                if (params.row.teacher.orgId === "") {
+                    return (
+                        <Typography color="text.secondary" gutterBottom>
+                            <i>Not assigned</i>
+                        </Typography>
+                    )
+                }
+                return (
+                    <Link target="_blank" underline="hover" href={`${singleTeacherPath}/view/${params.row.teacher.orgId}`}>{`${params.row.teacher.name.last}, ${params.row.teacher.name.first}`}</Link>
+                )
+            }
         },
         {
             field: 'room',
             headerName: 'Room',
             flex: 1,
             maxWidth: 130,
-            renderCell: (params: GridRenderCellParams<SessionViewAllComponentSingleSession, string>) => (
-                <Link target="_blank" underline="hover" href={`${singleRoomPath}/view/${params.row.room.roomNumber}`}>{params.row.room.roomNumber}</Link>
-            )
+            renderCell: (params: GridRenderCellParams<SessionViewAllComponentSingleSession, string>) => {
+                if (params.row.room.roomNumber === "") {
+                    return (
+                        <Typography color="text.secondary" gutterBottom>
+                            <i>Not assigned</i>
+                        </Typography>
+                    )
+                }
+                return (
+                    <Link target="_blank" underline="hover" href={`${singleRoomPath}/view/${params.row.room.roomNumber}`}>{params.row.room.roomNumber}</Link>
+                )
+            }
         },
         {
             field: "actions",

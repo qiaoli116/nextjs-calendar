@@ -133,6 +133,35 @@ const insertOneDocument = async <T>(collectionName: string, document: T): Promis
     return documentCreated;
 }
 
+const insertManyDocuments = async <T>(collectionName: string, documents: T[]): Promise<T[] | null> => {
+    let documentsCreated = null;
+    try {
+
+        const db = dbClient.db('appdb');
+        const collection = db.collection(collectionName);
+
+        const result = await collection.insertMany(documents);
+        console.log('Inserted result:', result);
+        if (result.insertedCount > 0) {
+            const objectIdList = [];
+            Object.keys(result.insertedIds).forEach((index) => {
+                objectIdList.push(new ObjectId(result.insertedIds[index]));
+            });
+
+            const indexQuery = { _id: { $in: objectIdList } };
+            const docs = await collection.find(indexQuery).collation(collationCaseInsensitive).toArray();
+            console.log('Found documents:', docs);
+            documentsCreated = docs;
+            console.log('Inserted documents:', documentsCreated);
+        }
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+
+    }
+    return documentsCreated;
+}
+
 const updateOneDocument = async <T>(collectionName: string, indexQuery: object, update: object, options: object = {}): Promise<T | null> => {
     console.log('Update query:')
     console.log("collectionName", collectionName)
@@ -193,7 +222,8 @@ export {
     readOneDocumentByIndex,
     readOneDocumentById,
     insertOneDocument,
-    updateOneDocument as udpateOneDocument,
+    insertManyDocuments,
+    updateOneDocument,
     deleteOneDocumentByIndex,
     collationCaseInsensitive,
 

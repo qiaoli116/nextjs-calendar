@@ -6,7 +6,7 @@ import {
     readOneDocumentByIndex,
     deleteOneDocumentByIndex,
     insertOneDocument,
-    udpateOneDocument
+    updateOneDocument
 } from '../db.js'
 import { ITeacher } from './types.js'
 const collectionName = dbCollections.teachers.name;
@@ -25,7 +25,7 @@ async function createTeacher(teacher: ITeacher): Promise<ITeacher | null> {
 
 async function updateTeacher(orgId: string, updates: {}): Promise<ITeacher | null> {
     const updateObj = { "$set": updates }
-    return await udpateOneDocument<ITeacher>(collectionName, { orgId: orgId }, updateObj);
+    return await updateOneDocument<ITeacher>(collectionName, { orgId: orgId }, updateObj);
 }
 
 async function deleteTeacherByOrgId(orgId: string): Promise<boolean> {

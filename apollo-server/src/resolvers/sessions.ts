@@ -1,4 +1,4 @@
-import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex, udpateOneDocument } from '../db.js'
+import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex, updateOneDocument, insertManyDocuments } from '../db.js'
 import { ISession, ISubjectIndex } from './types.js'
 import { TeachersCRUD } from './teachers.js';
 import { SubjectsCRUD } from './subjects.js';
@@ -17,6 +17,29 @@ async function createSession(session: ISession): Promise<ISession | null> {
     return await insertOneDocument<ISession>(collectionName, session);
 }
 
+async function createSessionsBulk(): Promise<ISession[] | null> {
+    const sessions: ISession[] = [
+        // give me two sample data for ISession
+        {
+            sessionId: genSessionRef(),
+            date: "2023-12-15",
+            teacher: "teacher1",
+            room: "room1",
+            subjects: [],
+            timeslots: []
+        },
+        {
+            sessionId: genSessionRef(),
+            date: "2023-12-16",
+            teacher: "teacher2",
+            room: "room2",
+            subjects: [],
+            timeslots: []
+        },
+    ]
+    return await insertManyDocuments<ISession>(collectionName, sessions);
+}
+
 async function addSubjectToSession(sessionId: String, subjectIndex: ISubjectIndex): Promise<ISession | null> {
     const updateObj = {
         "$addToSet": {
@@ -28,7 +51,7 @@ async function addSubjectToSession(sessionId: String, subjectIndex: ISubjectInde
             },
         }
     };
-    return await udpateOneDocument<ISession>(collectionName, { sessionId }, updateObj);
+    return await updateOneDocument<ISession>(collectionName, { sessionId }, updateObj);
 }
 
 async function removeSubjectFromSession(sessionId: String, subjectIndex: ISubjectIndex): Promise<ISession | null> {
@@ -42,7 +65,7 @@ async function removeSubjectFromSession(sessionId: String, subjectIndex: ISubjec
             },
         }
     };
-    return await udpateOneDocument<ISession>(collectionName, { sessionId }, updateObj);
+    return await updateOneDocument<ISession>(collectionName, { sessionId }, updateObj);
 }
 
 const SessionsQuery = {
@@ -81,19 +104,50 @@ const SessionsQuery = {
                 timeslots: args.timeslots
             };
             return await createSession(session);
+        },
+        sessionCreateBulk: async (parent, args, context, info) => {
+            console.log("addSessionsBulk", args);
+            return await createSessionsBulk();
         }
     },
     Children: {
         Session: {
             teacher: async (parent, args, context, info) => {
                 console.log("Session teacher", parent);
-                const { teacher } = parent;
-                return await TeachersCRUD.readTeacherByOrgId(teacher);
+                const { teacher: teacherId } = parent;
+                const emptyTeacher = {
+                    orgId: "",
+                    userName: "",
+                    email: "",
+                    name: {
+                        first: "",
+                        last: ""
+                    }
+                }
+                if (teacherId === "" || teacherId === null || teacherId === undefined) {
+                    return emptyTeacher;
+                }
+                const teacher = await TeachersCRUD.readTeacherByOrgId(teacherId);
+                if (teacher === null) {
+                    return emptyTeacher;
+                }
+                return teacher;
             },
             room: async (parent, args, context, info) => {
                 console.log("Session room", parent);
-                const { room } = parent;
-                return await RoomsCRUD.readRoomByRoomNumber(room);
+                const { room: roomNumber } = parent;
+                const emptyRoom = {
+                    roomNumber: "",
+                    type: "",
+                };
+                if (roomNumber === "" || roomNumber === null || roomNumber === undefined) {
+                    return emptyRoom;
+                }
+                const room = await RoomsCRUD.readRoomByRoomNumber(roomNumber);
+                if (room === null) {
+                    return emptyRoom;
+                }
+                return room;
             },
             subjects: async (parent, args, context, info) => {
                 console.log("Session subjects", parent);

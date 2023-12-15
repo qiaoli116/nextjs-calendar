@@ -1,4 +1,4 @@
-import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex, udpateOneDocument } from '../db.js'
+import { dbClient, dbCollections, insertOneDocument, readAllDocuments, readOneDocumentByIndex, updateOneDocument } from '../db.js'
 import { IQualification, ISession, ISubject, ISubjectIndex, ITASIndex, IUnit } from './types.js';
 import { SessionsCRUD } from './sessions.js';
 import sessions from '../dataSource/sessions.js';
@@ -63,7 +63,7 @@ async function updateSubjectDateRange(subjectIndex: ISubjectIndex, startDate: st
             "dateRange.endDate": endDate,
         }
     }
-    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+    return await updateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
 }
 
 async function updateSubjectDeliveryMode(subjectIndex: ISubjectIndex, deliveryMode: string): Promise<ISubject | null> {
@@ -72,7 +72,7 @@ async function updateSubjectDeliveryMode(subjectIndex: ISubjectIndex, deliveryMo
             "deliveryMode": deliveryMode,
         }
     }
-    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+    return await updateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
 }
 
 async function updateSubjectCRN(subjectIndex: ISubjectIndex, unitCode: string, crn: string): Promise<ISubject | null> {
@@ -88,7 +88,7 @@ async function updateSubjectCRN(subjectIndex: ISubjectIndex, unitCode: string, c
             }
         ]
     }
-    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj, options);
+    return await updateOneDocument<ISubject>(collectionName, subjectIndex, updateObj, options);
 }
 
 async function addSessionToSubject(subjectIndex: ISubjectIndex, sessionId: string): Promise<ISubject | null> {
@@ -97,7 +97,7 @@ async function addSessionToSubject(subjectIndex: ISubjectIndex, sessionId: strin
             "sessions": sessionId,
         }
     }
-    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+    return await updateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
 }
 
 async function removeSessionToSubject(subjectIndex: ISubjectIndex, sessionId: string): Promise<ISubject | null> {
@@ -106,7 +106,7 @@ async function removeSessionToSubject(subjectIndex: ISubjectIndex, sessionId: st
             "sessions": sessionId,
         }
     }
-    return await udpateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
+    return await updateOneDocument<ISubject>(collectionName, subjectIndex, updateObj);
 }
 
 async function associateSessionToSubject(subjectIndex: ISubjectIndex, sessionId: string): Promise<ISubject | null> {

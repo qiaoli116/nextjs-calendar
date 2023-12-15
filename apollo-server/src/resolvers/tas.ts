@@ -3,7 +3,7 @@ import {
     dbCollections,
     readAllDocuments,
     insertOneDocument,
-    udpateOneDocument,
+    updateOneDocument,
     deleteOneDocumentByIndex,
     readOneDocumentByIndex
 } from '../db.js'
@@ -48,7 +48,7 @@ async function addTASSubjects(tasIndex: ITASDBIndex, subjects: ITASSubject[]): P
         "$push": { subjects: { "$each": subjects } }
     }
 
-    return udpateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
+    return updateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
 }
 
 async function deleteTASSubjects(tasIndex: ITASDBIndex, subjectCodes: string[]): Promise<ITAS | null> {
@@ -61,7 +61,7 @@ async function deleteTASSubjects(tasIndex: ITASDBIndex, subjectCodes: string[]):
             }
         }
     }
-    return udpateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
+    return updateOneDocument<ITAS>(collectionName, tasIndex, updateObj);
 }
 
 async function deleteTAS(tasIndex: ITASDBIndex): Promise<boolean> {
