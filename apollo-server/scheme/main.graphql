@@ -31,7 +31,7 @@ type Mutation {
     subjectSessionAssociate(subjectIndex: SubjectIndexInput, sessionId: String): Subject
     subjectSessionDisassociate(subjectIndex: SubjectIndexInput, sessionId: String): Subject
     sessionCreate(date:String, teacherOrgId: String, roomNumber: String, timeslots: [String], subjectIndexes: [SubjectIndexInput]): Session
-    sessionCreateBulk: [Session]
+    sessionCreateBulk(dates:[String], teacherOrgId: String, roomNumber: String, timeslots: [String], subjectIndexes: [SubjectIndexInput]): [Session]
 }
 
 type Room{

@@ -17,26 +17,7 @@ async function createSession(session: ISession): Promise<ISession | null> {
     return await insertOneDocument<ISession>(collectionName, session);
 }
 
-async function createSessionsBulk(): Promise<ISession[] | null> {
-    const sessions: ISession[] = [
-        // give me two sample data for ISession
-        {
-            sessionId: genSessionRef(),
-            date: "2023-12-15",
-            teacher: "teacher1",
-            room: "room1",
-            subjects: [],
-            timeslots: []
-        },
-        {
-            sessionId: genSessionRef(),
-            date: "2023-12-16",
-            teacher: "teacher2",
-            room: "room2",
-            subjects: [],
-            timeslots: []
-        },
-    ]
+async function createSessionsBulk(sessions: ISession[]): Promise<ISession[] | null> {
     return await insertManyDocuments<ISession>(collectionName, sessions);
 }
 
@@ -107,7 +88,35 @@ const SessionsQuery = {
         },
         sessionCreateBulk: async (parent, args, context, info) => {
             console.log("addSessionsBulk", args);
-            return await createSessionsBulk();
+            console.log("addSession", args);
+            const { subjectIndexes } = args;
+            const _subjectIndexes: ISubjectIndex[] = [];
+            if (Array.isArray(subjectIndexes)) {
+                subjectIndexes.forEach((subjectIndex) => {
+                    const _subjectIndex: ISubjectIndex = {
+                        term: subjectIndex.term,
+                        department: subjectIndex.department,
+                        block: subjectIndex.block,
+                        code: subjectIndex.code,
+                    }
+                    _subjectIndexes.push(_subjectIndex);
+                })
+            }
+            const dates = args.dates;
+            const sessions: ISession[] = [];
+            for (const date of dates) {
+                const session: ISession = {
+                    sessionId: genSessionRef(),
+                    date: date,
+                    teacher: args.teacherOrgId,
+                    room: args.roomNumber,
+                    subjects: _subjectIndexes,
+                    timeslots: args.timeslots
+                };
+                sessions.push(session);
+            }
+
+            return await createSessionsBulk(sessions);
         }
     },
     Children: {

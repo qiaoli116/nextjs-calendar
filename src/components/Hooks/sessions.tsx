@@ -207,6 +207,86 @@ export function useCreateSession(): [UseMutationExecute<CreateSessionMutationDat
     executeMutation
   ];
 }
+
+const session_bulk_create_query_string_extended = `
+mutation SessionCreate($dates: [String], $teacherOrgId: String, $roomNumber: String, $timeslots: [String], $subjectIndexes: [SubjectIndexInput]) {
+    sessionCreate(dates: $dates, teacherOrgId: $teacherOrgId, roomNumber: $roomNumber, timeslots: $timeslots, subjectIndexes: $subjectIndexes) {
+      sessionId
+      date
+      teacher {
+        orgId
+        email
+        name {
+          first
+          last
+        }
+      }
+      room {
+        roomNumber
+        type
+      }
+      timeslots
+      subjects {
+        code
+        title
+        term
+        department
+        block
+        tasIndex {
+          year
+          department
+          qualificationCode
+        }
+        qualification {
+          code
+          title
+        }
+        deliveryMode
+        dateRange {
+          startDate
+          endDate
+        }
+        units {
+          code
+          title
+          crn
+        }
+        sessions {
+          sessionId
+          date
+          teacher {
+            orgId
+            email
+            name {
+              first
+              last
+            }
+          }
+          room {
+            roomNumber
+            type
+          }
+          timeslots
+        }
+      }
+    }
+  }
+`;
+export interface ICreateSessionBulkMutationVariables {
+  dates: string[];
+  teacherOrgId: string;
+  roomNumber: string;
+  timeslots: string[];
+  subjectIndexes: ISubjectIndex[];
+}
+type CreateSessionBulkMutationData = { sessionCreateBulk: ISessionExtended[] } | undefined | null;
+export function useCreateSessionsBulk(): [UseMutationExecute<CreateSessionBulkMutationData, ICreateSessionBulkMutationVariables>] {
+  const [result, executeMutation] = useMutation<CreateSessionBulkMutationData, ICreateSessionBulkMutationVariables>(session_bulk_create_query_string_extended);
+
+  return [
+    executeMutation
+  ];
+}
 // export interface ICreateTeacherMutationVariables extends ISession {
 //     // sessionId: string;
 //     // date: string;
