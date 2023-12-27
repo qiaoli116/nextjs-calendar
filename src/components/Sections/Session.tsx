@@ -16,7 +16,7 @@ import { useFetchOneById } from "../Hooks/crud";
 import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { Alert, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridToolbarContainer, GridToolbarExport, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import { ICreateSessionMutationVariables, useCreateSession, useQueryOneSession, useQuerySessions } from '../Hooks/sessions';
+import { ICreateSessionBulkMutationVariables, ICreateSessionMutationVariables, useCreateSession, useCreateSessionsBulk, useQueryOneSession, useQuerySessions } from '../Hooks/sessions';
 import CRUDLinksComponent from '../Controls/CRUDLinks';
 import Link from '@mui/material/Link';
 import { useSearchParams } from "next/navigation";
@@ -535,6 +535,178 @@ const SessionCreateComponent = ({
     )
 
 }
+
+const SessionBulkCreateComponent = ({
+    subjectIndex,
+    onCreateSuccess
+}: {
+    subjectIndex?: ISubjectIndex,
+    onCreateSuccess?: (sessions: ISessionExtended[]) => void,
+}) => {
+    console.log("SessionBulkCreateComponent", "subjectIndex", subjectIndex);
+    const params = useSearchParams();
+    const subjectIndexes = subjectIndex === undefined ||
+        subjectIndex === null ||
+        subjectIndex.code === undefined || subjectIndex.code === null || subjectIndex.code === "" ||
+        subjectIndex.term === undefined || subjectIndex.term === null || subjectIndex.term === "" ||
+        subjectIndex.block === undefined || subjectIndex.block === null || subjectIndex.block === "" ||
+        subjectIndex.department === undefined || subjectIndex.department === null || subjectIndex.department === ""
+        ? [] : [
+            {
+                code: subjectIndex.code,
+                term: subjectIndex.term,
+                block: subjectIndex.block,
+                department: subjectIndex.department,
+            }
+        ];
+
+    const emptySessionBulk: ICreateSessionBulkMutationVariables = {
+        dates: [],
+        teacherOrgId: "",
+        roomNumber: "",
+        timeslots: [],
+        subjectIndexes: subjectIndexes,
+    }
+    const [sessionBulk, setSessionBulk] = React.useState<ICreateSessionBulkMutationVariables>(emptySessionBulk);
+    const [firstDate, setFirstDate] = React.useState<string>("");
+    const [numberOfWeeks, setNumberOfWeeks] = React.useState<number>(1);
+    const [mutationStatus, setMutationStatus] = React.useState<MutationStatus>("idle");
+    const [executeCreateSessionsBulk] = useCreateSessionsBulk();
+    // this is a general purpose handler for all input fields
+    const handleInputChange = (e: any) => {
+        const { name, value } = e.target;
+        console.log("handleInputChange - ", "name", name, "value", value);
+        const s = { ...sessionBulk };
+        _.set(s, name, value);
+        setSessionBulk(s);
+        console.log("handleInputChange - ", "sessionBulk", sessionBulk);
+    };
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit - ", "sessionBulk", sessionBulk);
+        setMutationStatus("loading");
+        const _sessionBulk = { ...sessionBulk };
+        const result = await executeCreateSessionsBulk(_sessionBulk);
+        console.log("handleSubmit - ", "result", result)
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.sessionCreateBulk == null || result.data.sessionCreateBulk == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onCreateSuccess) {
+                    onCreateSuccess(result.data.sessionCreateBulk);
+                }
+            }
+
+        }
+    };
+    const resetMutationStatus = () => {
+        setMutationStatus("idle");
+    }
+    return (
+        <>
+            <form onSubmit={handleSubmit}>
+                <Box sx={boxSx}>
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="Date 1st Session"
+                                format='DD/MM/YYYY'
+                                value={firstDate === "" ? undefined : dayjs(firstDate)}
+                                onChange={
+                                    (d) => {
+                                        const _d = d === null || d === undefined ? "" : d.format('YYYY-MM-DD');
+                                        setFirstDate(_d);
+                                    }
+                                }
+                            />
+                        </LocalizationProvider>
+                    </FormControl>
+                </Box>
+
+                <Box sx={boxSx}>
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+                        <TeacherSelect
+                            value={sessionBulk.teacherOrgId}
+                            name="teacherOrgId"
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                </Box>
+                <Box sx={boxSx}>
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+
+                        <RoomSelect
+                            value={sessionBulk.roomNumber}
+                            name="roomNumber"
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                </Box>
+                <Box sx={boxSx}>
+                    <FormControl sx={{ width: "400PX", pr: "10px" }}>
+                        <TimeSlotsSelect
+                            values={sessionBulk.timeslots}
+                            name="timeslots"
+                            onChange={handleInputChange}
+                        />
+                    </FormControl>
+                </Box>
+                <FormControl sx={{ pr: "10px" }}>
+                    <Button type='submit' disabled={mutationStatus === "loading"}>
+                        {mutationStatus === "loading" ? <>Creating&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Create"}
+                    </Button>
+                </FormControl>
+
+                {mutationStatus === "error" &&
+                    <AlertBar
+                        message="Create Error"
+                        severity="error"
+                        onClick={resetMutationStatus}
+                    />
+                }
+                {mutationStatus === "success" &&
+                    <AlertBar
+                        message="Create Success"
+                        severity="success"
+                        onClick={resetMutationStatus}
+                    />
+                }
+
+            </form>
+            {
+                params.get("debug") !== null && (
+                    <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
+                        <code>
+                            <pre>
+                                {JSON.stringify(sessionBulk, null, 2) + ","}
+                            </pre>
+                        </code>
+                    </Box>
+                )
+            }
+        </>
+    )
+
+}
+
+const getConsectiveWeekDays = (startDate: string, numberOfWeeks: number): string[] => {
+    let date = dayjs(startDate);
+    let days: string[] = [];
+    if (!date.isValid()) {
+        return days;
+    }
+
+    for (let i = 0; i < numberOfWeeks; i++) {
+        let newDate = date.add(i * 7, "day");
+        if (newDate.isValid()) {
+            days.push(newDate.format("YYYY-MM-DD"));
+        }
+    }
+    return days;
+};
 
 // const generateSessionReference = () => {
 //     return "Session." + uuidv4();
