@@ -28,7 +28,7 @@ import dayjs from 'dayjs';
 import { DateField, DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimeSlotsDisplayHorizontalBrief } from '../Controls/TimeSlotsDisplay';
-import { SessionCreateComponent } from './Session';
+import { SessionBulkCreateComponent } from './Session';
 
 const boxSx = {
     py: "8px"
@@ -179,7 +179,19 @@ function SubjectViewOneComponent({ subjectIndex, singleSessionPath }: { subjectI
         )
     }
 
+    // sort the sessions by date
+    subject.sessions.sort((a, b) => {
+        // Split the strings into year, month, and day components
+        const [year1, month1, day1] = a.date.split('-').map(Number);
+        const [year2, month2, day2] = b.date.split('-').map(Number);
 
+        // Compare the components in descending order of significance (year, month, day)
+        if (year1 !== year2) return year1 - year2;
+        if (month1 !== month2) return month1 - month2;
+        return day1 - day2;
+    })
+
+    console.log("subject.sessions", subject.sessions);
     return (
         <>
             <Box sx={boxSx}>
@@ -319,7 +331,7 @@ function SubjectViewOneComponent({ subjectIndex, singleSessionPath }: { subjectI
                         return (
                             <>
                                 <Grid xs={3}>
-                                    <Card sx={{ width: 200 }} variant="outlined">
+                                    <Card sx={{ width: 210 }} variant="outlined">
                                         <CardContent sx={{ pb: "14px !important" }}>
                                             <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
                                                 SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
@@ -1079,6 +1091,17 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
             </>
         )
     }
+    // sort the sessions by date
+    subject.sessions.sort((a, b) => {
+        // Split the strings into year, month, and day components
+        const [year1, month1, day1] = a.date.split('-').map(Number);
+        const [year2, month2, day2] = b.date.split('-').map(Number);
+
+        // Compare the components in descending order of significance (year, month, day)
+        if (year1 !== year2) return year1 - year2;
+        if (month1 !== month2) return month1 - month2;
+        return day1 - day2;
+    })
     return (
         <>
             <Box sx={boxSx}>
@@ -1209,7 +1232,7 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                         return (
                             <>
                                 <Grid xs={3}>
-                                    <Card sx={{ width: 200 }} variant="outlined">
+                                    <Card sx={{ width: 210 }} variant="outlined">
                                         <CardContent sx={{ pb: "14px !important" }}>
                                             <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
                                                 SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
@@ -1239,18 +1262,21 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
             </Box>
             <Box sx={boxSx}>
                 <h3>Create Session</h3>
-                <SessionCreateComponent
+                <SessionBulkCreateComponent
                     subjectIndex={subjectIndex}
-                    onCreateSuccess={async (session) => {
-                        const s = await executeAssociateSubjectSession({
-                            subjectIndex: subjectIndex,
-                            sessionId: session.sessionId,
-                        });
-                        if (s.error || s.data === null || s.data === undefined || s.data.subjectSessionAssociate === null || s.data.subjectSessionAssociate === undefined) {
-                            console.log("SubjectUpdateComponent - executeAssociateSubjectSession with error - s", s);
-                        } else {
-                            console.log("SubjectUpdateComponent - executeAssociateSubjectSession successfully - s", s);
-                            setSubject({ ...s.data.subjectSessionAssociate })
+                    onCreateSuccess={async (sessions) => {
+                        console.log("SubjectUpdateComponent - onCreateSuccess - sessions", sessions);
+                        for (let i = 0; i < sessions.length; i++) {
+                            const s = await executeAssociateSubjectSession({
+                                subjectIndex: subjectIndex,
+                                sessionId: sessions[i].sessionId,
+                            });
+                            if (s.error || s.data === null || s.data === undefined || s.data.subjectSessionAssociate === null || s.data.subjectSessionAssociate === undefined) {
+                                console.log("SubjectUpdateComponent - executeAssociateSubjectSession with error - s", s);
+                            } else {
+                                console.log("SubjectUpdateComponent - executeAssociateSubjectSession successfully - s", s);
+                                setSubject({ ...s.data.subjectSessionAssociate })
+                            }
                         }
                     }}
                 />

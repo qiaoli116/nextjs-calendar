@@ -81,6 +81,7 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
 
     }
 
+
     const columns: GridColDef[] = [
         {
             field: 'id',
@@ -307,6 +308,17 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                 {session.subjects.length > 1 && `${session.subjects.length} subjects associate with this session`}
             </Typography>
             {session.subjects.map((subject, index) => {
+                // sort the sessions by date
+                subject.sessions.sort((a, b) => {
+                    // Split the strings into year, month, and day components
+                    const [year1, month1, day1] = a.date.split('-').map(Number);
+                    const [year2, month2, day2] = b.date.split('-').map(Number);
+
+                    // Compare the components in descending order of significance (year, month, day)
+                    if (year1 !== year2) return year1 - year2;
+                    if (month1 !== month2) return month1 - month2;
+                    return day1 - day2;
+                })
                 return (
                     <Box sx={boxSx}>
                         <Card sx={{ width: 850 }} variant="outlined">
@@ -330,7 +342,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                                         return (
                                             <>
                                                 <Grid xs={3}>
-                                                    <Card sx={{ width: 200 }} variant="outlined">
+                                                    <Card sx={{ width: 210 }} variant="outlined">
                                                         <CardContent sx={{ pb: "14px !important" }}>
                                                             <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
                                                                 SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
@@ -612,20 +624,45 @@ const SessionBulkCreateComponent = ({
                     <FormControl sx={{ width: "400PX", pr: "10px" }}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
-                                label="Date 1st Session"
+                                label="1st Session Date"
                                 format='DD/MM/YYYY'
                                 value={firstDate === "" ? undefined : dayjs(firstDate)}
                                 onChange={
                                     (d) => {
                                         const _d = d === null || d === undefined ? "" : d.format('YYYY-MM-DD');
                                         setFirstDate(_d);
+                                        const _dates = getConsectiveWeekDays(_d, numberOfWeeks);
+                                        handleInputChange({
+                                            target: {
+                                                name: "dates",
+                                                value: _dates,
+                                            }
+
+                                        })
                                     }
                                 }
                             />
                         </LocalizationProvider>
                     </FormControl>
                 </Box>
-
+                <Box sx={boxSx}>
+                    <TextField
+                        label="Number"
+                        type="number"
+                        value={numberOfWeeks}
+                        onChange={(e) => {
+                            const _numberOfWeeks = parseInt(e.target.value);
+                            setNumberOfWeeks(_numberOfWeeks);
+                            const _dates = getConsectiveWeekDays(firstDate, _numberOfWeeks);
+                            handleInputChange({
+                                target: {
+                                    name: "dates",
+                                    value: _dates,
+                                }
+                            })
+                        }}
+                    />
+                </Box>
                 <Box sx={boxSx}>
                     <FormControl sx={{ width: "400PX", pr: "10px" }}>
                         <TeacherSelect
@@ -708,323 +745,9 @@ const getConsectiveWeekDays = (startDate: string, numberOfWeeks: number): string
     return days;
 };
 
-// const generateSessionReference = () => {
-//     return "Session." + uuidv4();
-// }
-
-// const generateInitialSession = (): ISession => {
-//     return {
-//         reference: generateSessionReference(),
-//         date: "",
-//         teacher: null,
-//         room: null,
-//         subjects: [],
-//         timeslots: [],
-//     }
-// }
-// const sessionInitNew = generateInitialSession();
-// const sessionInitEmpty = {
-//     reference: "",
-//     date: "",
-//     teacher: null,
-//     room: null,
-//     subjects: [],
-//     timeslots: [],
-// }
-
-// const boxSx = {
-//     py: "8px"
-// }
-
-
-// const SessionCreateComponent = ({ date, teacher, room, subject, createResultCallback }: {
-//     date?: string,
-//     teacher?: string,
-//     room?: string,
-//     subject?: string,
-//     createResultCallback?: (session: ISession | undefined) => void,
-// }) => {
-//     console.log("SessionCreateComponent", date, teacher, room, subject, createResultCallback)
-//     const sessionInit = {
-//         ...sessionInitNew,
-//         date: date === undefined ? "" : date,
-//         teacher: teacher === undefined ? null : teacher,
-//         room: room === undefined ? null : room,
-//         subjects: subject === undefined ? [] : [subject],
-//     }
-//     const [session, setSession] = React.useState<ISession>(sessionInit);
-//     const [loading, setLoading] = React.useState<boolean>(true);
-
-//     // this is a general purpose handler for all input fields
-//     const handleInputChange = (e: any) => {
-//         const { name, value } = e.target;
-//         console.log("handleInputChange - ", "name", name, "value", value);
-//         const s = { ...session };
-//         _.set(s, name, value);
-//         setSession(s);
-//         console.log("handleInputChange - ", "session", session);
-//     };
-
-//     const resetForm = () => {
-//         console.log("resetForm called");
-//         setSession(generateInitialSession());
-//     };
-//     const handleSubmit = async (e: any) => {
-//         e.preventDefault();
-//         console.log("handleSubmit", session);
-//         console.log("handleSubmit", JSON.stringify(session, null, 2));
-//         const _session = await SessionsDataService.createSession(session);
-//         if (createResultCallback !== undefined) {
-//             console.log("handleSubmit", "createResultCallback", _session);
-//             createResultCallback(_session);
-//         }
-//     };
-
-//     return (
-//         <Box sx={{
-//             width: '100%',
-//         }} >
-//             <form onSubmit={handleSubmit}>
-//                 <Grid container spacing={2}>
-//                     <Grid xs={12}>
-//                         <h1>Session create</h1>
-//                     </Grid>
-//                     <Grid xs={6}>
-//                         <div>
-//                             <Grid container spacing={2}>
-//                                 <Grid xs={8}>
-//                                     <Box sx={boxSx}>
-//                                         <TextField
-//                                             fullWidth
-//                                             label="Session ID (Read only)"
-//                                             value={session.reference}
-//                                             name='reference'
-//                                             onChange={handleInputChange}
-//                                             InputProps={{
-//                                                 readOnly: true,
-//                                             }}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <TextField
-//                                             type='date'
-//                                             fullWidth
-//                                             label="Date"
-//                                             value={session.date}
-//                                             name='date'
-//                                             onChange={handleInputChange}
-//                                             InputLabelProps={{
-//                                                 shrink: true,
-//                                             }}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <TeacherSelect
-//                                             value={session.teacher === null ? "" : session.teacher}
-//                                             name="teacher"
-//                                             onChange={handleInputChange}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <RoomSelect
-//                                             value={session.room === null ? "" : session.room}
-//                                             name="room"
-//                                             onChange={handleInputChange}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <Button type='submit'>
-//                                             Save
-//                                         </Button>
-//                                         <Button onClick={resetForm}>
-//                                             Reset
-//                                         </Button>
-//                                     </Box>
-//                                 </Grid>
-//                                 <Grid xs={4}>
-//                                     <Box sx={boxSx}>
-//                                         <TimeSlotsSelect
-//                                             values={session.timeslots}
-//                                             name="timeslots"
-//                                             onChange={handleInputChange}
-//                                         />
-//                                     </Box>
-//                                 </Grid>
-
-//                             </Grid>
-//                         </div>
-
-
-
-
-//                     </Grid>
-//                     <Grid xs={6}>
-//                         <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-//                             <code>
-//                                 <pre>
-//                                     {JSON.stringify(session, null, 2) + ","}
-//                                 </pre>
-//                             </code>
-//                         </Box>
-//                     </Grid>
-//                 </Grid>
-//             </form>
-//         </Box >
-//     )
-// }
-
-
-// /**
-//  * Create of update a session. Specify "create" for create, if not specified, it is update.
-//  * If create is true, reference will be ignored. If create is false, reference should be specified.
-//  * 
-//  * @param reference - session reference, will be ignored if create is true
-//  * @param create - true for create, false for update. default is false
-//  *  
-//  */
-// const SessionUpdateComponent = ({ reference, create = false }:
-//     { reference?: string, create?: boolean }) => {
-//     console.log("SessionCreateOrUpdateComponent", reference, create)
-//     const [session, setSession] = React.useState<ISession>(sessionInitEmpty);
-//     const [loading, setLoading] = React.useState<boolean>(true);
-
-//     React.useEffect(() => {
-//         const fetchData = async () => {
-//             console.log("SessionCreateOrUpdateComponent useEffect", reference);
-//             if (create === true) {
-//                 setSession(sessionInitNew);
-//             } else { // create is false
-//                 if (reference !== undefined) {
-//                     const session = await SessionsDataService.getOneSessionByReference(reference);
-//                     if (session !== undefined) {
-//                         setSession(session);
-//                     } else {
-//                         setSession({ ...sessionInitEmpty, reference: reference });
-//                     }
-//                 } else {
-//                     setSession({ ...sessionInitEmpty });
-//                 }
-//             }
-//         };
-//         fetchData();
-//         setLoading(false);
-//     }, []);
-//     // this is a general purpose handler for all input fields
-//     const handleInputChange = (e: any) => {
-//         const { name, value } = e.target;
-//         setSession({
-//             ...session,
-//             [name]: value
-//         });
-//     };
-//     const resetForm = () => {
-//         console.log("resetForm called");
-//         setSession(generateInitialSession());
-//     };
-//     const handleSubmit = (e: any) => {
-//         e.preventDefault();
-//         console.log("handleSubmit", session);
-//         console.log("handleSubmit", JSON.stringify(session, null, 2));
-
-//     };
-
-//     return (
-//         <Box sx={{
-//             width: '100%',
-//         }} >
-//             <form onSubmit={handleSubmit}>
-//                 <Grid container spacing={2}>
-//                     <Grid xs={12}>
-//                         <h1>Session {create ? "create" : "update"}</h1>
-//                     </Grid>
-//                     <Grid xs={6}>
-//                         <div>
-//                             <Grid container spacing={2}>
-//                                 <Grid xs={8}>
-//                                     <Box sx={boxSx}>
-//                                         <TextField
-//                                             fullWidth
-//                                             label="Session ID (Read only)"
-//                                             value={session.reference}
-//                                             name='reference'
-//                                             onChange={handleInputChange}
-//                                             InputProps={{
-//                                                 readOnly: true,
-//                                             }}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <TextField
-//                                             type='date'
-//                                             fullWidth
-//                                             label="Date"
-//                                             value={session.date}
-//                                             name='date'
-//                                             onChange={handleInputChange}
-//                                             InputLabelProps={{
-//                                                 shrink: true,
-//                                             }}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <TeacherSelect
-//                                             value={session.teacher === null ? "" : session.teacher}
-//                                             name="teacher"
-//                                             onChange={handleInputChange}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <RoomSelect
-//                                             value={session.room === null ? "" : session.room}
-//                                             name="room"
-//                                             onChange={handleInputChange}
-//                                         />
-//                                     </Box>
-//                                     <Box sx={boxSx}>
-//                                         <Button type='submit'>
-//                                             Save
-//                                         </Button>
-//                                         <Button onClick={resetForm}>
-//                                             Reset
-//                                         </Button>
-//                                         {loading ? <CircularProgress color="inherit" size={20} /> : null}
-//                                     </Box>
-//                                 </Grid>
-//                                 <Grid xs={4}>
-//                                     <Box sx={boxSx}>
-//                                         <TimeSlotsSelect
-//                                             values={session.timeslots}
-//                                             name="timeslots"
-//                                             onChange={handleInputChange}
-//                                         />
-//                                     </Box>
-//                                 </Grid>
-
-//                             </Grid>
-//                         </div>
-
-
-
-
-//                     </Grid>
-//                     <Grid xs={6}>
-//                         <Box sx={{ bgcolor: "#f0f0f0", p: "5px 20px", borderRadius: 2, fontWeight: "800" }}>
-//                             <code>
-//                                 <pre>
-//                                     {JSON.stringify(session, null, 2) + ","}
-//                                 </pre>
-//                             </code>
-//                         </Box>
-//                     </Grid>
-//                 </Grid>
-//             </form>
-//         </Box >
-//     )
-// }
 export {
     SessionViewAllComponent,
     SessionViewOneComponent,
     SessionCreateComponent,
-    // SessionCreateComponent,
-    // SessionUpdateComponent,
+    SessionBulkCreateComponent
 };

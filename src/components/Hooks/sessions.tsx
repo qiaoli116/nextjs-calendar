@@ -209,8 +209,8 @@ export function useCreateSession(): [UseMutationExecute<CreateSessionMutationDat
 }
 
 const session_bulk_create_query_string_extended = `
-mutation SessionCreate($dates: [String], $teacherOrgId: String, $roomNumber: String, $timeslots: [String], $subjectIndexes: [SubjectIndexInput]) {
-    sessionCreate(dates: $dates, teacherOrgId: $teacherOrgId, roomNumber: $roomNumber, timeslots: $timeslots, subjectIndexes: $subjectIndexes) {
+mutation sessionCreateBulk($dates: [String], $teacherOrgId: String, $roomNumber: String, $timeslots: [String], $subjectIndexes: [SubjectIndexInput]) {
+  sessionCreateBulk(dates: $dates, teacherOrgId: $teacherOrgId, roomNumber: $roomNumber, timeslots: $timeslots, subjectIndexes: $subjectIndexes) {
       sessionId
       date
       teacher {

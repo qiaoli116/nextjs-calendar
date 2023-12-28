@@ -37,6 +37,7 @@ export default function SubjectsUpdate({ params }: { params: { department: strin
 
             <SubjectUpdateComponent
                 subjectIndex={subjectIndex}
+                singleSessionPath='/sessions'
 
             />
 
