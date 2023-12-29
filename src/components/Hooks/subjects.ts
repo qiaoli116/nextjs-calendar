@@ -339,3 +339,65 @@ export function useAssociateSubjectSession(): [UseMutationExecute<AssociateSubje
     executeMutation
   ];
 }
+
+
+export interface IDisassociateSubjectSessionMutationVariables {
+  subjectIndex: ISubjectIndex;
+  sessionId: string;
+}
+type DisassociateSubjectSessionMutationData = {
+  subjectSessionDisassociate: ISubjectExtended;
+} | undefined | null;
+export function useDisassociateSubjectSession(): [UseMutationExecute<DisassociateSubjectSessionMutationData, IDisassociateSubjectSessionMutationVariables>] {
+  const SUBJECT_DISASSOCIATE_SESSION_MUTATION = gql`
+      mutation Mutation($subjectIndex: SubjectIndexInput, $sessionId: String) {
+        subjectSessionDisassociate(subjectIndex: $subjectIndex, sessionId: $sessionId) {
+          code
+          title
+          term
+          department
+          block
+          tasIndex {
+            year
+            department
+            qualificationCode
+          }
+          qualification {
+            code
+            title
+          }
+          deliveryMode
+          dateRange {
+            startDate
+            endDate
+          }
+          units {
+            code
+            title
+            crn
+          }
+          sessions {
+            sessionId
+            date
+            teacher {
+              orgId
+              email
+              name {
+                first
+                last
+              }
+            }
+            room {
+              roomNumber
+              type
+            }
+            timeslots
+          }
+        }
+      }
+    `;
+  const [result, executeMutation] = useMutation<DisassociateSubjectSessionMutationData, IDisassociateSubjectSessionMutationVariables>(SUBJECT_DISASSOCIATE_SESSION_MUTATION);
+  return [
+    executeMutation
+  ];
+}

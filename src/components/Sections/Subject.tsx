@@ -18,8 +18,8 @@ import { CircularProgress } from '@mui/material';
 import { useFetchOneById } from '../Hooks/crud';
 import Modal from '@mui/material/Modal';
 import { ISession } from '../../dataService/sessions';
-import { ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ISubjectUnit, ITAS, ITASQualification, ITASSubject, TDeliveryMode } from '@/types';
-import { IUpdateSubjectCRNMutationVariables, IUpdateSubjectDateRangeMutationVariables, IUpdateSubjectDeliveryModeMutationVariables, useAssociateSubjectSession, useCreateSubject, useQueryOneSubject, useQuerySubjects, useUpdateSubjectCRN, useUpdateSubjectDateRange, useUpdateSubjectDeliveryMode } from '@/components/Hooks/subjects';
+import { ISessionExtended, ISubject, ISubjectCreateInput, ISubjectExtended, ISubjectIndex, ISubjectUnit, ITAS, ITASQualification, ITASSubject, TDeliveryMode } from '@/types';
+import { IDisassociateSubjectSessionMutationVariables, IUpdateSubjectCRNMutationVariables, IUpdateSubjectDateRangeMutationVariables, IUpdateSubjectDeliveryModeMutationVariables, useAssociateSubjectSession, useCreateSubject, useDisassociateSubjectSession, useQueryOneSubject, useQuerySubjects, useUpdateSubjectCRN, useUpdateSubjectDateRange, useUpdateSubjectDeliveryMode } from '@/components/Hooks/subjects';
 import { AlertBar, AlertLoading } from '../Controls/AlertBar';
 import { useSearchParams } from "next/navigation";
 import { Message } from '@mui/icons-material';
@@ -29,6 +29,8 @@ import { DateField, DatePicker, LocalizationProvider } from '@mui/x-date-pickers
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimeSlotsDisplayHorizontalBrief } from '../Controls/TimeSlotsDisplay';
 import { SessionBulkCreateComponent } from './Session';
+import DeleteIcon from '@mui/icons-material/Delete';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 const boxSx = {
     py: "8px"
@@ -334,7 +336,7 @@ function SubjectViewOneComponent({ subjectIndex, singleSessionPath }: { subjectI
                                     <Card sx={{ width: 210 }} variant="outlined">
                                         <CardContent sx={{ pb: "14px !important" }}>
                                             <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
-                                                SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
+                                                # {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
                                             </Typography>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                                 {dayjs(session.date).format('DD/MM/YYYY')} ({session.timeslots.length / 2} hrs)
@@ -343,11 +345,14 @@ function SubjectViewOneComponent({ subjectIndex, singleSessionPath }: { subjectI
                                                 <TimeSlotsDisplayHorizontalBrief timeslots={session.timeslots} />
                                             </Box>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {session.teacher.name.last}, {session.teacher.name.first}
+                                                {session.teacher.orgId === "" && (<i>No teacher assigned</i>)}
+                                                {session.teacher.orgId !== "" && `${session.teacher.name.last}, ${session.teacher.name.first}`}
                                             </Typography>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {session.room.roomNumber} ({session.room.type})
+                                                {session.room.roomNumber === "" && (<i>No room assigned</i>)}
+                                                {session.teacher.orgId !== "" && `${session.room.roomNumber}, (${session.room.type})`}
                                             </Typography>
+
                                         </CardContent>
                                     </Card>
                                 </Grid>
@@ -1025,11 +1030,75 @@ const SubjectUpdateCRNComponent = ({ subjectIndex, unitCode, defaultCRN, onUpdat
     )
 }
 
+const SubjectDisassociateSessionComponent = ({ subjectIndex, sessionId, onDisassociateSuccess }:
+    {
+        subjectIndex: ISubjectIndex,
+        sessionId: string,
+        onDisassociateSuccess?: (subject: ISubjectExtended) => void
+    }) => {
+    console.log("SubjectDisassociateSessionComponent - ", "subjectIndex", subjectIndex, "sessionId", sessionId);
+    const { term, department, block, code } = subjectIndex;
+    const [mutationStatus, setMutationStatus] = React.useState("idle");
+    const [executeDisassociateSubjectSession] = useDisassociateSubjectSession();
+    const [showDeleteButton, setShowDeleteButton] = React.useState<boolean>(false);
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("handleSubmit");
+        setMutationStatus("loading");
+        const mutationVariable: IDisassociateSubjectSessionMutationVariables = {
+            subjectIndex: subjectIndex,
+            sessionId: sessionId,
+        }
+
+        const result = await executeDisassociateSubjectSession(mutationVariable);
+        console.log("handleSubmit - result", result);
+        if (!!result.error) {
+            setMutationStatus("error");
+        } else {
+            if (result.data == null || result.data == undefined || result.data.subjectSessionDisassociate == null || result.data.subjectSessionDisassociate == undefined) {
+                setMutationStatus("error");
+            } else {
+                setMutationStatus("success");
+                if (onDisassociateSuccess) {
+                    console.log("handleSubmit - onDisassociateSuccess", result.data.subjectSessionDisassociate);
+                    onDisassociateSuccess(result.data.subjectSessionDisassociate);
+                }
+            }
+        }
+    }
+
+    const toggleShowDeleteButton = (e: any) => {
+        setShowDeleteButton(!showDeleteButton);
+        e.stopPropagation();
+    }
+    return (
+        <>
+
+            <form onSubmit={handleSubmit}>
+                <Link underline="hover" href="javascript:;" onClick={toggleShowDeleteButton}>
+                    {showDeleteButton ? <KeyboardDoubleArrowLeftIcon sx={{ mb: "-6px" }} /> : <DeleteIcon sx={{ mb: "-6px" }} />}
+                </Link>
+                {showDeleteButton &&
+                    <>
+                        <Button type='submit' disabled={mutationStatus === "loading"} sx={{ p: "0px" }}
+                            onClick={(e) => { console.log("DeleteButton clicked"); e.stopPropagation() }}
+                        >
+                            {mutationStatus === "loading" ? <>Removing&nbsp;&nbsp;<CircularProgress color="inherit" size={20} /></> : "Remove"}
+                        </Button>
+                    </>
+                }
+            </form>
+        </>
+    )
+
+}
+
 const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIndex: ISubjectIndex, singleSessionPath: string }) => {
     const params = useSearchParams();
     const { term, department, block, code } = subjectIndex;
     const { loading, error, dataError, subject: subjectCurrent, reexecuteQuerySubject } = useQueryOneSubject(subjectIndex);
     const [executeAssociateSubjectSession] = useAssociateSubjectSession();
+    const [newSessionAssociating, setNewSessionAssociating] = React.useState<boolean>(false);
     const emptySubject: ISubjectExtended = {
         tasIndex: {
             year: "",
@@ -1102,6 +1171,25 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
         if (month1 !== month2) return month1 - month2;
         return day1 - day2;
     })
+
+
+    const sessionBulkCreateOnSuccessHandler = async (sessions: ISessionExtended[]) => {
+        console.log("SubjectUpdateComponent - onCreateSuccess - sessions", sessions);
+        setNewSessionAssociating(true);
+        for (let i = 0; i < sessions.length; i++) {
+            const s = await executeAssociateSubjectSession({
+                subjectIndex: subjectIndex,
+                sessionId: sessions[i].sessionId,
+            });
+            if (s.error || s.data === null || s.data === undefined || s.data.subjectSessionAssociate === null || s.data.subjectSessionAssociate === undefined) {
+                console.log("SubjectUpdateComponent - executeAssociateSubjectSession with error - s", s);
+            } else {
+                console.log("SubjectUpdateComponent - executeAssociateSubjectSession successfully - s", s);
+                setSubject({ ...s.data.subjectSessionAssociate })
+            }
+        }
+        setNewSessionAssociating(false);
+    }
     return (
         <>
             <Box sx={boxSx}>
@@ -1220,6 +1308,12 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                 })}
             </Box>
             <h3>Sessions</h3>
+            {newSessionAssociating && (
+                <AlertLoading
+                    message={`Associating new sessions to subject - DO NOT REFRESH THE PAGE`}
+                />
+
+            )}
             <Typography sx={{ fontSize: "16px", fontWeight: "600", mt: "10px" }}>
                 {subject.sessions.length == 0 && "No session associates with this subject"}
                 {subject.sessions.length == 1 && "1 session associates with this subject"}
@@ -1235,7 +1329,14 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                                     <Card sx={{ width: 210 }} variant="outlined">
                                         <CardContent sx={{ pb: "14px !important" }}>
                                             <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
-                                                SESSION {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
+                                                # {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
+                                                <SubjectDisassociateSessionComponent
+                                                    subjectIndex={subjectIndex}
+                                                    sessionId={session.sessionId}
+                                                    onDisassociateSuccess={(subject) => {
+                                                        setSubject({ ...subject });
+                                                    }}
+                                                />
                                             </Typography>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                                 {dayjs(session.date).format('DD/MM/YYYY')} ({session.timeslots.length / 2} hrs)
@@ -1244,10 +1345,12 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                                                 <TimeSlotsDisplayHorizontalBrief timeslots={session.timeslots} />
                                             </Box>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {session.teacher.name.last}, {session.teacher.name.first}
+                                                {session.teacher.orgId === "" && (<i>No teacher assigned</i>)}
+                                                {session.teacher.orgId !== "" && `${session.teacher.name.last}, ${session.teacher.name.first}`}
                                             </Typography>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                {session.room.roomNumber} ({session.room.type})
+                                                {session.room.roomNumber === "" && (<i>No room assigned</i>)}
+                                                {session.teacher.orgId !== "" && `${session.room.roomNumber}, (${session.room.type})`}
                                             </Typography>
                                         </CardContent>
                                     </Card>
@@ -1264,21 +1367,7 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                 <h3>Create Session</h3>
                 <SessionBulkCreateComponent
                     subjectIndex={subjectIndex}
-                    onCreateSuccess={async (sessions) => {
-                        console.log("SubjectUpdateComponent - onCreateSuccess - sessions", sessions);
-                        for (let i = 0; i < sessions.length; i++) {
-                            const s = await executeAssociateSubjectSession({
-                                subjectIndex: subjectIndex,
-                                sessionId: sessions[i].sessionId,
-                            });
-                            if (s.error || s.data === null || s.data === undefined || s.data.subjectSessionAssociate === null || s.data.subjectSessionAssociate === undefined) {
-                                console.log("SubjectUpdateComponent - executeAssociateSubjectSession with error - s", s);
-                            } else {
-                                console.log("SubjectUpdateComponent - executeAssociateSubjectSession successfully - s", s);
-                                setSubject({ ...s.data.subjectSessionAssociate })
-                            }
-                        }
-                    }}
+                    onCreateSuccess={sessionBulkCreateOnSuccessHandler}
                 />
             </Box>
             {
