@@ -1331,6 +1331,7 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                                             <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
                                                 # {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
                                                 <SubjectDisassociateSessionComponent
+                                                    key={session.sessionId}
                                                     subjectIndex={subjectIndex}
                                                     sessionId={session.sessionId}
                                                     onDisassociateSuccess={(subject) => {
