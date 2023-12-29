@@ -174,7 +174,13 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
                     disableRowSelectionOnClick
                     slots={{
                         toolbar: () => (
-                            <>
+                            <Box
+                                sx={{
+                                    ".m-datagrid-toolbar-export button": {
+                                        fontSize: "inherit!important",
+                                    }
+                                }}
+                            >
                                 <GridToolbarContainer>
                                     <CRUDLinksComponent
                                         baseURL={singleSessionPath}
@@ -183,12 +189,15 @@ function SessionViewAllComponent({ singleSessionPath = "", singleTeacherPath = "
                                         updateLink={false}
                                         deleteLink={false}
                                     />
-                                    <GridToolbarExport />
+                                    <GridToolbarExport
+                                        className="m-datagrid-toolbar-export"
+
+                                    />
                                     <Box sx={{ flex: '1 1 0%' }}></Box>
                                     <GridToolbarQuickFilter />
 
                                 </GridToolbarContainer>
-                            </>
+                            </Box>
                         )
                     }}
                     slotProps={{
@@ -262,7 +271,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                 </FormControl>
             </Box>
             <Box sx={boxSx}>
-                <FormControl sx={{ width: "150px" }}>
+                <FormControl sx={{ width: "150px", pr: "10px" }}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateField
                             fullWidth
@@ -279,7 +288,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                     <TextField
                         fullWidth
                         label="Room"
-                        defaultValue={`${session.room.roomNumber} (${session.room.type})`}
+                        defaultValue={session.room.roomNumber === "" ? "Not assigned" : `${session.room.roomNumber} (${session.room.type})`}
                         InputProps={{
                             readOnly: true,
                         }}
@@ -289,7 +298,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                     <TextField
                         fullWidth
                         label="Teacher"
-                        defaultValue={`${session.teacher.name.last}, ${session.teacher.name.first} (${session.teacher.orgId})`}
+                        defaultValue={session.teacher.orgId === "" ? "Not assigned" : `${session.teacher.name.last}, ${session.teacher.name.first} (${session.teacher.orgId})`}
                         InputProps={{
                             readOnly: true,
                         }}
@@ -354,10 +363,12 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                                                                 <TimeSlotsDisplayHorizontalBrief timeslots={session.timeslots} />
                                                             </Box>
                                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                                {session.teacher.name.last}, {session.teacher.name.first}
+                                                                {session.teacher.orgId === "" && (<i>No teacher assigned</i>)}
+                                                                {session.teacher.orgId !== "" && `${session.teacher.name.last}, ${session.teacher.name.first}`}
                                                             </Typography>
                                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                                                {session.room.roomNumber} ({session.room.type})
+                                                                {session.room.roomNumber === "" && (<i>No room assigned</i>)}
+                                                                {session.teacher.orgId !== "" && `${session.room.roomNumber}, (${session.room.type})`}
                                                             </Typography>
                                                         </CardContent>
                                                     </Card>
@@ -365,11 +376,7 @@ const SessionViewOneComponent = ({ sessionId, singleSubjectPath, singleSessionPa
                                             </>
                                         )
                                     })}
-
-
                                 </Grid>
-
-
                             </CardActions>
                         </Card>
                     </Box>

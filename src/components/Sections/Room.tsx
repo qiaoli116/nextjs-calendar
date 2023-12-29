@@ -96,7 +96,12 @@ function RoomViewAllComponent({ singleRoomPath = "" }: { singleRoomPath: string 
                     disableRowSelectionOnClick
                     slots={{
                         toolbar: () => (
-                            <>
+                            <Box
+                                sx={{
+                                    "& button": {
+                                        fontSize: "inherit!important",
+                                    }
+                                }}>
                                 <GridToolbarContainer>
                                     <CRUDLinksComponent
                                         baseURL={singleRoomPath}
@@ -110,7 +115,7 @@ function RoomViewAllComponent({ singleRoomPath = "" }: { singleRoomPath: string 
                                     <GridToolbarQuickFilter />
 
                                 </GridToolbarContainer>
-                            </>
+                            </Box>
                         )
                     }}
                     slotProps={{

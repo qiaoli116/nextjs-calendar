@@ -30,7 +30,7 @@ export default function CRUDLinksComponent({ baseURL = "/", resourceId = "", cre
                         <Link underline="hover" href={`${baseURL}/create`}>
                             <Box sx={style1}>
                                 {hasIcon && <Box sx={{ pr: "2px" }}><AddBoxIcon sx={{ mb: "-4px" }} /></Box>}
-                                {hasText && <Box sx={{ pl: "2px" }}>CREATE</Box>}
+                                {hasText && <Box sx={{ pl: "2px", fontWeight: "500" }}>CREATE</Box>}
                             </Box>
                         </Link>
                     </Box>
@@ -40,7 +40,7 @@ export default function CRUDLinksComponent({ baseURL = "/", resourceId = "", cre
                         <Link underline="hover" href={`${baseURL}/view/${resourceId}`}>
                             <Box sx={style1}>
                                 {hasIcon && <Box sx={{ pr: "2px" }}><ArticleIcon sx={{ mb: "-4px" }} /></Box>}
-                                {hasText && <Box sx={{ pl: "2px" }}>VIEW</Box>}
+                                {hasText && <Box sx={{ pl: "2px", fontWeight: "500" }}>VIEW</Box>}
                             </Box>
                         </Link>
                     </Box>
@@ -50,7 +50,7 @@ export default function CRUDLinksComponent({ baseURL = "/", resourceId = "", cre
                         <Link underline="hover" href={`${baseURL}/edit/${resourceId}`}>
                             <Box sx={style1}>
                                 {hasIcon && <Box sx={{ pr: "2px" }}><EditIcon sx={{ mb: "-4px" }} /></Box>}
-                                {hasText && <Box sx={{ pl: "2px" }}>EDIT</Box>}
+                                {hasText && <Box sx={{ pl: "2px", fontWeight: "500" }}>EDIT</Box>}
                             </Box>
                         </Link>
                     </Box>
@@ -60,7 +60,7 @@ export default function CRUDLinksComponent({ baseURL = "/", resourceId = "", cre
                         <Link underline="hover" href={`${baseURL}/delete/${resourceId}`}>
                             <Box sx={style1}>
                                 {hasIcon && <Box sx={{ pr: "2px" }}><DeleteIcon sx={{ mb: "-4px" }} /></Box>}
-                                {hasText && <Box sx={{ pl: "2px" }}>DELETE</Box>}
+                                {hasText && <Box sx={{ pl: "2px", fontWeight: "500" }}>DELETE</Box>}
                             </Box>
                         </Link>
                     </Box>

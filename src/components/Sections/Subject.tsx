@@ -116,7 +116,12 @@ function SubjectViewAllComponent({ singleSubjectPath = "" }: { singleSubjectPath
                     disableRowSelectionOnClick
                     slots={{
                         toolbar: () => (
-                            <>
+                            <Box
+                                sx={{
+                                    "& button": {
+                                        fontSize: "inherit!important",
+                                    }
+                                }}>
                                 <GridToolbarContainer>
                                     <CRUDLinksComponent
                                         baseURL={singleSubjectPath}
@@ -130,7 +135,7 @@ function SubjectViewAllComponent({ singleSubjectPath = "" }: { singleSubjectPath
                                     <GridToolbarQuickFilter />
 
                                 </GridToolbarContainer>
-                            </>
+                            </Box>
                         )
                     }}
                     slotProps={{

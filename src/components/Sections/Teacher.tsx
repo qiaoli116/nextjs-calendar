@@ -115,7 +115,12 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
                     disableRowSelectionOnClick
                     slots={{
                         toolbar: () => (
-                            <>
+                            <Box
+                                sx={{
+                                    "& button": {
+                                        fontSize: "inherit!important",
+                                    }
+                                }}>
                                 <GridToolbarContainer>
                                     <CRUDLinksComponent
                                         baseURL={singleTeacherPath}
@@ -129,7 +134,7 @@ function TeacherViewAllComponent({ singleTeacherPath = "" }: { singleTeacherPath
                                     <GridToolbarQuickFilter />
 
                                 </GridToolbarContainer>
-                            </>
+                            </Box>
                         )
                     }}
                     slotProps={{

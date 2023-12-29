@@ -100,7 +100,12 @@ function TASViewAllComponent({ singleTASPath = "" }: { singleTASPath: string }) 
                     disableRowSelectionOnClick
                     slots={{
                         toolbar: () => (
-                            <>
+                            <Box
+                                sx={{
+                                    "& button": {
+                                        fontSize: "inherit!important",
+                                    }
+                                }}>
                                 <GridToolbarContainer>
                                     <CRUDLinksComponent
                                         baseURL={singleTASPath}
@@ -114,7 +119,7 @@ function TASViewAllComponent({ singleTASPath = "" }: { singleTASPath: string }) 
                                     <GridToolbarQuickFilter />
 
                                 </GridToolbarContainer>
-                            </>
+                            </Box>
                         )
                     }}
                     slotProps={{
