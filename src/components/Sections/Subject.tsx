@@ -1330,14 +1330,6 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                                         <CardContent sx={{ pb: "14px !important" }}>
                                             <Typography sx={{ ontSize: 14 }} color="text.secondary" gutterBottom>
                                                 # {sessionIndex + 1} • <Link target="_blank" href={`${singleSessionPath}/view/${session.sessionId}`}>{session.sessionId.slice(-8)}</Link>
-                                                <SubjectDisassociateSessionComponent
-                                                    key={session.sessionId}
-                                                    subjectIndex={subjectIndex}
-                                                    sessionId={session.sessionId}
-                                                    onDisassociateSuccess={(subject) => {
-                                                        setSubject({ ...subject });
-                                                    }}
-                                                />
                                             </Typography>
                                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                                 {dayjs(session.date).format('DD/MM/YYYY')} ({session.timeslots.length / 2} hrs)
@@ -1353,6 +1345,14 @@ const SubjectUpdateComponent = ({ subjectIndex, singleSessionPath }: { subjectIn
                                                 {session.room.roomNumber === "" && (<i>No room assigned</i>)}
                                                 {session.teacher.orgId !== "" && `${session.room.roomNumber}, (${session.room.type})`}
                                             </Typography>
+                                            <SubjectDisassociateSessionComponent
+                                                key={session.sessionId}
+                                                subjectIndex={subjectIndex}
+                                                sessionId={session.sessionId}
+                                                onDisassociateSuccess={(subject) => {
+                                                    setSubject({ ...subject });
+                                                }}
+                                            />
                                         </CardContent>
                                     </Card>
                                 </Grid>
